@@ -1,110 +1,31 @@
 version: '3.8'
 
 services:
-  api:
-    build:
-      context: .
-    image: serikaron/v2ray
-    entrypoint: ./api --db=${DB_USER}:${DB_PASS}@tcp(db)/${DB_NAME}
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-      - core
-
-  core_wrapper:
-    build:
-      context: core-wrapper
-    image: serikaron/core-wrapper
-    entrypoint: ./api
-    depends_on:
-      - core
-
-  core:
-    image: v2fly/v2fly-core
-    restart: always
-    volumes:
-      - ./v2ray_config.json:/etc/v2ray/config.json
-    ports:
-      - "10086:10086"
-
-  db:
-    image: mysql:latest
-    restart: always
-    volumes:
-      - ./sql:/sql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
-
   user:
     build:
       context: ./
       dockerfile: user/dockerfile
-    image: serikaron/v2ray-user
-    entrypoint: node --experimental-json-modules /src/app/app.mjs ${DB_USER}:${DB_PASS}@user_db/${DB_NAME}
+    image: tk-user
+    entrypoint: node --experimental-json-modules /src/app.mjs
     depends_on:
       - user_db
     ports:
       - "8082:8080"
+    volumes:
+      - .env:/src/.env
 
   user_db:
-    image: mysql:latest
+    image: mongo
     restart: always
-    volumes:
-      - ./sql:/sql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_USER_PASS}
+      MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_USER_DB}
 
-  system:
-    build:
-      context: ./
-      dockerfile: system/dockerfile
-    image: serikaron/v2ray-system
-    entrypoint: node --experimental-json-modules /src/app/app.mjs ${DB_USER}:${DB_PASS}@system_db/${DB_NAME}
+  user_migration:
+    image: tk-user
     depends_on:
-      - system_db
-    ports:
-      - "8081:8080"
-
-  system_db:
-    image: mysql:latest
-    restart: always
+      - user_db
+    entrypoint: node /src/migration.mjs
     volumes:
-      - ./sql:/sql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT}
-      MYSQL_DATABASE: ${DB_NAME}
-      MYSQL_USER: ${DB_USER}
-      MYSQL_PASSWORD: ${DB_PASS}
-
-  api1:
-    build:
-      context: ./
-      dockerfile: api/dockerfile
-    image: serikaron/v2ray-api
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-    entrypoint: node --experimental-json-modules /src/app/app.mjs
-    ports:
-      - "8080:8080"
-
-  token:
-    build:
-      context: ./
-      dockerfile: token/dockerfile
-    image: serikaron/v2ray-token
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-    entrypoint: node --experimental-json-modules /src/app/app.mjs
-    ports:
-      - "8084:8080"
-
-  token_cache:
-    image: redis:alpine
-    restart: always
+      - .env:/src/.env

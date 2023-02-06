@@ -1,4 +1,4 @@
-FROM amd64/node:16
+FROM amd64/node
 
 ENV NODE_ENV=production
 
@@ -6,10 +6,10 @@ WORKDIR /src
 
 COPY ["user/package.json", "user/package-lock.json*", "./"]
 
-RUN chown -R node:node /src
+RUN npm install --omit=dev && npm install -g nodemon
 
-USER node
+ENV TZ=Asia/Hong_Kong
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-RUN npm install --production
-
-COPY --chown=node:node user app
+#COPY scripts/.env /src
+COPY user/*.mjs /src
