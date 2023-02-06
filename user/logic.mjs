@@ -26,5 +26,5 @@ userRouter.post("/add", ...handle(async (req, res) => {
 userRouter.get("/phone/:phone", ...handle(async (req, res) => {
     const user = await req.context.mongo.db.collection("users")
         .findOne({phone: req.params.phone})
-    res.onSuccess({user})
+    res.onSuccess(user)
 }))

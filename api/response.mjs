@@ -14,7 +14,7 @@ export class Response {
     }
 
     get code() {
-        return this.res.code
+        return Number(this.res.code)
     }
 
     get msg() {
@@ -26,6 +26,6 @@ export class Response {
     }
 
     toString() {
-        return JSON.stringify(this)
+        return JSON.stringify(this.res)
     }
 }

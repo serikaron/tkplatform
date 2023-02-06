@@ -1,4 +1,4 @@
-FROM amd64/node:16
+FROM node
 
 ENV NODE_ENV=production
 
@@ -6,10 +6,11 @@ WORKDIR /src
 
 COPY ["api/package.json", "api/package-lock.json*", "./"]
 
-RUN chown -R node:node /src
-
-USER node
-
 RUN npm install --production
 
-COPY --chown=node:node api app
+ENV TZ=Asia/Hong_Kong
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+COPY api/node_template.json /src
+COPY api/*.mjs /src
+

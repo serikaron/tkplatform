@@ -3,19 +3,21 @@
 import express from "express"
 import {getDeadline, listNode, login, refreshToken, register} from "./logic.mjs";
 import {handleWithAuth, handleWithoutAuth} from "./middleware.mjs";
+import {v1Router} from "./user.mjs";
 
 const app = express()
 const port = 8080
 
 app.use(express.json())
+app.use("/v1", v1Router)
 
-app.post("/v1/users/register", ...handleWithoutAuth(async (req, res, _) => {
-    res.send(await register(req.body))
-}))
-
-app.post("/v1/users/login", ...handleWithoutAuth( async (req, res, _) => {
-    res.send(await login(req.body))
-}))
+// app.post("/v1/users/register", ...handleWithoutAuth(async (req, res, _) => {
+//     res.send(await register(req.body))
+// }))
+//
+// app.post("/v1/users/login", ...handleWithoutAuth( async (req, res, _) => {
+//     res.send(await login(req.body))
+// }))
 
 app.post("/v1/token/refresh", ...handleWithoutAuth(async (req, res, _) => {
     res.send(await refreshToken(req.header("authentication"), req.body.refreshToken))

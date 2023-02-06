@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  api:
+    build:
+      context: ./
+      dockerfile: api/dockerfile
+    image: tk-api
+    entrypoint: node /src/app.mjs
+    depends_on:
+      - user
+    ports:
+      - "9000:8080"
+    volumes:
+      - .env:/src/.env
+
   user:
     build:
       context: ./

@@ -36,7 +36,7 @@ export class System {
 }
 
 export class User {
-    static baseURL = "http://user:8080/v1/users"
+    static baseURL = "http://user:8080/v1/user"
 
     static async countDevice(device) {
         return call(async () => {
@@ -54,8 +54,19 @@ export class User {
                 baseURL: this.baseURL,
                 method: 'post',
                 data: {
-                    user, inviter
+                    phone: user.phone,
+                    password: user.password,
                 }
+            })
+        })
+    }
+
+    static async getUser(phone) {
+        return call(async () => {
+            return axios({
+                url: `/phone/${phone}`,
+                baseURL: this.baseURL,
+                method: 'get'
             })
         })
     }
