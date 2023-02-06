@@ -50,5 +50,9 @@ export function errorHandler(error, req, res, next) {
 }
 
 export function handle(handler) {
-    return [injection, buildContext, handler, cleanContext, errorHandler, response]
+    const h = async (req, res, next) => {
+        await handler(req, res)
+        next()
+    }
+    return [injection, buildContext, h, cleanContext, errorHandler, response]
 }

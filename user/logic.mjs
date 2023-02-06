@@ -9,7 +9,7 @@ export const v1router = express.Router()
 const userRouter = express.Router()
 v1router.use('/user', userRouter)
 
-userRouter.post("/add", ...handle(async (req, res, next) => {
+userRouter.post("/add", ...handle(async (req, res) => {
     try {
         await req.context.mongo.db.collection("users")
             .insertOne({phone: req.body.phone, password: req.body.password})
@@ -21,12 +21,10 @@ userRouter.post("/add", ...handle(async (req, res, next) => {
             throw error;
         }
     }
-    next()
 }))
 
-userRouter.get("/phone/:phone", ...handle(async (req, res, next) => {
+userRouter.get("/phone/:phone", ...handle(async (req, res) => {
     const user = await req.context.mongo.db.collection("users")
         .findOne({phone: req.params.phone})
     res.onSuccess({user})
-    next()
 }))
