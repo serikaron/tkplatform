@@ -4,7 +4,4 @@ services:
 #      - .env:/src/.env
       - ./:/src
 
-  migration:
-    volumes:
-      - ./:/src
 

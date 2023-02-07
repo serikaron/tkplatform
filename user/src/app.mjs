@@ -1,8 +1,9 @@
 'use strict'
 
 import express from "express"
-import {v1router} from "./logic.mjs";
+import {v1router} from "./router.mjs";
 import 'express-async-errors'
+import './handlers/register.mjs'
 
 const app = express()
 const port = 8080
