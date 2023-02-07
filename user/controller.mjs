@@ -1,7 +1,7 @@
 'use strict'
 
 import express from "express";
-import {handle} from "./src/middleware.mjs";
+import {handle} from "./middleware.mjs";
 import 'express-async-errors'
 import {MongoServerError} from "mongodb";
 

@@ -1,6 +1,6 @@
 'use strict'
 
-import {register} from "./logic.mjs";
+import {register} from "./register.mjs";
 
 function todayTimestamp() {
     return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
