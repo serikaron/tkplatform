@@ -5,7 +5,7 @@ services:
     build:
       context: ./
       dockerfile: api/dockerfile
-    image: tk-api
+    image: car.daoyi365.com:5000/tk-api
     entrypoint: node /src/app.mjs
     depends_on:
       - user
@@ -18,7 +18,7 @@ services:
     build:
       context: ./
       dockerfile: user/dockerfile
-    image: tk-user
+    image: car.daoyi365.com:5000/tk-user
     entrypoint: node --experimental-json-modules /src/app.mjs
     depends_on:
       - user_db
@@ -36,9 +36,24 @@ services:
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_USER_DB}
 
   user_migration:
-    image: tk-user
+    image: car.daoyi365.com:5000/tk-user
     depends_on:
       - user_db
     entrypoint: node /src/migration.mjs
     volumes:
       - .env:/src/.env
+
+  token:
+    build:
+      context: ./
+      dockerfile: token/dockerfile
+    image: car.daoyi365.com:5000/tk-token
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+    entrypoint: node --experimental-json-modules /src/app/app.mjs
+    ports:
+      - "8084:8080"
+
+  token_cache:
+    image: redis:alpine
+    restart: always
