@@ -17,10 +17,15 @@ jobs:
       -
         name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
+#      -
+#        name: Build api
+#        uses: docker/build-push-action@v4
+#        with:
+#          context: .
+#          file: ./api/dockerfile
+#          tags: car.daoyi365.com:5000/tk-api
+
       -
-        name: Build api
-        uses: docker/build-push-action@v4
-        with:
-          context: .
-          file: ./api/dockerfile
-          tags: car.daoyi365.com:5000/tk-api
+        name: Compose build
+        run: |
+          docker compose build
