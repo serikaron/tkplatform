@@ -1,2 +1,9 @@
-- name: Just test
-  run: echo "A test output"
+name: Just test
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    run: echo "A test output"
