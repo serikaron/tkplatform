@@ -29,3 +29,12 @@ jobs:
         name: Compose build
         run: |
           docker compose build && docker compose push
+
+      - name: deploy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd tkplatform && docker compose pull && docker compose stop && docker compose up -d
