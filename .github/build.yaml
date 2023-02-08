@@ -1,0 +1,2 @@
+- name: Just test
+  run: echo "A test output"
