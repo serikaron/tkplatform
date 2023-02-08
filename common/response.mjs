@@ -1,7 +1,8 @@
 'use strict'
 
 export class Response {
-    constructor(res) {
+    constructor(status, res) {
+        this._status = status
         this.res = res
     }
 
@@ -11,6 +12,10 @@ export class Response {
 
     isError() {
         return !this.isSuccess()
+    }
+
+    get status() {
+        return this._status
     }
 
     get code() {

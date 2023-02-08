@@ -5,6 +5,7 @@ import argon2i from "argon2";
 import {Token} from "../stubs.mjs";
 import {userRouter} from "../router.mjs";
 import {handle} from "../middleware.mjs";
+import 'express-async-errors'
 
 class UserNotFound extends UserError {
     constructor({code = -200} = {}) {

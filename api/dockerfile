@@ -1,16 +1,16 @@
 FROM amd64/node
 
+ENV TZ=Asia/Hong_Kong
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 ENV NODE_ENV=production
 
-WORKDIR /src
+WORKDIR /app
 
 COPY ["api/package.json", "api/package-lock.json*", "./"]
 
 RUN npm install --production
 
-ENV TZ=Asia/Hong_Kong
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
-
-COPY api/node_template.json /src
-COPY api/*.mjs /src
+COPY common /app/common
+COPY api/src /app/api/src
 

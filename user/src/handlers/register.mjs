@@ -7,6 +7,7 @@ import {getUser} from "../dao.mjs";
 import {MongoServerError} from "mongodb";
 import {Token} from "../stubs.mjs";
 import argon2i from "argon2";
+import 'express-async-errors'
 
 class UserExists extends UserError {
     constructor({code = -100} = {}) {

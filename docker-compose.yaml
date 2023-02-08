@@ -6,13 +6,13 @@ services:
       context: ./
       dockerfile: api/dockerfile
     image: car.daoyi365.com:5000/tk-api
-    entrypoint: node /src/app.mjs
+    entrypoint: node /app/api/src/app.mjs
     depends_on:
       - user
     ports:
       - "9000:8080"
     volumes:
-      - .env:/src/.env
+      - .env:/app/.env
 
   user:
     build:
