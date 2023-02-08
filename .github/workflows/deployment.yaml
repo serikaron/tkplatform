@@ -11,5 +11,9 @@ jobs:
       -
         name: ls
         uses: appleboy/ssh-action@v0.1.7
-        script: |
-          ls /root
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          script: |
+            ls /root
