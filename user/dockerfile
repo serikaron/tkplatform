@@ -5,11 +5,12 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 ENV NODE_ENV=production
 
-WORKDIR /src
+WORKDIR /app
 
 COPY ["user/package.json", "user/package-lock.json*", "./"]
 
 RUN npm install --omit=dev
 
 #COPY scripts/.env /src
-COPY user /src
+COPY common /app/common
+COPY user /app/user

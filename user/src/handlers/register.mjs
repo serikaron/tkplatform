@@ -5,6 +5,7 @@ import {handle} from "../middleware.mjs";
 import {InvalidArgument, UserError} from "../error.mjs";
 import {getUser} from "../dao.mjs";
 import {MongoServerError} from "mongodb";
+import {Token} from "../stubs.mjs";
 
 class UserExists extends UserError {
     constructor({code = -100} = {}) {
@@ -105,12 +106,18 @@ async function registerHandler(req) {
     })
 }
 
-function genToken(req, res) {
-    res.response({
-        data: {
-            token: ""
-        }
-    })
+async function genToken(req, res) {
+    const result = await Token.generate({phone: req.body.phone})
+    if (!result.isSuccess()) {
+        res.response({
+            code: -101,
+            msg: "注册成功，请重新登录"
+        })
+    } else {
+        res.response({
+            data: result.data
+        })
+    }
 }
 
 userRouter.post('/register', ...handle([

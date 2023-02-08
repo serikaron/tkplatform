@@ -19,13 +19,13 @@ services:
       context: ./
       dockerfile: user/dockerfile
     image: car.daoyi365.com:5000/tk-user
-    entrypoint: node --experimental-json-modules /src/app.mjs
+    entrypoint: node /app/user/src/app.mjs
     depends_on:
       - user_db
     ports:
       - "8082:8080"
     volumes:
-      - .env:/src/.env
+      - .env:/app/.env
 
   user_db:
     image: mongo

@@ -1,7 +1,0 @@
-services:
-  user:
-    volumes:
-#      - .env:/src/.env
-      - ./:/src
-
-
