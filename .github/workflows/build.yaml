@@ -8,5 +8,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Just test
-        run: echo "A test output"
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Docker
+        uses: docker/setup-docker@v2
+
+      - name: Build with Docker Compose
+        run: |
+          docker compose build && docker compose push
