@@ -6,4 +6,7 @@ on:
 
 jobs:
   test:
-    run: echo "A test output"
+    runs-on: ubuntu-latest
+    steps:
+      - name: Just test
+        run: echo "A test output"
