@@ -68,7 +68,8 @@ async function addUser({context, user, inviter}) {
             await context.mongo.db.collection("users")
                 .insertOne(user)
             await context.mongo.db.collection("users")
-                .updateOne({phone: inviter.phone}, {$set: {member: inviter.member}})
+                .updateOne({phone: inviter.phone},
+                    {$set: {member: inviter.member, downLines: inviter.downLines}})
             await session.commitTransaction()
         } catch (error) {
             await session.abortTransaction()
@@ -114,7 +115,7 @@ function genToken(req, res) {
 
 userRouter.post('/register', ...handle([
     checkInput,
-    // checkUserExist,
+    checkUserExist,
     getInviter,
     registerHandler,
     genToken
@@ -135,6 +136,12 @@ export function register({registerUser, inviter, config}) {
         }
     }
 
+    registerUser.upLine = inviter.phone
+    if (inviter.downLines === undefined) {
+        inviter.downLines = [registerUser.phone]
+    } else {
+        inviter.downLines.push(registerUser.phone)
+    }
     const baseline = Math.max(inviter.member.expiration, todayTimestamp())
     inviter.member.expiration = baseline + config.daysForInvite * 86400
     return {

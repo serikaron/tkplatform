@@ -44,10 +44,12 @@ describe('register', () => {
                 expect(result).toStrictEqual({
                     registerUser: {
                         phone: "13333333333", password: "123456",
-                        member: {expiration: todayTimestamp() + 7 * 86400}
+                        member: {expiration: todayTimestamp() + 7 * 86400},
+                        upLine: "13444444444"
                     },
                     inviter: {
-                        phone: "13444444444", member: {expiration: todayTimestamp() + 2 * 86400}
+                        phone: "13444444444", member: {expiration: todayTimestamp() + 2 * 86400},
+                        downLines: ["13333333333"]
                     }
                 })
             })
@@ -68,9 +70,64 @@ describe('register', () => {
                 expect(result).toStrictEqual({
                     registerUser: {
                         phone: "13333333333", password: "123456",
-                        member: {expiration: todayTimestamp() + 7 * 86400}
+                        member: {expiration: todayTimestamp() + 7 * 86400},
+                        upLine: "13444444444"
                     }, inviter: {
-                        phone: "13444444444", member: {expiration: todayTimestamp() + 4 * 86400}
+                        phone: "13444444444", member: {expiration: todayTimestamp() + 4 * 86400},
+                        downLines: ["13333333333"]
+                    }
+                })
+            })
+        })
+        describe("down lines is empty", () => {
+            it("should set relationship correctly", () => {
+                const result = register({
+                    registerUser: {
+                        phone: "13333333333", password: "123456",
+                    },
+                    inviter: {
+                        phone: "13444444444", member: {expiration: todayTimestamp()}
+                    },
+                    config: {
+                        daysForRegister: 7, daysForInvite: 3
+                    }
+                })
+                expect(result).toStrictEqual({
+                    registerUser: {
+                        phone: "13333333333", password: "123456",
+                        member: {expiration: todayTimestamp() + 7 * 86400},
+                        upLine: "13444444444"
+                    },
+                    inviter: {
+                        phone: "13444444444", member: {expiration: todayTimestamp() + 3 * 86400},
+                        downLines: ["13333333333"],
+                    },
+                })
+            })
+        })
+        describe("down lines is not empty", () => {
+            it("should set relationship correctly", () => {
+                const result = register({
+                    registerUser: {
+                        phone: "13333333333", password: "123456",
+                    },
+                    inviter: {
+                        phone: "13444444444", member: {expiration: todayTimestamp()},
+                        downLines: ["13222222222"],
+                    },
+                    config: {
+                        daysForRegister: 7, daysForInvite: 3
+                    }
+                })
+                expect(result).toStrictEqual({
+                    registerUser: {
+                        phone: "13333333333", password: "123456",
+                        member: {expiration: todayTimestamp() + 7 * 86400},
+                        upLine: "13444444444"
+                    },
+                    inviter: {
+                        phone: "13444444444", member: {expiration: todayTimestamp() + 3 * 86400},
+                        downLines: ["13222222222", "13333333333"]
                     }
                 })
             })
