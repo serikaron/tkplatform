@@ -19,5 +19,5 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          file: api/dockerfile
+          file: ./api/dockerfile
           tags: car.daoyi365.com:5000/tk-api
