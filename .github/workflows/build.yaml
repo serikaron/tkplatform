@@ -1,11 +1,11 @@
-name: Just test
+name: Build
 
 on:
   push:
     branches: [main]
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
     steps:
       -
@@ -28,4 +28,4 @@ jobs:
       -
         name: Compose build
         run: |
-          docker compose build
+          docker compose build && docker compose push
