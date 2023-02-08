@@ -6,6 +6,7 @@ import {InvalidArgument, UserError} from "../error.mjs";
 import {getUser} from "../dao.mjs";
 import {MongoServerError} from "mongodb";
 import {Token} from "../stubs.mjs";
+import argon2i from "argon2";
 
 class UserExists extends UserError {
     constructor({code = -100} = {}) {
@@ -88,7 +89,7 @@ async function addUser({context, user, inviter}) {
 }
 
 async function registerHandler(req) {
-    const result = register({
+    const result = await register({
         registerUser: {
             phone: req.body.phone, password: req.body.password
         },
@@ -132,7 +133,8 @@ function todayTimestamp() {
     return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
 }
 
-export function register({registerUser, inviter, config}) {
+export async function register({registerUser, inviter, config}) {
+    registerUser.password = await argon2i.hash(registerUser.password)
     registerUser.member = {
         expiration: todayTimestamp() + config.daysForRegister * 86400
     }

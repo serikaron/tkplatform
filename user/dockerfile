@@ -13,4 +13,4 @@ RUN npm install --omit=dev
 
 #COPY scripts/.env /src
 COPY common /app/common
-COPY user /app/user
+COPY user/src /app/user/src
