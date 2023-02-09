@@ -41,7 +41,7 @@ services:
     depends_on:
       - token_cache
     ports:
-      - "8084:8080"
+      - "8085:8080"
 
   token_cache:
     image: redis:alpine
