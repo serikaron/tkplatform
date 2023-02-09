@@ -1,0 +1,1 @@
+docker compose -f deploy.docker-compose.yaml rm -s -f && docker compose -f deploy.docker-compose.yaml -f integration.test.docker-compose.yaml up -d

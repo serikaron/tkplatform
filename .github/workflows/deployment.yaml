@@ -1,0 +1,29 @@
+name: Deployment
+
+on: [success(integration-test)]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: push image
+        run:
+          sh scripts/push_image.sh
+
+      - name: scp files
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          source: "deploy.docker-compose.yaml, scripts/depoly.sh"
+          target: "/root/tkplatform"
+
+      - name: deploy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd tkplatform && sh depoly.sh

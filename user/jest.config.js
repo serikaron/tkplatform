@@ -1,5 +1,4 @@
 export default {
-    // transform: {
-    //     '^.+\\.mjs$': 'babel-jest',
-    // },
+    roots: ["<rootDir>/src"],
+    transform: {}
 }

@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: ./
+      dockerfile: api/dockerfile
+    image: car.daoyi365.com:5000/tk-api
+
+  user:
+    build:
+      context: ./
+      dockerfile: user/dockerfile
+    image: car.daoyi365.com:5000/tk-user
+
+  token:
+    build:
+      context: ./
+      dockerfile: token/dockerfile
+    image: car.daoyi365.com:5000/tk-token

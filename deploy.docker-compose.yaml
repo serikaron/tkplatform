@@ -2,23 +2,20 @@ version: '3.8'
 
 services:
   api:
-    build:
-      context: ./
-      dockerfile: api/dockerfile
     image: car.daoyi365.com:5000/tk-api
+    restart: always
     entrypoint: node /app/api/src/app.mjs
     depends_on:
       - user
+      - token
     ports:
       - "9000:8080"
     volumes:
       - .env:/app/.env
 
   user:
-    build:
-      context: ./
-      dockerfile: user/dockerfile
     image: car.daoyi365.com:5000/tk-user
+    restart: always
     entrypoint: node /app/user/src/app.mjs
     depends_on:
       - user_db
@@ -35,22 +32,14 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_USER_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_USER_DB}
 
-  user_migration:
-    image: car.daoyi365.com:5000/tk-user
-    depends_on:
-      - user_db
-    entrypoint: node /src/migration.mjs
-    volumes:
-      - .env:/src/.env
-
   token:
-    build:
-      context: ./
-      dockerfile: token/dockerfile
     image: car.daoyi365.com:5000/tk-token
+    restart: always
     environment:
       - SECRET_KEY=${SECRET_KEY}
     entrypoint: node --experimental-json-modules /src/app/app.mjs
+    depends_on:
+      - token_cache
     ports:
       - "8084:8080"
 
