@@ -38,12 +38,10 @@ class Captcha {
     }
 }
 
-captchaRouter.post('/require', ...handleWithoutAuth1(async (req, res) => {
-    const response = await Captcha.require(req.body)
-    res.onSuccess(response.data, response.code, response.msg)
+captchaRouter.post('/require', ...handleWithoutAuth1(async (req) => {
+    return await Captcha.require(req.body)
 }))
 
-captchaRouter.post('/verify', ...handleWithoutAuth1(async (req, res) => {
-    const response = await Captcha.verify(req.body)
-    res.onSuccess(response.data, response.code, response.msg)
+captchaRouter.post('/verify', ...handleWithoutAuth1(async (req) => {
+    return await Captcha.verify(req.body)
 }))

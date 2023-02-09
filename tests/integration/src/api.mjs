@@ -57,6 +57,7 @@ async function call({path, query, body}) {
 function simpleVerification(response) {
     expect(response.status).toBe(200)
     expect(response.code).toBe(0)
+    expect(JSON.stringify(response.data) !== "{}").toBe(true)
 }
 
 export async function test({path, query, body, verify = simpleVerification}) {

@@ -29,7 +29,9 @@ app.post('/v1/captcha/require', async (req, res) => {
     // res.type('svg')
     res.status(200).json({
         code: 0, msg: "success",
-        captcha: captcha.data
+        data: {
+            captcha: captcha.data
+        }
     })
 })
 

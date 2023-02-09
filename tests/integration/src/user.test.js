@@ -10,13 +10,6 @@ describe('register and login', () => {
                 phone: "13333333333",
                 password: "123456"
             },
-            verify: (response) => {
-                if (response.code !== 0) {
-                    console.log(response.toString())
-                }
-                expect(response.status).toBe(200)
-                expect(response.code).toBe(0)
-            }
         })
         await test({
             path: '/v1/user/login',
@@ -24,13 +17,6 @@ describe('register and login', () => {
                 phone: "13333333333",
                 password: "123456"
             },
-            verify: (response) => {
-                if (response.code !== 0) {
-                    console.log(response.toString())
-                }
-                expect(response.status).toBe(200)
-                expect(response.code).toBe(0)
-            }
         })
     })
 })

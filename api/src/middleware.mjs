@@ -94,7 +94,8 @@ async function response(req, res) {
 }
 
 async function injection(req, res, next) {
-    res.onSuccess = function ({status = 200, data = {}, code = 0, msg = "success"} = {}) {
+    res.response = function ({status = 200, data = {}, code = 0, msg = "success"} = {}) {
+        // console.log(`response, ${req.originalUrl}, ${JSON.stringify(data)}`)
         req.res = {status, code, msg, data}
     }
     next()
@@ -125,7 +126,14 @@ export function handleWithAuth(handler) {
 
 export function handleWithoutAuth1(handler) {
     const h = async (req, res, next) => {
-        await handler(req, res)
+        const response = await handler(req, res)
+        // console.log(`handle, ${req.originalUrl}, ${JSON.stringify(response.data)}, ${response.toString()}`)
+        res.response({
+            status: response.status,
+            data: response.data,
+            code: response.code,
+            msg: response.msg
+        })
         next()
     }
     return [checkTime, checkSign, injection, h, errorHandler, response]

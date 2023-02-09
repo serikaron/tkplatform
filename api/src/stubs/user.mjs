@@ -37,12 +37,10 @@ class User {
     }
 }
 
-userRouter.post('/register', ...handleWithoutAuth1(async (req, res) => {
-    const response = await User.register(req.body)
-    res.onSuccess(response.data, response.code, response.msg)
+userRouter.post('/register', ...handleWithoutAuth1(async (req) => {
+    return await User.register(req.body)
 }))
 
-userRouter.post('/login', ...handleWithoutAuth1(async (req, res) => {
-    const response = await User.login(req.body)
-    res.onSuccess(response.data, response.code, response.msg)
+userRouter.post('/login', ...handleWithoutAuth1(async (req) => {
+    return await User.login(req.body)
 }))
