@@ -1,4 +1,4 @@
-cat << EOF > .env
+cat << EOF > tests/integration/.env
 COMPOSE_PROJECT_NAME=tk
 MONGO_USER_HOST=user_db
 MONGO_USER_DB=tkuser
