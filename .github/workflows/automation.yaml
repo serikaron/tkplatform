@@ -44,7 +44,7 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USER }}
           key: ${{ secrets.KEY }}
-          source: "deploy.docker-compose.yaml, scripts/depoly.sh"
+          source: "deploy.docker-compose.yaml, scripts/deploy.sh"
           target: "/root/tkplatform"
 
       - name: deploy
@@ -54,4 +54,4 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.KEY }}
           script: |
-            cd tkplatform && sh scripts/depoly.sh
+            cd tkplatform && sh deploy.sh
