@@ -4,5 +4,7 @@ MONGO_USER_HOST=user_db
 MONGO_USER_DB=tkuser
 MONGO_USER_USER=tkuser
 MONGO_USER_PASS=tkuser
-SECRET_KEY=123456"
+SECRET_KEY=123456
 EOF
+
+cp tests/integration/.env .
