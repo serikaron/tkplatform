@@ -26,8 +26,8 @@ jobs:
       - name: Compose build
         run: sh scripts/build_all.sh
 
-      - name: start services
-        run: sh scripts/start_for_integration.sh
+      - name: start services for integration test
+        run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
       - name: integration test
         run: cd tests/integration && npm install && npm run test
 
