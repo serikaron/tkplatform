@@ -33,6 +33,7 @@ jobs:
         run:
           cd scripts && sh ./start_for_integration.sh
       - name: integration test
+        run:
           cd integration && npm install && npm run test
 
       - name: push image
