@@ -54,4 +54,4 @@ jobs:
           username: ${{ secrets.USER }}
           key: ${{ secrets.KEY }}
           script: |
-            cd tkplatform && sh deploy.sh
+            cd tkplatform && sh scripts/deploy.sh
