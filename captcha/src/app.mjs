@@ -26,7 +26,7 @@ app.post('/v1/captcha/require', async (req, res) => {
     await redis.connect()
     await redis.set(req.body.phone, captcha.text, "EX", 300)
 
-    res.type('svg')
+    // res.type('svg')
     res.status(200).json({
         code: 0, msg: "success",
         captcha: captcha.data
