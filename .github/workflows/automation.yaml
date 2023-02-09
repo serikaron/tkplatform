@@ -29,7 +29,7 @@ jobs:
       - name: start services
         run: sh scripts/start_for_integration.sh
       - name: integration test
-        run: cd integration && npm install && npm run test
+        run: cd tests/integration && npm install && npm run test
 
       - name: push image
         run: sh scripts/push_image.sh
