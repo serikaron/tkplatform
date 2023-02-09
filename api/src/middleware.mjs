@@ -86,22 +86,16 @@ async function checkToken(req, res, next) {
 }
 
 async function response(req, res) {
-    res.status(200).json(req.res)
+    res.status(req.res.status).json({
+        code: req.res.code,
+        msg: req.res.msg,
+        data: req.res.data
+    })
 }
 
 async function injection(req, res, next) {
-    res.onSuccess = function (data, code, msg) {
-        req.res = {
-            code: code === undefined ? 0 : code,
-            msg: msg === undefined ? 'success' : msg,
-            data: data
-        }
-    }
-    res.onFailed = function (code, msg) {
-        req.res = {
-            code, msg,
-            data: {}
-        }
+    res.onSuccess = function ({status = 200, data = {}, code = 0, msg = "success"} = {}) {
+        req.res = {status, code, msg, data}
     }
     next()
 }

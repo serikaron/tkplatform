@@ -2,12 +2,11 @@
 
 
 import express from "express";
-import {handleWithoutAuth1} from "./middleware.mjs";
+import {handleWithoutAuth1} from "../middleware.mjs";
 import 'express-async-errors'
-import {call} from "../../common/call.mjs";
+import {call} from "../../../common/call.mjs";
 import axios from "axios";
-
-export const v1Router = express.Router()
+import {v1Router} from "../router.mjs";
 
 const userRouter = express.Router()
 v1Router.use('/user', userRouter)

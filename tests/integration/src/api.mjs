@@ -54,7 +54,12 @@ async function call({path, query, body}) {
     }
 }
 
-export async function test({path, query, body, verify}) {
+function simpleVerification(response) {
+    expect(response.status).toBe(200)
+    expect(response.code).toBe(0)
+}
+
+export async function test({path, query, body, verify = simpleVerification}) {
     const response = await call({path, query, body})
     verify(response)
 }

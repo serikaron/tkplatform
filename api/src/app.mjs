@@ -1,7 +1,9 @@
 'use strict'
 
 import express from "express"
-import {v1Router} from "./user.mjs";
+import {v1Router} from "./router.mjs";
+import './stubs/user.mjs'
+import './stubs/captcha.mjs'
 
 const app = express()
 const port = 8080
