@@ -31,6 +31,10 @@ jobs:
       - name: integration test
         run: cd tests/integration && npm install && npm run test
 
+      - name: show logs when failed
+        if: failure()
+        run: docker compose -f deploy.docker-compose.yaml logs
+
       - name: push image
         run: sh scripts/push_image.sh
 
