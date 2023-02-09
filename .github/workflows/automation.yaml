@@ -33,7 +33,7 @@ jobs:
 
       - name: show logs when failed
         if: failure()
-        run: docker compose -f deploy.docker-compose.yaml logs
+        run: docker compose logs
 
       - name: push image
         run: sh scripts/push_image.sh

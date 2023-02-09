@@ -12,6 +12,5 @@ COPY ["api/package.json", "api/package-lock.json*", "./"]
 RUN npm install --production
 
 COPY common /app/common
-COPY docs/swagger.json /app/docs/
 COPY api/src /app/api/src
 
