@@ -19,4 +19,4 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: test user
-        run: cd user && npm install && npm run test
+        run: ls && cd user && npm install && npm run test
