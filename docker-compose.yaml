@@ -48,7 +48,7 @@ services:
     restart: always
 
   captcha:
-    image: ${REGISTRY}tk-captcha
+    image: car.daoyi365.com:5000/tk-captcha
     restart: always
     entrypoint: node /app/captcha/src/app.mjs
     depends_on:
