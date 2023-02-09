@@ -1,1 +1,1 @@
-docker compose -f deploy.docker-compose.yaml push
+docker compose -f docker-compose.yaml push

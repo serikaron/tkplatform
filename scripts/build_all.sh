@@ -1,1 +1,1 @@
-docker compose -f deploy.docker-compose.yaml -f build.docker-compose.yaml build
+docker compose -f docker-compose.yaml -f docker-compose.build.yaml build
