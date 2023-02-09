@@ -22,6 +22,9 @@ describe('register and login', () => {
                 password: "123456"
             },
             verify: (response) => {
+                if (response.code !== 0) {
+                    console.log(response.toString())
+                }
                 expect(response.status).toBe(200)
                 expect(response.code).toBe(0)
             }
