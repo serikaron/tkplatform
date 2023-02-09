@@ -25,7 +25,7 @@ const jsdocOpt = {
         {name: "user(用户相关)"},
         {name: "captcha(图形码)"},
     ],
-    apis: ['./src/stubs/*.mjs']
+    apis: ['./api/src/stubs/*.mjs']
 }
 
 const swaggerSpec = swaggerJsdoc(jsdocOpt)
