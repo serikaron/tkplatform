@@ -1,1 +1,1 @@
-docker compose pull && docker compose stop && docker compose up
+docker compose pull && docker compose stop && docker compose up -d
