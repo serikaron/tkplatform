@@ -116,7 +116,7 @@ function errorHandler(error, req, res, next) {
     req.res = {
         data: {},
         errCode: -1,
-        errMsg: "Internal Error"
+        errMsg: `${error}`
     }
     next()
 }
