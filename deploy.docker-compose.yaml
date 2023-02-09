@@ -46,3 +46,16 @@ services:
   token_cache:
     image: redis:alpine
     restart: always
+
+  captcha:
+    image: ${REGISTRY}tk-captcha
+    restart: always
+    entrypoint: node /app/captcha/src/app.mjs
+    depends_on:
+      - captcha_cache
+    ports:
+      - "9003:8080"
+
+  captcha_cache:
+    image: redis:alpine
+    restart: always

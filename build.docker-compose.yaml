@@ -18,3 +18,8 @@ services:
       context: ./
       dockerfile: token/dockerfile
     image: car.daoyi365.com:5000/tk-token
+
+  captcha:
+    build:
+      context: ./
+      dockerfile: captcha/dockerfile
