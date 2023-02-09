@@ -1,0 +1,58 @@
+name: Automation
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  unit-test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [ 18.x, 19.x ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: test user
+        run: cd user && npm install && npm run test
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Compose build
+        run: |
+          sh scripts/build_all.sh
+
+      - name: start services
+        run:
+          cd scripts && sh ./start_for_integration.sh
+      - name: integration test
+          cd integration && npm install && npm run test
+
+      - name: push image
+        run:
+          sh scripts/push_image.sh
+
+      - name: scp files
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          source: "deploy.docker-compose.yaml, scripts/depoly.sh"
+          target: "/root/tkplatform"
+
+      - name: deploy
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USER }}
+          key: ${{ secrets.KEY }}
+          script: |
+            cd tkplatform && sh depoly.sh
