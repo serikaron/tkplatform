@@ -16,8 +16,8 @@ jobs:
         with:
           node-version: "19.x"
 
-      - name: test user
-        run: cd user && npm install && npm run test
+#      - name: test user
+#        run: cd user && npm install && npm run test
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2

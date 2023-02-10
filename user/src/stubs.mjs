@@ -1,7 +1,7 @@
 'use strict'
 
-import {call} from "../../common/call.mjs";
 import axios from "axios";
+import {call} from "../../common/call.mjs";
 
 export class Token {
     static baseURL = "http://token:8080/v1"
