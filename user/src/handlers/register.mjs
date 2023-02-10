@@ -2,14 +2,14 @@
 
 import {userRouter} from "../router.mjs";
 import {handle} from "../middleware.mjs";
-import {InvalidArgument, UserError} from "../error.mjs";
+import {InvalidArgument, TKError} from "../../../common/error.mjs";
 import {getUser} from "../dao.mjs";
 import {MongoServerError} from "mongodb";
 import {Token} from "../stubs.mjs";
 import argon2i from "argon2";
 import 'express-async-errors'
 
-class UserExists extends UserError {
+class UserExists extends TKError {
     constructor({code = -100} = {}) {
         super({
             httpCode: 409,

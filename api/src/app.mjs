@@ -4,6 +4,7 @@ import express from "express"
 import {v1Router} from "./router.mjs";
 import './stubs/user.mjs'
 import './stubs/captcha.mjs'
+import './stubs/sms.mjs'
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from 'swagger-jsdoc'
 

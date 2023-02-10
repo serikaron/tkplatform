@@ -1,10 +1,23 @@
 'use strict'
 
-import {handle} from "../../common/flow.mjs";
-import {smsRouter} from "./router.mjs";
+import {TKError} from "../../common/error.mjs";
 
-function checkArgument() {}
+class CodeError extends TKError {
+    constructor() {
+        super({
+            httpCode: 200,
+            code: -200,
+            msg: "验证码错误"
+        });
+    }
+}
 
-smsRouter.get('/verify', ...handle(async (req) => {
-    const code = req.context.redis.get()
-}))
+export function route(router) {
+    router.get('/verify/code/:code/phone/:phone', async (req, res, next) => {
+        const code = req.context.redis.get(req.params.phone)
+        if (code === null || code !== req.params.code) {
+            throw new CodeError()
+        }
+        next()
+    })
+}

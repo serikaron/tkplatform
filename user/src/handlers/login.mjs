@@ -1,13 +1,13 @@
 'use strict'
 
-import {InvalidArgument, UserError} from "../error.mjs";
+import {InvalidArgument, TKError} from "../../../common/error.mjs";
 import argon2i from "argon2";
 import {Token} from "../stubs.mjs";
 import {userRouter} from "../router.mjs";
 import {handle} from "../middleware.mjs";
 import 'express-async-errors'
 
-class UserNotFound extends UserError {
+class UserNotFound extends TKError {
     constructor({code = -200} = {}) {
         super({
             httpCode: 404,
@@ -17,7 +17,7 @@ class UserNotFound extends UserError {
     }
 }
 
-class PasswordNotMatch extends UserError {
+class PasswordNotMatch extends TKError {
     constructor({code = -201} = {}) {
         super({
             httpCode: 403,
@@ -27,7 +27,7 @@ class PasswordNotMatch extends UserError {
     }
 }
 
-class TokenFailed extends UserError {
+class TokenFailed extends TKError {
     constructor({code = -202} = {}) {
         super({
             httpCode: 500,

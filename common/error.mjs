@@ -1,6 +1,6 @@
 'use strict'
 
-export class UserError extends Error {
+export class TKError extends Error {
     constructor({httpCode, code, msg}) {
         super(msg);
         this.httpCode = httpCode
@@ -8,7 +8,7 @@ export class UserError extends Error {
     }
 }
 
-export class InvalidArgument extends UserError {
+export class InvalidArgument extends TKError {
     constructor({code = -100, msg = ""} = {}) {
         const m = msg === "" ? "" : `(${msg})`
         super({

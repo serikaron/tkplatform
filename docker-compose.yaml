@@ -59,3 +59,16 @@ services:
   captcha_cache:
     image: redis:alpine
     restart: always
+
+  sms:
+    image: car.daoyi365.com:5000/tk-sms
+    restart: always
+    entrypoint: node /app/sms/src/app.mjs
+    depends_on:
+      - sms_cache
+    ports:
+      - "9004:8080"
+
+  sms_cache:
+    image: redis:alpine
+    restart: always

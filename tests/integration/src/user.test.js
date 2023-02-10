@@ -19,4 +19,17 @@ describe('register and login', () => {
             },
         })
     })
+
+    it("should return error when argument invalid", async () => {
+        await test({
+            path: '/v1/user/register',
+            body: {
+                password: "123456"
+            },
+            verify: (response) => {
+                expect(response.status).toBe(400)
+                expect(response.code).toBe(-100)
+            }
+        })
+    })
 })

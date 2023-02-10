@@ -23,3 +23,8 @@ services:
     build:
       context: ./
       dockerfile: captcha/dockerfile
+
+  sms:
+    build:
+      context: ./
+      dockerfile: sms/dockerfile

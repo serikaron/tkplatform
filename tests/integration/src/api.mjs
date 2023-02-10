@@ -49,7 +49,7 @@ async function call({path, query, body}) {
         const r = await makeCall({path, query, body})
         return new Response(r.status, r.data)
     } catch (e) {
-        console.log(e)
+        // console.log(e)
         return new Response(e.response.status, {code: e.response.data.code, msg: e.response.data.msg})
     }
 }

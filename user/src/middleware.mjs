@@ -1,7 +1,7 @@
 'use strict'
 
 import {connect as connectMongo, close as closeMongo} from "./mongo.mjs";
-import {UserError} from "./error.mjs";
+import {TKError} from "../../common/error.mjs";
 
 export async function buildContext(req, res, next) {
     const mongo = await connectMongo()
@@ -38,7 +38,7 @@ export function errorHandler(error, req, res, next) {
     } else {
         console.log(`path:${req.path}, body:${JSON.stringify(req.body)}`)
     }
-    if (error instanceof UserError) {
+    if (error instanceof TKError) {
         res.response({
             httpCode: error.httpCode,
             code: error.code,
