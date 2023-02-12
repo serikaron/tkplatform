@@ -2,7 +2,8 @@
 
 import express from "express";
 import {errorHandler, injection, responseHandler} from "../common/flow.mjs";
-import {route} from "./handlers/register.mjs";
+import {route as routeRegister} from "./handlers/register.mjs";
+import {route as routeLogin} from "./handlers/login.mjs"
 // import 'express-async-errors'
 
 export function setup(app, {setup= (router) => {}, teardown= (router) => {}} = {}) {
@@ -11,7 +12,8 @@ export function setup(app, {setup= (router) => {}, teardown= (router) => {}} = {
 
     setup(router)
 
-    route(router)
+    routeRegister(router)
+    routeLogin(router)
 
     teardown(router)
 }

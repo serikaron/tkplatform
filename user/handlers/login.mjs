@@ -1,42 +1,10 @@
 'use strict'
 
-import {TKError} from "../../common/errors/error.mjs";
 import argon2i from "argon2";
-import {Token} from "../stubs.mjs";
-import {userRouter} from "../router.mjs";
-import {handle} from "../middleware.mjs";
-import 'express-async-errors'
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {makeMiddleware} from "../../common/flow.mjs";
+import {LoginFailed, PasswordNotMatch} from "../../common/errors/10000-user.mjs";
 
-class UserNotFound extends TKError {
-    constructor({code = -200} = {}) {
-        super({
-            httpCode: 404,
-            code: code,
-            msg: "用户名或密码错误"
-        });
-    }
-}
-
-class PasswordNotMatch extends TKError {
-    constructor({code = -201} = {}) {
-        super({
-            httpCode: 403,
-            code: code,
-            msg: "用户名或密码错误"
-        });
-    }
-}
-
-class TokenFailed extends TKError {
-    constructor({code = -202} = {}) {
-        super({
-            httpCode: 500,
-            code: code,
-            msg: "登录失败，请稍后重试"
-        });
-    }
-}
 
 function checkInput(req) {
     function isBadField(field) {
@@ -44,20 +12,21 @@ function checkInput(req) {
     }
 
     if (isBadField(req.body.phone)) {
-        throw new InvalidArgument({code: -100, msg: "phone"})
+        throw new InvalidArgument()
     }
     if (isBadField(req.body.password)) {
-        return new InvalidArgument({code: -101, msg: "password"})
+        throw new InvalidArgument()
     }
 }
 
 async function getUser(req) {
-    console.log(`getUser: phone:${req.body.phone}`)
-    const user = await req.context.mongo.db.collection("users")
-        .findOne({phone: req.body.phone})
-    console.log(`getUser: ${JSON.stringify(user)}`)
+    // console.log(`getUser: phone:${req.body.phone}`)
+    // const user = await req.context.mongo.db.collection("users")
+    //     .findOne({phone: req.body.phone})
+    // console.log(`getUser: ${JSON.stringify(user)}`)
+    const user = await req.context.mongo.getUserByPhone(req.body.phone)
     if (user === null) {
-        throw new UserNotFound()
+        throw new PasswordNotMatch()
     } else {
         req.user = user
     }
@@ -72,19 +41,23 @@ async function checkPassword(req) {
 }
 
 async function genToken(req, res) {
-    const result = await Token.generate({phone: req.body.phone})
+    // const result = await Token.generate({phone: req.body.phone})
+    const result = await req.context.stubs.token.gen({phone: req.body.phone})
     if (!result.isSuccess()) {
-        throw new TokenFailed()
+        throw new LoginFailed()
     } else {
         res.response({
+            msg: "登录成功",
             data: result.data
         })
     }
 }
 
-userRouter.post("/login", ...handle([
-    checkInput,
-    getUser,
-    checkPassword,
-    genToken
-]))
+export function route(router) {
+    router.post("/login", ...makeMiddleware([
+        checkInput,
+        getUser,
+        checkPassword,
+        genToken
+    ]))
+}

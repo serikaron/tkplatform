@@ -61,8 +61,6 @@ async function runTest(
         .send(body)
     if (response.status === 500 && response.body.code === 1) {
         throw new Error(response.body.msg)
-        // console.log(response.body.msg)
-        // expect(true).toBe(false)
     }
     expect(response.status).toBe(status)
     expect(response.body.code).toEqual(code)
