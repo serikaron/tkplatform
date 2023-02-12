@@ -1,6 +1,5 @@
 'use strict'
 
-import {TKError} from "./errors/error.mjs";
 import {errorHandler, injection, responseHandler} from "./flow.mjs";
 
 const diContainer = {
@@ -14,10 +13,10 @@ const diContainer = {
     },
     teardown: (middlewares) => {
         return (router) => {
+            router.use(errorHandler)
             middlewares.forEach(middleware => {
                 router.use(middleware)
             })
-            router.use(errorHandler)
             router.use(responseHandler)
         }
     }

@@ -14,7 +14,7 @@ export async function generate(payload) {
     const refreshToken = uuidv4()
 
     try {
-        await setToken(payload.uuid, refreshToken)
+        await setToken(payload.id, refreshToken)
     } catch (e) {
         console.log(e)
         return {code: -1, msg: "set token failed"}
@@ -33,7 +33,7 @@ export async function verify(accessToken) {
             algorithm: "HS256"
         })
 
-        const serverToken = await getToken(payload.uuid)
+        const serverToken = await getToken(payload.id)
         if (serverToken === "" || serverToken === null) {
             return {code: -1, msg: "refresh token not found"}
         }
@@ -59,15 +59,15 @@ export async function refresh(accessToken, refreshToken) {
             return {code: -2, msg: "not an expired token"}
         }
 
-        const serverToken = await getToken(payload.uuid)
+        const serverToken = await getToken(payload.id)
 
         if (refreshToken !== serverToken) {
             console.log("refresh token not match")
-            await delToken(payload.uuid)
+            await delToken(payload.id)
             return {code: -3, msg: "invalid token"}
         }
 
-        return await generate(payload.uuid)
+        return await generate(payload.id)
     } catch (e) {
         console.log(e)
         return {code: -100, msg: e.toString()}

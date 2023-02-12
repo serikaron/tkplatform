@@ -13,10 +13,6 @@ async function connect() {
     return client
 }
 
-async function close(client) {
-    await client.close()
-}
-
 export async function setupMongo(req) {
     if (req.context === undefined) {
         req.context = {}
@@ -29,9 +25,9 @@ export async function setupMongo(req) {
     }
     req.context.mongo = {
         client, db, collection,
-        getUserByPhone: async (phone) => {
+        getUserByPhone: async (find, projection) => {
             return await collection.users
-                .findOne({phone: phone})
+                .findOne(find, projection)
         },
         getUserById: async (id) => {
             return await collection.users

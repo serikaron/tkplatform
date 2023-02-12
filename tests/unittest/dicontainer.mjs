@@ -31,10 +31,10 @@ const testDIContainer = {
     },
     teardown: (middlewares) => {
         return (router) => {
+            router.use(mockErrorHandler)
             middlewares.forEach(middleware => {
                 router.use(middleware)
             })
-            router.use(mockErrorHandler)
             router.use(responseHandler)
         }
     }

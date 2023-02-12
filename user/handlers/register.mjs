@@ -23,7 +23,7 @@ function checkInput(req) {
 }
 
 async function checkUserExist(req) {
-    const user = await req.context.mongo.getUserByPhone(req.body.phone)
+    const user = await req.context.mongo.getUserByPhone({phone: req.body.phone}, {_id: 1})
     if (user !== null) {
         throw new UserExists({msg: "手机已注册"})
     }
@@ -40,8 +40,14 @@ async function getInviter(req) {
     req.inviter = inviter
 }
 
+async function getConfig(req) {
+    req.body.config = {
+        daysForRegister: 7, daysForInvite: 3
+    }
+}
+
 async function registerHandler(req) {
-    const register = async ({registerUser, inviter, config}) => {
+    const register = async ({registerUser, inviter, config = {daysForRegister: 7, daysForInvite: 3}}) => {
         function todayTimestamp() {
             return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
         }
@@ -127,6 +133,7 @@ export function route(router) {
         checkInput,
         checkUserExist,
         getInviter,
+        getConfig,
         registerHandler,
         updateDB,
         genToken

@@ -16,7 +16,7 @@ services:
   user:
     image: car.daoyi365.com:5000/tk-user
     restart: always
-    entrypoint: node /app/user/src/app.mjs
+    entrypoint: node /app/user/app.mjs
     depends_on:
       - user_db
     ports:
@@ -37,7 +37,7 @@ services:
     restart: always
     environment:
       - SECRET_KEY=${SECRET_KEY}
-    entrypoint: node --experimental-json-modules /src/app/app.mjs
+    entrypoint: node --experimental-json-modules /app/token/app.mjs
     depends_on:
       - token_cache
     ports:
