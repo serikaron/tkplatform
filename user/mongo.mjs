@@ -48,10 +48,12 @@ export async function setupMongo(req) {
 
             const withoutInviter = async () => {
                 try {
-                    await collection.users
+                    const result = await collection.users
                         .insertOne(user)
+                    return result.insertedId
                 } catch (error) {
                     handlerError(error)
+                    return null
                 }
             }
 
@@ -59,23 +61,25 @@ export async function setupMongo(req) {
                 const session = client.startSession()
                 session.startTransaction()
                 try {
-                    await collection.users
+                    const result = await collection.users
                         .insertOne(user)
                     await collection.users
                         .updateOne(inviter.filter, inviter.update)
                     await session.commitTransaction()
+                    return result.insertedId
                 } catch (error) {
                     await session.abortTransaction()
                     handlerError(error)
+                    return null
                 } finally {
                     await session.endSession()
                 }
             }
 
             if (inviter === undefined) {
-                await withoutInviter()
+                return await withoutInviter()
             } else {
-                await withInviter()
+                return await withInviter()
             }
         }
     }

@@ -6,12 +6,14 @@ import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 import supertest from "supertest";
 import {Response} from "../../common/response.mjs";
+import {jest} from '@jest/globals'
 
 async function runTest(
     {
         body = {phone: "13333333333", password: "123456"},
         dbUsers = {},
-        token = undefined,
+        getUserByPhone = undefined,
+        tokenFn = undefined,
         status, code, msg, data = {},
     }
 ) {
@@ -21,19 +23,14 @@ async function runTest(
             (req) => {
                 req.context = {
                     mongo: {
-                        getUserByPhone: async (phone) => {
-                            return phone in dbUsers ? dbUsers[phone] : null
-                        }
+                        getUserByPhone,
+                        // getUserByPhone: async (phone) => {
+                        //     return phone in dbUsers ? dbUsers[phone] : null
+                        // }
                     },
                     stubs: {
                         token: {
-                            gen: async (payload) => {
-                                if (token === undefined) {
-                                    return new Response(500, {code: -1})
-                                } else {
-                                    return new Response(200, {code: 0, msg: "success", data: token})
-                                }
-                            }
+                            gen: tokenFn
                         }
                     }
                 }
@@ -70,33 +67,44 @@ describe("test login", () => {
     test.concurrent.each([
         {
             name: "user not found",
-            body: {phone: "13333333333", password: "12345"}
+            body: {phone: "13333333333", password: "12345"},
+            getUserByPhone: jest.fn((find, project) => {
+                return null
+            })
         },
         {
             name: "invalid password",
             body: {phone: "13333333333", password: "1234"},
-            dbUsers: {
-                "13333333333": {
+            getUserByPhone: jest.fn((find, projection) => {
+                return {
+                    _id: "13333333333_user_id",
+                    phone: "13333333333",
                     password: "$argon2id$v=19$m=65536,t=3,p=4$ikege0oHTlgCJU5GoC25Aw$RDpdmkT/gLXP9eohSf2OJb3oWYjMvJ885P35xq8LswA"
                 }
-            }
+            })
         }
-    ])("$name should return PasswordNotMatch", async ({name, body, dbUsers}) => {
+    ])("$name should return PasswordNotMatch", async ({name, body, getUserByPhone}) => {
         await runTest({
-            body, dbUsers,
+            body, getUserByPhone,
             status: 403,
             code: -10003,
             msg: "用户名或密码错误"
         })
+        expect(getUserByPhone).toHaveBeenCalledWith({phone: "13333333333"}, {phone: 1, password: 1})
     })
 
     test("gen token failed should return LoginFailed", async () => {
         await runTest({
             body: {phone: "13333333333", password: "123456"},
-            dbUsers: {
-                "13333333333": {
+            getUserByPhone: async (find, projection) => {
+                return {
+                    _id: "13333333333_user_id",
+                    phone: "13333333333",
                     password: "$argon2id$v=19$m=65536,t=3,p=4$ikege0oHTlgCJU5GoC25Aw$RDpdmkT/gLXP9eohSf2OJb3oWYjMvJ885P35xq8LswA"
                 }
+            },
+            tokenFn: async (payload) => {
+                return new Response(500, {code: -1, msg: "error"})
             },
             token: undefined,
             status: 500,
@@ -106,17 +114,24 @@ describe("test login", () => {
     })
 
     test("login success should return correct token", async () => {
+        const tokenFn = jest.fn((payload) => {
+            return new Response(200, {
+                code: 0, msg: "success", data: {
+                    accessToken: "accessToken",
+                    refreshToken: "refreshToken",
+                }
+            })
+        })
         await runTest({
             body: {phone: "13333333333", password: "123456"},
-            dbUsers: {
-                "13333333333": {
+            getUserByPhone: async (find, projection) => {
+                return {
+                    _id: "13333333333_user_id",
+                    phone: "13333333333",
                     password: "$argon2id$v=19$m=65536,t=3,p=4$ikege0oHTlgCJU5GoC25Aw$RDpdmkT/gLXP9eohSf2OJb3oWYjMvJ885P35xq8LswA"
                 }
             },
-            token: {
-                accessToken: "accessToken",
-                refreshToken: "refreshToken"
-            },
+            tokenFn,
             status: 200,
             code: 0,
             msg: "登录成功",
@@ -124,6 +139,9 @@ describe("test login", () => {
                 accessToken: "accessToken",
                 refreshToken: "refreshToken"
             }
+        })
+        expect(tokenFn).toHaveBeenCalledWith({
+            id: "13333333333_user_id", phone: "13333333333"
         })
     })
 })

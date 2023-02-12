@@ -43,3 +43,13 @@ export class LoginFailed extends TKError {
         })
     }
 }
+
+export class RegisterFailed extends TKError {
+    constructor() {
+        super({
+            status: 500,
+            code: codeBase - 5,
+            msg: "注册失败"
+        });
+    }
+}

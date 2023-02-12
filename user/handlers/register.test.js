@@ -21,7 +21,8 @@ async function runTest(
         config = {daysForRegister: 7, daysForInvite: 3},
         verify = (req, res) => {
         },
-        token = {status: 200, res: {code: 0, msg: "success"}},
+        insertAndUpdate = undefined,
+        tokenFn = undefined,
         status, code, msg,
         data = {},
     }
@@ -38,13 +39,11 @@ async function runTest(
                         getUserById: async (id) => {
                             return id in dbUsers ? dbUsers[id] : null
                         },
-                        insertAndUpdate: jest.fn(),
+                        insertAndUpdate,
                     },
                     stubs: {
                         token: {
-                            gen: async (payload) => {
-                                return new Response(token.status, token.res)
-                            }
+                            gen: tokenFn,
                         }
                     }
                 }
@@ -115,6 +114,11 @@ describe("test register", () => {
         it("should return encrypted password", async () => {
             await runTest({
                 body: {phone: "13333333333", password: "123456"},
+                insertAndUpdate: (user, inviter) => {
+                },
+                tokenFn: (payload) => {
+                    return new Response(200, {code: 0})
+                },
                 verify: async (req) => {
                     expect(req.updateDB.registerUser.phone).toBe("13333333333")
                     expect(req.updateDB.registerUser.password === "123456").not.toBe(true)
@@ -173,6 +177,11 @@ describe("test register", () => {
                             daysForRegister: config.daysForRegister,
                             daysForInvite: config.daysForInvite
                         },
+                        insertAndUpdate: (user, inviter) => {
+                        },
+                        tokenFn: (payload) => {
+                            return new Response(200, {code: 0})
+                        },
                         verify: (req) => {
                             expect(req.updateDB.registerUser.member.expiration).toBe(config.expectUserExpiration)
                             if (config.expectInviterExpiration === undefined) {
@@ -228,6 +237,11 @@ describe("test register", () => {
                                 downLines: c.existsDownLines
                             }
                         },
+                        insertAndUpdate: (user, inviter) => {
+                        },
+                        tokenFn: (payload) => {
+                            return new Response(200, {code: 0})
+                        },
                         verify: (req) => {
                             expect(req.updateDB.registerUser.upLine).toBe(c.expectUpLine)
                             if (c.inviterPhone === undefined) {
@@ -244,12 +258,26 @@ describe("test register", () => {
             })
         })
     })
+    test("update db failed should return RegisterError", async () => {
+        await runTest({
+            body: {phone: "13333333333", password: "123456"},
+            insertAndUpdate: async (user, inviter) => {
+                return null
+            },
+            status: 500,
+            code: -10005,
+            msg: "注册失败"
+        })
+    })
     describe("with various scenarios", () => {
         const scenarios = [
             {phone: "13333333333", password: "123456"},
             {phone: "13333333333", password: "123456", inviter: {id: "13444444444"}}
         ]
         it("should update db correctly", async () => {
+            const insertAndUpdate = jest.fn((user, inviter) => {
+                return "13333333333_user_id"
+            })
             await serialTest(scenarios, async (s) => {
                 await runTest({
                     body: s,
@@ -258,6 +286,10 @@ describe("test register", () => {
                             id: s.inviter.id,
                             member: {expiration: todayTimestamp()},
                         }
+                    },
+                    insertAndUpdate,
+                    tokenFn: async (payload) => {
+                        return new Response(200, {code: 0})
                     },
                     verify: (req) => {
                         if (s.inviter === undefined) {
@@ -287,11 +319,13 @@ describe("test register", () => {
     describe("when get token failed", () => {
         it("should also return a partial success", async () => {
             await runTest({
-                token: {
-                    status: 500, res: {
+                insertAndUpdate: (user, inviter) => {
+                },
+                tokenFn: (payload) => {
+                    return new Response(500, {
                         code: -20001,
                         msg: "error"
-                    }
+                    })
                 },
                 status: 201,
                 code: -20001,
@@ -303,6 +337,14 @@ describe("test register", () => {
         {body: {phone: "13333333333", password: "12345"}},
         {body: {phone: "13333333333", password: "12345", inviter: {id: "13444444444"}}},
     ])('(well done scenarios ($#) should return with token', async (scenarios) => {
+        const tokenFn = jest.fn(payload => {
+            return new Response(200, {
+                code:0, msg: "success", data: {
+                    accessToken: "accessToken",
+                    refreshToken: "refreshToken"
+                }
+            })
+        })
         await runTest({
             body: scenarios.body,
             dbUsers: scenarios.body.inviter === undefined ? {} : {
@@ -311,16 +353,10 @@ describe("test register", () => {
                     member: {expiration: todayTimestamp()}
                 }
             },
-            token: {
-                status: 200,
-                res: {
-                    code: 0, msg: "success",
-                    data: {
-                        accessToken: "accessToken",
-                        refreshToken: "refreshToken"
-                    }
-                },
+            insertAndUpdate: async (user, inviter) => {
+                return "13333333333_user_id"
             },
+            tokenFn,
             status: 201,
             code: 0,
             msg: "注册成功",
@@ -328,6 +364,10 @@ describe("test register", () => {
                 accessToken: "accessToken",
                 refreshToken: "refreshToken"
             }
+        })
+        expect(tokenFn).toHaveBeenCalledWith({
+            id: "13333333333_user_id",
+            phone: "13333333333"
         })
     })
 })

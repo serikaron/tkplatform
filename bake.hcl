@@ -1,5 +1,5 @@
 group default {
-  targets = ["user"]
+  targets = ["tk-node", "user"]
 }
 
 variable "GITHUB_SHA" {
@@ -14,6 +14,7 @@ target "tk-node" {
   target     = "tk-node"
   cache-from = ["type=gha,scope=tk-node"]
   cache-to   = ["type=gha,mode=max,scope=tk-node"]
+  tags       = ["tk-node"]
 }
 
 target "user" {
@@ -27,5 +28,5 @@ target "user" {
     "${REGISTRY}/user:${GITHUB_SHA}",
   ]
   cache-from = ["type=gha,scope=user"]
-  cache-to = ["type=gha,mode=max,scope=user"]
+  cache-to   = ["type=gha,mode=max,scope=user"]
 }

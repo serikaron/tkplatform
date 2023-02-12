@@ -1,7 +1,7 @@
 'use strict'
 
 import {makeMiddleware} from "../../common/flow.mjs";
-import {UserExists, UserNotExists} from "../../common/errors/10000-user.mjs"
+import {RegisterFailed, UserExists, UserNotExists} from "../../common/errors/10000-user.mjs"
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import argon2i from "argon2";
 
@@ -85,7 +85,7 @@ async function registerHandler(req) {
 }
 
 async function updateDB(req) {
-    req.context.mongo.insertAndUpdate({
+    const insertedId = await req.context.mongo.insertAndUpdate({
         user: req.updateDB.registerUser,
         inviter: req.updateDB.inviter === undefined ? undefined : {
             filter: {_id: req.body.inviter.id},
@@ -97,10 +97,15 @@ async function updateDB(req) {
             }
         }
     })
+    if (insertedId === null) {
+        throw new RegisterFailed()
+    } else {
+        req.insertedId = insertedId
+    }
 }
 
 async function genToken(req, res) {
-    const response = await req.context.stubs.token.gen({phone: req.body.phone})
+    const response = await req.context.stubs.token.gen({id: req.insertedId, phone: req.body.phone})
     if (response.isError()) {
         res.response({
             status: 201,
