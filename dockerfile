@@ -1,4 +1,4 @@
-FROM amd64/node
+FROM node as tk-node
 
 ENV TZ=Asia/Hong_Kong
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
@@ -7,10 +7,13 @@ ENV NODE_ENV=production
 
 WORKDIR /app
 
-COPY ["user/package.json", "user/package-lock.json*", "./"]
+COPY ["package.json", "package-lock.json*", "jest.config.js", "./"]
 
 RUN npm install --omit=dev
 
-#COPY scripts/.env /src
+FROM tk-node as service
+
+ARG name
+
 COPY common /app/common
-COPY user/src /app/user/src
+COPY ${name} /app/${name}
