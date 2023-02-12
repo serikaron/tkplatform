@@ -1,7 +1,7 @@
 'use strict'
 
 import {connect as connectMongo, close as closeMongo} from "./mongo.mjs";
-import {TKError} from "../../common/error.mjs";
+import {errorHandler} from "../common/flow.mjs";
 
 export async function buildContext(req, res, next) {
     const mongo = await connectMongo()
@@ -27,29 +27,6 @@ export async function injection(req, res, next) {
         req.res = {
             httpCode, code, msg, data
         }
-    }
-    next()
-}
-
-export function errorHandler(error, req, res, next) {
-    console.log(error)
-    if (req.method === "GET") {
-        console.log(`path:${req.path}, query:${JSON.stringify(req.query)}, params:${JSON.stringify(req.params)}`)
-    } else {
-        console.log(`path:${req.path}, body:${JSON.stringify(req.body)}`)
-    }
-    if (error instanceof TKError) {
-        res.response({
-            httpCode: error.httpCode,
-            code: error.code,
-            msg: error.message
-        })
-    } else {
-        res.response({
-            httpCode: 500,
-            code: -1,
-            msg: "Internal Server Error"
-        })
     }
     next()
 }

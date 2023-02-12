@@ -1,6 +1,6 @@
 'use strict'
 
-import {TKError} from "../../common/error.mjs";
+import {TKError} from "../../errors/error.mjs";
 
 class CodeError extends TKError {
     constructor() {

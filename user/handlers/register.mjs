@@ -2,12 +2,13 @@
 
 import {userRouter} from "../router.mjs";
 import {handle} from "../middleware.mjs";
-import {InvalidArgument, TKError} from "../../../common/error.mjs";
+import {TKError} from "../../errors/error.mjs";
 import {getUser} from "../dao.mjs";
 import {MongoServerError} from "mongodb";
-import {Token} from "../stubs.mjs";
 import argon2i from "argon2";
 import 'express-async-errors'
+import {makeMiddleware} from "../../common/flow.mjs";
+import {InvalidArgument} from "../../errors/00000-basic.mjs";
 
 class UserExists extends TKError {
     constructor({code = -100} = {}) {
@@ -109,26 +110,36 @@ async function registerHandler(req) {
 }
 
 async function genToken(req, res) {
-    const result = await Token.generate({phone: req.body.phone})
-    if (!result.isSuccess()) {
-        res.response({
-            code: -101,
-            msg: "注册成功，请重新登录"
-        })
-    } else {
-        res.response({
-            data: result.data
-        })
-    }
+    // const result = await Token.generate({phone: req.body.phone})
+    // if (!result.isSuccess()) {
+    //     res.response({
+    //         code: -101,
+    //         msg: "注册成功，请重新登录"
+    //     })
+    // } else {
+    //     res.response({
+    //         data: result.data
+    //     })
+    // }
 }
 
-userRouter.post('/register', ...handle([
-    checkInput,
-    checkUserExist,
-    getInviter,
-    registerHandler,
-    genToken
-]))
+// userRouter.post('/register', ...handle([
+//     checkInput,
+//     checkUserExist,
+//     getInviter,
+//     registerHandler,
+//     genToken
+// ]))
+
+export function route(router) {
+    // router.post('/register', makeMiddleware([
+    //     checkInput,
+    //     checkUserExist,
+    //     getInviter,
+    //     registerHandler,
+    //     genToken
+    // ]))
+}
 
 function todayTimestamp() {
     return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)

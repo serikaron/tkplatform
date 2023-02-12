@@ -1,6 +1,6 @@
 'use strict'
 
-import {TKError} from "./error.mjs";
+import {TKError} from "../errors/error.mjs";
 
 
 export function injection(req, res, next) {
@@ -32,13 +32,13 @@ export function errorHandler(error, req, res, next) {
     }
     if (error instanceof TKError) {
         res.response({
-            httpCode: error.httpCode,
+            status: error.status,
             code: error.code,
             msg: error.message
         })
     } else {
         res.response({
-            httpCode: 500,
+            status: 500,
             code: -1,
             msg: "Internal Server Error"
         })
