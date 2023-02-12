@@ -1,7 +1,7 @@
 'use strict'
 
-import {axiosCall} from "../../stubs/call.mjs";
-import {TKError} from "../../errors/error.mjs";
+import {axiosCall} from "../../common/call.mjs";
+import {TKError} from "../../common/errors/error.mjs";
 import {sendSMS} from "./smsbao.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 

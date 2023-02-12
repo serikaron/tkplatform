@@ -1,6 +1,6 @@
 'use strict'
 
-import {axiosCall} from "../stubs/call.mjs";
+import {axiosCall} from "../common/call.mjs";
 
 export function setupStub(req) {
     if (req.context === undefined) {

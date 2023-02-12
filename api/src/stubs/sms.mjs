@@ -4,7 +4,7 @@
 import express from "express";
 import {handleWithoutAuth1} from "../middleware.mjs";
 import 'express-async-errors'
-import {call} from "../../../stubs/call.mjs";
+import {call} from "../../../common/call.mjs";
 import axios from "axios";
 import {v1Router} from "../router.mjs";
 

@@ -1,6 +1,6 @@
 'use strict'
 
-import {TKError} from "../errors/error.mjs";
+import {TKError} from "./errors/error.mjs";
 import {errorHandler, injection, responseHandler} from "./flow.mjs";
 
 const diContainer = {

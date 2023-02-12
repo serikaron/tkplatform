@@ -2,7 +2,7 @@
 
 import {MongoClient, MongoServerError} from 'mongodb'
 import * as dotenv from 'dotenv'
-import {UserExists} from "../errors/10000-user.mjs";
+import {UserExists} from "../common/errors/10000-user.mjs";
 
 dotenv.config()
 

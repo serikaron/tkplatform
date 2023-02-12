@@ -1,6 +1,6 @@
 'use strict'
 
-import {Response} from "../common/response.mjs"
+import {Response} from "./response.mjs"
 import axios from "axios";
 
 export async function call(f) {

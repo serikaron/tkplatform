@@ -1,8 +1,8 @@
 'use strict'
 
 import {makeMiddleware} from "../../common/flow.mjs";
-import {UserExists, UserNotExists} from "../../errors/10000-user.mjs"
-import {InvalidArgument} from "../../errors/00000-basic.mjs";
+import {UserExists, UserNotExists} from "../../common/errors/10000-user.mjs"
+import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import argon2i from "argon2";
 
 function checkInput(req) {

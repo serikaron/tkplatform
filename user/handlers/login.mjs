@@ -1,12 +1,12 @@
 'use strict'
 
-import {TKError} from "../../errors/error.mjs";
+import {TKError} from "../../common/errors/error.mjs";
 import argon2i from "argon2";
 import {Token} from "../stubs.mjs";
 import {userRouter} from "../router.mjs";
 import {handle} from "../middleware.mjs";
 import 'express-async-errors'
-import {InvalidArgument} from "../../errors/00000-basic.mjs";
+import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 
 class UserNotFound extends TKError {
     constructor({code = -200} = {}) {

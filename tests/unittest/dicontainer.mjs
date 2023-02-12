@@ -1,7 +1,7 @@
 'use strict'
 
 import {errorHandler, injection, responseHandler} from "../../common/flow.mjs";
-import {TKError} from "../../errors/error.mjs";
+import {TKError} from "../../common/errors/error.mjs";
 
 function mockErrorHandler(err, req, res, next) {
     if (err instanceof TKError) {
