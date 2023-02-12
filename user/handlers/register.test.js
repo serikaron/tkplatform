@@ -1,15 +1,10 @@
 'use strict'
 
-// import {register} from "./register.mjs";
-// import {route} from "./register1.mjs";
 import argon2i from "argon2";
-// import {MockRouter} from "../../../tests/unittest/mock_router.mjs";
-// import 'express-async-errors'
-import express from "express";
 import {setup as setupServer} from '../server.mjs'
 import createApp from "../../common/app.mjs";
 import supertest from 'supertest'
-import {errorHandler, makeMiddleware, responseHandler} from "../../common/flow.mjs";
+import {makeMiddleware} from "../../common/flow.mjs";
 import {parallelRun, serialTest} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals"
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
@@ -18,11 +13,6 @@ import {Response} from "../../common/response.mjs";
 function todayTimestamp() {
     return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
 }
-
-// describe('register', () => {
-
-
-// })
 
 async function runTest(
     {

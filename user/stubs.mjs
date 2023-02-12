@@ -1,21 +1,22 @@
 'use strict'
 
-import axios from "axios";
-import {call} from "../stubs/call.mjs";
+import {axiosCall} from "../stubs/call.mjs";
 
-export class Token {
-    static baseURL = "http://token:8080/v1"
+export function setupStub(req) {
+    if (req.context === undefined) {
+        req.context = {}
+    }
 
-    static async generate({phone}) {
-        return call(async () => {
-            return axios({
-                url: "/token/generate",
-                baseURL: this.baseURL,
-                method: 'post',
-                data: {
-                    uuid: phone
-                }
-            })
-        })
+    req.context.stubs = {
+        token: {
+            gen: async (payload) => {
+                return await axiosCall({
+                    url: "/token/generate",
+                    baseURL: this.baseURL,
+                    method: 'post',
+                    data: payload,
+                })
+            }
+        }
     }
 }

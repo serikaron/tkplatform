@@ -1,20 +1,28 @@
 'use strict'
 
 import 'express-async-errors'
-import express from "express"
-// import {v1router} from "./router.mjs";
-// import './handlers/register.mjs'
-// import './handlers/login.mjs'
+import createApp from "../common/app.mjs";
+import {setup} from "./server.mjs";
+import diContainer from "../common/dicontainer.mjs";
+import {makeMiddleware} from "../common/flow.mjs";
+import {cleanMongo, setupMongo} from "./mongo.mjs";
+import {setupStub} from "./stubs.mjs";
 
-const app = express()
-const port = 8080
+const app = createApp()
+setup(app, {
+        setup: diContainer.setup(
+            makeMiddleware([
+                setupMongo, setupStub
+            ])
+        ),
+        teardown: diContainer.teardown(
+            makeMiddleware([
+                cleanMongo
+            ])
+        )
+    }
+)
 
-app.use(express.json())
-
-export default app
-
-// app.use('/v1', v1router)
-//
-// app.listen(port, () => {
-//     console.log(`listening on port ${port}`)
-// });
+app.listen(8080, () => {
+    console.log('user service started')
+});

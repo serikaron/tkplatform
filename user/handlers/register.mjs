@@ -1,24 +1,9 @@
 'use strict'
 
-import {userRouter} from "../router.mjs";
-import {handle} from "../middleware.mjs";
-import {TKError} from "../../errors/error.mjs";
-import {getUser} from "../dao.mjs";
-import {MongoServerError} from "mongodb";
-import argon2i from "argon2";
-import 'express-async-errors'
 import {makeMiddleware} from "../../common/flow.mjs";
+import {UserExists, UserNotExists} from "../../errors/10000-user.mjs"
 import {InvalidArgument} from "../../errors/00000-basic.mjs";
-
-class UserExists extends TKError {
-    constructor({code = -100} = {}) {
-        super({
-            httpCode: 409,
-            code: code,
-            msg: "用户已存在"
-        });
-    }
-}
+import argon2i from "argon2";
 
 function checkInput(req) {
     function isBadField(field) {
@@ -26,146 +11,119 @@ function checkInput(req) {
     }
 
     if (isBadField(req.body.phone)) {
-        throw new InvalidArgument({code: -100, msg: "phone"})
+        throw new InvalidArgument()
     }
     if (isBadField(req.body.password)) {
-        return new InvalidArgument({code: -101, msg: "password"})
+        throw new InvalidArgument()
+    }
+    if (req.body.inviter !== undefined &&
+        isBadField(req.body.inviter.id)) {
+        throw new InvalidArgument()
     }
 }
 
 async function checkUserExist(req) {
-    const result = await req.context.mongo.db.collection("users")
-        .findOne({phone: req.body.phone}, {_id: 1})
-    if (result !== null) {
-        throw new UserExists()
+    const user = await req.context.mongo.getUserByPhone(req.body.phone)
+    if (user !== null) {
+        throw new UserExists({msg: "手机已注册"})
     }
 }
 
 async function getInviter(req) {
-    if (req.body.inviter !== undefined) {
-        req.inviter = await getUser(req.context, req.body.inviter)
+    if (req.body.inviter === undefined) {
+        return
     }
-}
-
-async function addUser({context, user, inviter}) {
-    const handlerError = (error) => {
-        if (error instanceof MongoServerError && error.code === 11000) {
-            throw new UserExists()
-        } else {
-            throw error;
-        }
+    const inviter = await req.context.mongo.getUserById(req.body.inviter.id)
+    if (inviter === null) {
+        throw new UserNotExists({msg: "邀请人不存在"})
     }
-
-    const withoutInviter = async () => {
-        try {
-            await context.mongo.db.collection("users")
-                .insertOne(user)
-        } catch (error) {
-            handlerError(error)
-        }
-    }
-
-    const withInviter = async () => {
-        const session = context.mongo.client.startSession()
-        session.startTransaction()
-        try {
-            await context.mongo.db.collection("users")
-                .insertOne(user)
-            await context.mongo.db.collection("users")
-                .updateOne({phone: inviter.phone},
-                    {$set: {member: inviter.member, downLines: inviter.downLines}})
-            await session.commitTransaction()
-        } catch (error) {
-            await session.abortTransaction()
-            handlerError(error)
-        } finally {
-            session.endSession()
-        }
-    }
-
-    if (inviter === undefined) {
-        await withoutInviter()
-    } else {
-        await withInviter()
-    }
+    req.inviter = inviter
 }
 
 async function registerHandler(req) {
+    const register = async ({registerUser, inviter, config}) => {
+        function todayTimestamp() {
+            return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
+        }
+
+        registerUser.password = await argon2i.hash(registerUser.password)
+        registerUser.member = {
+            expiration: todayTimestamp() + config.daysForRegister * 86400
+        }
+
+        if (inviter === undefined) {
+            return {
+                registerUser
+            }
+        }
+
+        registerUser.upLine = inviter.id
+        if (inviter.downLines === undefined) {
+            inviter.downLines = [registerUser.phone]
+        } else {
+            inviter.downLines.push(registerUser.phone)
+        }
+        const baseline = Math.max(inviter.member.expiration, todayTimestamp())
+        inviter.member.expiration = baseline + config.daysForInvite * 86400
+        return {
+            registerUser, inviter
+        }
+    }
+
     const result = await register({
         registerUser: {
             phone: req.body.phone, password: req.body.password
         },
         inviter: req.inviter,
-        config: {
-            daysForRegister: 7,
-            daysForInvite: 3
-        }
+        config: req.config,
     })
 
-    await addUser({
-        context: req.context,
-        user: result.registerUser,
+    req.updateDB = {
+        registerUser: result.registerUser,
         inviter: result.inviter
+    }
+}
+
+async function updateDB(req) {
+    req.context.mongo.insertAndUpdate({
+        user: req.updateDB.registerUser,
+        inviter: req.updateDB.inviter === undefined ? undefined : {
+            filter: {_id: req.body.inviter.id},
+            update: {
+                $set: {
+                    member: req.updateDB.inviter.member,
+                    downLines: req.updateDB.inviter.downLines
+                }
+            }
+        }
     })
 }
 
 async function genToken(req, res) {
-    // const result = await Token.generate({phone: req.body.phone})
-    // if (!result.isSuccess()) {
-    //     res.response({
-    //         code: -101,
-    //         msg: "注册成功，请重新登录"
-    //     })
-    // } else {
-    //     res.response({
-    //         data: result.data
-    //     })
-    // }
+    const response = await req.context.stubs.token.gen({phone: req.body.phone})
+    if (response.isError()) {
+        res.response({
+            status: 201,
+            code: response.code,
+            msg: "注册成功，请重新登录"
+        })
+    } else {
+        res.response({
+            status: 201,
+            code: 0,
+            msg: "注册成功",
+            data: response.data
+        })
+    }
 }
-
-// userRouter.post('/register', ...handle([
-//     checkInput,
-//     checkUserExist,
-//     getInviter,
-//     registerHandler,
-//     genToken
-// ]))
 
 export function route(router) {
-    // router.post('/register', makeMiddleware([
-    //     checkInput,
-    //     checkUserExist,
-    //     getInviter,
-    //     registerHandler,
-    //     genToken
-    // ]))
-}
-
-function todayTimestamp() {
-    return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
-}
-
-export async function register({registerUser, inviter, config}) {
-    registerUser.password = await argon2i.hash(registerUser.password)
-    registerUser.member = {
-        expiration: todayTimestamp() + config.daysForRegister * 86400
-    }
-
-    if (inviter === undefined) {
-        return {
-            registerUser
-        }
-    }
-
-    registerUser.upLine = inviter.phone
-    if (inviter.downLines === undefined) {
-        inviter.downLines = [registerUser.phone]
-    } else {
-        inviter.downLines.push(registerUser.phone)
-    }
-    const baseline = Math.max(inviter.member.expiration, todayTimestamp())
-    inviter.member.expiration = baseline + config.daysForInvite * 86400
-    return {
-        registerUser, inviter
-    }
+    router.post('/register', ...makeMiddleware([
+        checkInput,
+        checkUserExist,
+        getInviter,
+        registerHandler,
+        updateDB,
+        genToken
+    ]))
 }
