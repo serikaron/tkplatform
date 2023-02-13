@@ -32,6 +32,8 @@ jobs:
 
       - name: start services for integration test
         run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
+      - name: delay
+        run: sleep 5s
       - name: integration test
         run: npm run test:integration
 
