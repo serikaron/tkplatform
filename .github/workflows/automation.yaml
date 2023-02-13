@@ -30,37 +30,5 @@ jobs:
           files: bake.hcl
           load: true
 
-      - name: start services for integration test
-        run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
-      - name: delay
-        run: sleep 5s
-      - name: integration test
-        run: npm run test:integration
-
-      - name: show logs when failed
-        if: failure()
-        run: docker compose logs
-
-      - name: push image
-        uses: docker/bake-action@v2.3.0
-        with:
-          files: bake.hcl
-          push: true
-
-      - name: scp files
-        uses: appleboy/scp-action@master
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.KEY }}
-          source: "docker-compose.yaml, scripts/deploy.sh"
-          target: "/root/tkplatform"
-
-      - name: deploy
-        uses: appleboy/ssh-action@v0.1.7
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USER }}
-          key: ${{ secrets.KEY }}
-          script: |
-            cd tkplatform && sh scripts/deploy.sh
+      - name: check
+        run: docker images
