@@ -2,7 +2,7 @@
 
 import {test} from "./api.mjs";
 
-test("sms service should live", async () => {
+it("sms service should live", async () => {
     await test({
         path: '/v1/sms/send',
         body: {
