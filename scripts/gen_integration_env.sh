@@ -1,10 +1,15 @@
-cat << EOF > tests/integration/.env
+cat << EOF > .env
 COMPOSE_PROJECT_NAME=tk
+REGISTRY=car.daoyi365.com:5000/
+
 MONGO_USER_HOST=user_db
 MONGO_USER_DB=tkuser
 MONGO_USER_USER=tkuser
 MONGO_USER_PASS=tkuser
+
 SECRET_KEY=123456
+
+SMSBAO_USER=111
+SMSBAO_KEY=222
 EOF
 
-cp tests/integration/.env .

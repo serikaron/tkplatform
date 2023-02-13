@@ -27,7 +27,8 @@ jobs:
       - name: bake
         uses: docker/bake-action@v2.3.0
         with:
-          push: false
+          files: bake.hcl
+          load: true
 
       - name: start services for integration test
         run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
@@ -41,6 +42,7 @@ jobs:
       - name: push image
         uses: docker/bake-action@v2.3.0
         with:
+          files: bake.hcl
           push: true
 
       - name: scp files
