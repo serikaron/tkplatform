@@ -1,4 +1,4 @@
-FROM node as tk-node
+FROM amd64/node:alpine as tk-node
 
 ENV TZ=Asia/Hong_Kong
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone

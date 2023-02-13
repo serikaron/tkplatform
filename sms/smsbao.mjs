@@ -1,15 +1,12 @@
 'use strict'
 
 import axios from 'axios'
-import dotenv from 'dotenv'
 
-dotenv.config()
 
 const api = "https://api.smsbao.com"
 
 export async function sendSMS(phone, code) {
     const msg = `【星济助手】您的验证码是${code}。如非本人操作，请忽略本短信`
-    const encoded = encodeURI(msg)
     try {
         const res = await axios({
             url: "/sms",
@@ -38,31 +35,22 @@ function statusStr(result){
     switch(result)
     {
         case '0':
-            console.log('短信发送成功')
-            break
+            return '短信发送成功'
         case '-1':
-            console.log('参数不全')
-            break
+            return '参数不全'
         case '-2':
-            console.log('服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！')
-            break
+            return '服务器空间不支持,请确认支持curl或者fsocket，联系您的空间商解决或者更换空间！'
         case '30':
-            console.log('密码错误')
-            break
+            return '密码错误'
         case '40':
-            console.log('账户不存在')
-            break
+            return '账户不存在'
         case '41':
-            console.log('余额不足')
-            break
+            return '余额不足'
         case '42':
-            console.log('账户已过期')
-            break
+            return '账户已过期'
         case '43':
-            console.log('IP地址限制')
-            break
+            return 'IP地址限制'
         case '50':
-            console.log('内容含有敏感字')
-            break
+            return '内容含有敏感字'
     }
 }

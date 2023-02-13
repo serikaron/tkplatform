@@ -5,7 +5,7 @@ import {setup as setupServer} from '../server.mjs'
 import createApp from "../../common/app.mjs";
 import supertest from 'supertest'
 import {makeMiddleware} from "../../common/flow.mjs";
-import {parallelRun, serialTest} from "../../tests/unittest/test-runner.mjs";
+import {parallelRun, serialTest, simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals"
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import {Response} from "../../common/response.mjs";
@@ -19,7 +19,7 @@ async function runTest(
         body = {phone: "13333333333", password: "123456"},
         dbUsers = {},
         config = {daysForRegister: 7, daysForInvite: 3},
-        verify = (req, res) => {
+        verify = () => {
         },
         insertAndUpdate = undefined,
         tokenFn = undefined,
@@ -30,11 +30,11 @@ async function runTest(
     const app = createApp()
     setupServer(app, {
         setup: testDIContainer.setup(makeMiddleware([
-            (req, res) => {
+            (req) => {
                 req.context = {
                     mongo: {
-                        getUserByPhone: async (phone) => {
-                            return phone in dbUsers ? dbUsers[phone] : null
+                        getUserByPhone: async (find) => {
+                            return find.phone in dbUsers ? dbUsers[find.phone] : null
                         },
                         getUserById: async (id) => {
                             return id in dbUsers ? dbUsers[id] : null
@@ -48,7 +48,7 @@ async function runTest(
                     }
                 }
             },
-            (req, res) => {
+            (req) => {
                 req.config = config
             }
         ])),
@@ -58,13 +58,7 @@ async function runTest(
     const response = await supertest(app)
         .post('/v1/user/register')
         .send(body)
-    if (response.status === 500 && response.body.code === 1) {
-        throw new Error(response.body.msg)
-    }
-    expect(response.status).toBe(status)
-    expect(response.body.code).toEqual(code)
-    expect(response.body.msg).toEqual(msg)
-    expect(response.body.data).toEqual(data)
+    simpleCheckResponse(response, status, code, msg, data)
 }
 
 describe("test register", () => {
@@ -114,9 +108,9 @@ describe("test register", () => {
         it("should return encrypted password", async () => {
             await runTest({
                 body: {phone: "13333333333", password: "123456"},
-                insertAndUpdate: (user, inviter) => {
+                insertAndUpdate: () => {
                 },
-                tokenFn: (payload) => {
+                tokenFn: () => {
                     return new Response(200, {code: 0})
                 },
                 verify: async (req) => {
@@ -177,9 +171,9 @@ describe("test register", () => {
                             daysForRegister: config.daysForRegister,
                             daysForInvite: config.daysForInvite
                         },
-                        insertAndUpdate: (user, inviter) => {
+                        insertAndUpdate: () => {
                         },
-                        tokenFn: (payload) => {
+                        tokenFn: () => {
                             return new Response(200, {code: 0})
                         },
                         verify: (req) => {
@@ -237,9 +231,9 @@ describe("test register", () => {
                                 downLines: c.existsDownLines
                             }
                         },
-                        insertAndUpdate: (user, inviter) => {
+                        insertAndUpdate: () => {
                         },
-                        tokenFn: (payload) => {
+                        tokenFn: () => {
                             return new Response(200, {code: 0})
                         },
                         verify: (req) => {
@@ -261,7 +255,7 @@ describe("test register", () => {
     test("update db failed should return RegisterError", async () => {
         await runTest({
             body: {phone: "13333333333", password: "123456"},
-            insertAndUpdate: async (user, inviter) => {
+            insertAndUpdate: async () => {
                 return null
             },
             status: 500,
@@ -275,7 +269,7 @@ describe("test register", () => {
             {phone: "13333333333", password: "123456", inviter: {id: "13444444444"}}
         ]
         it("should update db correctly", async () => {
-            const insertAndUpdate = jest.fn((user, inviter) => {
+            const insertAndUpdate = jest.fn(() => {
                 return "13333333333_user_id"
             })
             await serialTest(scenarios, async (s) => {
@@ -288,7 +282,7 @@ describe("test register", () => {
                         }
                     },
                     insertAndUpdate,
-                    tokenFn: async (payload) => {
+                    tokenFn: async () => {
                         return new Response(200, {code: 0})
                     },
                     verify: (req) => {
@@ -319,9 +313,9 @@ describe("test register", () => {
     describe("when get token failed", () => {
         it("should also return a partial success", async () => {
             await runTest({
-                insertAndUpdate: (user, inviter) => {
+                insertAndUpdate: () => {
                 },
-                tokenFn: (payload) => {
+                tokenFn: () => {
                     return new Response(500, {
                         code: -20001,
                         msg: "error"
@@ -337,7 +331,7 @@ describe("test register", () => {
         {body: {phone: "13333333333", password: "12345"}},
         {body: {phone: "13333333333", password: "12345", inviter: {id: "13444444444"}}},
     ])('(well done scenarios ($#) should return with token', async (scenarios) => {
-        const tokenFn = jest.fn(payload => {
+        const tokenFn = jest.fn(() => {
             return new Response(200, {
                 code:0, msg: "success", data: {
                     accessToken: "accessToken",
@@ -353,7 +347,7 @@ describe("test register", () => {
                     member: {expiration: todayTimestamp()}
                 }
             },
-            insertAndUpdate: async (user, inviter) => {
+            insertAndUpdate: async () => {
                 return "13333333333_user_id"
             },
             tokenFn,

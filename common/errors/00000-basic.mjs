@@ -12,3 +12,23 @@ export class InvalidArgument extends TKError {
         })
     }
 }
+
+export class InternalError extends TKError {
+    constructor() {
+        super({
+            status: 500,
+            code: codeBase - 2,
+            msg: "内部错误"
+        });
+    }
+}
+
+export class UnknownError extends TKError {
+    constructor() {
+        super({
+            status: 500,
+            code: codeBase - 3,
+            msg: "未知错误"
+        });
+    }
+}

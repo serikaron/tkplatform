@@ -7,11 +7,11 @@ import {makeMiddleware} from "../../common/flow.mjs";
 import supertest from "supertest";
 import {Response} from "../../common/response.mjs";
 import {jest} from '@jest/globals'
+import {simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
 
 async function runTest(
     {
         body = {phone: "13333333333", password: "123456"},
-        dbUsers = {},
         getUserByPhone = undefined,
         tokenFn = undefined,
         status, code, msg, data = {},
@@ -42,13 +42,7 @@ async function runTest(
     const response = await supertest(app)
         .post("/v1/user/login")
         .send(body)
-    if (response.status === 500 && response.body.code === 1) {
-        throw new Error(response.body.msg)
-    }
-    expect(response.status).toBe(status)
-    expect(response.body.code).toEqual(code)
-    expect(response.body.msg).toEqual(msg)
-    expect(response.body.data).toEqual(data)
+    simpleCheckResponse(response, status, code, msg, data);
 }
 
 describe("test login", () => {
@@ -68,14 +62,14 @@ describe("test login", () => {
         {
             name: "user not found",
             body: {phone: "13333333333", password: "12345"},
-            getUserByPhone: jest.fn((find, project) => {
+            getUserByPhone: jest.fn(() => {
                 return null
             })
         },
         {
             name: "invalid password",
             body: {phone: "13333333333", password: "1234"},
-            getUserByPhone: jest.fn((find, projection) => {
+            getUserByPhone: jest.fn(() => {
                 return {
                     _id: "13333333333_user_id",
                     phone: "13333333333",
@@ -83,7 +77,7 @@ describe("test login", () => {
                 }
             })
         }
-    ])("$name should return PasswordNotMatch", async ({name, body, getUserByPhone}) => {
+    ])("$name should return PasswordNotMatch", async ({body, getUserByPhone}) => {
         await runTest({
             body, getUserByPhone,
             status: 403,
@@ -96,14 +90,14 @@ describe("test login", () => {
     test("gen token failed should return LoginFailed", async () => {
         await runTest({
             body: {phone: "13333333333", password: "123456"},
-            getUserByPhone: async (find, projection) => {
+            getUserByPhone: async () => {
                 return {
                     _id: "13333333333_user_id",
                     phone: "13333333333",
                     password: "$argon2id$v=19$m=65536,t=3,p=4$ikege0oHTlgCJU5GoC25Aw$RDpdmkT/gLXP9eohSf2OJb3oWYjMvJ885P35xq8LswA"
                 }
             },
-            tokenFn: async (payload) => {
+            tokenFn: async () => {
                 return new Response(500, {code: -1, msg: "error"})
             },
             token: undefined,
@@ -114,7 +108,7 @@ describe("test login", () => {
     })
 
     test("login success should return correct token", async () => {
-        const tokenFn = jest.fn((payload) => {
+        const tokenFn = jest.fn(() => {
             return new Response(200, {
                 code: 0, msg: "success", data: {
                     accessToken: "accessToken",
@@ -124,7 +118,7 @@ describe("test login", () => {
         })
         await runTest({
             body: {phone: "13333333333", password: "123456"},
-            getUserByPhone: async (find, projection) => {
+            getUserByPhone: async () => {
                 return {
                     _id: "13333333333_user_id",
                     phone: "13333333333",

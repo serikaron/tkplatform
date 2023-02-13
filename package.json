@@ -1,6 +1,6 @@
 {
   "type": "module",
-  "name": "user",
+  "name": "tkplatform",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -11,7 +11,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@mysql/xdevapi": "^8.0.29",
     "argon2": "^0.30.3",
     "axios": "^1.3.2",
     "dotenv": "^16.0.3",
