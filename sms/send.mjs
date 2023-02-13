@@ -14,7 +14,7 @@ function checkInput(req) {
 }
 
 async function checkCaptcha(req) {
-    const response = await req.context.stubs.captcha.verify(req.body.captcha)
+    const response = await req.context.stubs.captcha.verify(req.body.phone, req.body.captcha)
     if (response.isError()) {
         throw new InvalidCaptcha()
     }
@@ -23,12 +23,10 @@ async function checkCaptcha(req) {
 async function sendCode(req, res) {
     let code = await req.context.redis.getCode(req.body.phone)
     if (code === null) {
-        // code = Math.floor(Math.random() * 10000)
-        code = req.context.sms.code()
+        code = `${req.context.sms.code()}`
         await req.context.redis.setCode(req.body.phone, code)
     }
-    const sendResult = await req.context.sms.send(req.body.phone, `${code}`)
-    // sendSMS(req.body.phone, `${code}`)
+    const sendResult = await req.context.sms.send(req.body.phone, code)
     if (sendResult !== 0) {
         throw new SendSmsFailed()
     }

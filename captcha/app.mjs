@@ -15,8 +15,8 @@ setup(app, {
             req.context.redis.setCaptcha = async (phone, captcha) => {
                 await req.context.redis.client.set(phone, captcha, "EX", 300)
             }
-            req.context.redis.getCaptcha = async () => {
-                return await req.context.redis.client.get(req.body.phone)
+            req.context.redis.getCaptcha = async (phone) => {
+                return await req.context.redis.client.get(phone)
             }
             next()
         },

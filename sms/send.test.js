@@ -89,6 +89,7 @@ test.concurrent.each([
     await runTest({
         verifyFn, status, code, msg
     })
+    expect(verifyFn).toHaveBeenCalledWith("13333333333", "a1b2")
 })
 
 test.concurrent.each([
@@ -114,7 +115,7 @@ test.concurrent.each([
     })
     expect(redisGet).toBeCalled()
     if (redisSet !== null) {
-        expect(redisSet).toBeCalledWith("13333333333", 3456)
+        expect(redisSet).toBeCalledWith("13333333333", "3456")
     }
 })
 
@@ -129,7 +130,7 @@ test.each([
 
     await runTest({
         smsFn: fn,
-        redisGet: async () => { return 8888 },
+        redisGet: async () => { return "8888" },
         status, code, msg
     })
     expect(fn).toHaveBeenCalledWith("13333333333", "8888")

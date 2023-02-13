@@ -52,7 +52,7 @@ test.each([
     {
         params: {phone: "13333333333", code: "1234"},
         redisGet: jest.fn(async () => {
-            return 3456
+            return "3456"
         }),
         status: 400, code: -30003, msg: "验证码错误"
     },
@@ -66,7 +66,7 @@ test.each([
     {
         params: {phone: "13333333333", code: "1234"},
         redisGet: jest.fn(async () => {
-            return 1234
+            return "1234"
         }),
         status: 200, code: 0, msg: "success"
     }

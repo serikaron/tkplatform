@@ -30,15 +30,11 @@ setup(app, {
         (req, res, next) => {
             req.context.stubs = {
                 captcha: {
-                    verify: async () => {
+                    verify: async (phone, captcha) => {
                         return await axiosCall({
                             baseURL: "http://captcha:8080",
-                            url: "/v1/captcha/verify",
-                            method: "POST",
-                            data: {
-                                phone: req.body.phone,
-                                code: req.body.captcha
-                            }
+                            url: `/v1/captcha/verify/${phone}/${captcha}`,
+                            method: "GET",
                         })
                     }
                 }
@@ -48,7 +44,7 @@ setup(app, {
         (req, res, next) => {
             req.context.sms = {
                 code: () => {
-                    Math.floor(Math.random() * 10000)
+                    return Math.floor(Math.random() * 10000)
                 },
                 send: async (phone, code) => {
                     return await sendSMS(phone, code)
