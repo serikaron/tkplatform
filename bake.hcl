@@ -12,7 +12,7 @@ variable "REGISTRY" {
 
 function tag_name {
   params = [server_name]
-  result = "${REGISTRY}/tk-${server_name}:${GITHUB_SHA}"
+  result = "${REGISTRY}/tk-${server_name}"
 }
 
 target "tk-node" {
