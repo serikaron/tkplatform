@@ -4,21 +4,29 @@ services:
   api:
     build:
       context: ./
-      dockerfile: api/dockerfile
+      dockerfile: dockerfile
     image: car.daoyi365.com:5000/tk-api
+
+  user:
+    build:
+      context: ./
+      dockerfile: dockerfile
+    image: car.daoyi365.com:5000/tk-user
 
   token:
     build:
       context: ./
-      dockerfile: token/dockerfile
+      dockerfile: dockerfile
     image: car.daoyi365.com:5000/tk-token
 
   captcha:
     build:
       context: ./
       dockerfile: captcha/dockerfile
+    image: car.daoyi365.com:5000/tk-captcha
 
   sms:
     build:
       context: ./
       dockerfile: sms/dockerfile
+    image: car.daoyi365.com:5000/tk-sms
