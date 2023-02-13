@@ -16,27 +16,32 @@ jobs:
         with:
           node-version: "19.x"
 
-#      - name: test user
-#        run: cd user && npm install && npm run test
+      - name: unit test
+        run: npm install && npm run test:unit
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
-      - name: Compose build
-        run: sh scripts/build_all.sh
+
+      - name: bake
+        uses: docker/bake-action@v2.3.0
+        with:
+          push: false
 
       - name: start services for integration test
         run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
       - name: integration test
-        run: cd tests/integration && npm install && npm run test
+        run: npm run test:integration
 
       - name: show logs when failed
         if: failure()
         run: docker compose logs
 
       - name: push image
-        run: sh scripts/push_image.sh
+        uses: docker/bake-action@v2.3.0
+        with:
+          push: true
 
       - name: scp files
         uses: appleboy/scp-action@master
