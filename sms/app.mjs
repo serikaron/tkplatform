@@ -23,7 +23,7 @@ setup(app, {
                 return await req.context.redis.client.get(phone)
             }
             req.context.redis.setCode = async (phone, code) => {
-                await req.context.redis.client.set(phone, code, EX, 300)
+                await req.context.redis.client.set(phone, code, "EX", 300)
             }
             next()
         },

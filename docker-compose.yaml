@@ -50,7 +50,7 @@ services:
   captcha:
     image: car.daoyi365.com:5000/tk-captcha
     restart: always
-    entrypoint: node /app/captcha/src/app.mjs
+    entrypoint: node /app/captcha/app.mjs
     depends_on:
       - captcha_cache
     ports:

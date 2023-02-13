@@ -31,3 +31,13 @@ export class CodeError extends TKError {
         });
     }
 }
+
+export class CaptchaError extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase - 4,
+            msg: "图形码错误"
+        });
+    }
+}

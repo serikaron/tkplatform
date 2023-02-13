@@ -3,23 +3,18 @@
 import {isBadPhone} from "../common/utils.mjs";
 import {InvalidArgument} from "../common/errors/00000-basic.mjs";
 import {makeMiddleware} from "../common/flow.mjs";
-import {CodeError} from "../common/errors/30000-sms-captcha.mjs";
+import {CaptchaError} from "../common/errors/30000-sms-captcha.mjs";
 
 function checkInput(req) {
     if (isBadPhone(req.params.phone)) {
         throw new InvalidArgument()
     }
-    const code = Number(req.params.code)
-    if (isNaN(code)) {
-        throw new InvalidArgument()
-    }
-    req.code = code
 }
 
-async function checkCode(req, res) {
-    const code = await req.context.redis.getCode(req.params.phone)
-    if (code === null || code !== req.code) {
-        throw new CodeError()
+async function checkCaptcha(req, res) {
+    const captcha = await req.context.redis.getCaptcha(req.params.phone)
+    if (captcha === null || captcha !== req.params.captcha) {
+        throw new CaptchaError()
     }
     res.response({
         status: 200,
@@ -29,8 +24,8 @@ async function checkCode(req, res) {
 }
 
 export function route(router) {
-    router.get('/verify/:phone/:code', ...makeMiddleware([
+    router.get('/verify/:phone/:captcha', ...makeMiddleware([
         checkInput,
-        checkCode
+        checkCaptcha
     ]))
 }

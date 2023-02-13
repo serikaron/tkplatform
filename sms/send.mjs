@@ -3,7 +3,7 @@
 import {makeMiddleware} from "../common/flow.mjs";
 import {isBadFieldString, isBadPhone} from "../common/utils.mjs";
 import {InvalidArgument} from "../common/errors/00000-basic.mjs";
-import {InvalidCaptcha, SendSmsFailed} from "../common/errors/30000-sms.mjs";
+import {InvalidCaptcha, SendSmsFailed} from "../common/errors/30000-sms-captcha.mjs";
 
 function checkInput(req) {
     if (isBadFieldString(req.body.phone) ||
