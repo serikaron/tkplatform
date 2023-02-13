@@ -2,6 +2,10 @@ group default {
   targets = ["tk-node", "api", "user", "token", "sms", "captcha"]
 }
 
+group push {
+  targets = ["api", "user", "token", "sms", "captcha"]
+}
+
 variable "GITHUB_SHA" {
   default = "latest"
 }
