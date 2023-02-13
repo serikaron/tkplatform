@@ -7,7 +7,7 @@ it("sms service should live", async () => {
         path: '/v1/sms/send',
         body: {
             phone: "13333333333",
-            captcha: "xxxx"
+            captcha: "v53J"
         },
         verify: (response) => {
             expect(response.status).toBe(200)

@@ -1,7 +1,7 @@
 'use strict'
 
 import {makeMiddleware} from "../../common/flow.mjs";
-import {RegisterFailed, UserExists, UserNotExists} from "../../common/errors/10000-user.mjs"
+import {RegisterFailed, UserExists, UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs"
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import argon2i from "argon2";
 
@@ -14,6 +14,9 @@ function checkInput(req) {
         throw new InvalidArgument()
     }
     if (isBadField(req.body.password)) {
+        throw new InvalidArgument()
+    }
+    if (isBadField(req.body.smsCode)) {
         throw new InvalidArgument()
     }
     if (req.body.inviter !== undefined &&
@@ -43,6 +46,13 @@ async function getInviter(req) {
 async function getConfig(req) {
     req.body.config = {
         daysForRegister: 7, daysForInvite: 3
+    }
+}
+
+async function verifySms(req) {
+    const response = await req.context.stubs.sms.verify(req.body.phone, req.body.smsCode)
+    if (response.isError()) {
+        throw new VerifySmsCodeFailed()
     }
 }
 
@@ -134,6 +144,7 @@ export function route(router) {
         checkUserExist,
         getInviter,
         getConfig,
+        verifySms,
         registerHandler,
         updateDB,
         genToken

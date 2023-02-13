@@ -1,31 +1,6 @@
 'use strict'
 
 
-import express from "express";
-import {handleWithoutAuth1} from "../middleware.mjs";
-import 'express-async-errors'
-import {call} from "../../../common/call.mjs";
-import axios from "axios";
-import {v1Router} from "../router.mjs";
-
-
-const smsRouter = express.Router()
-v1Router.use('/sms', smsRouter)
-
-class sms {
-    static baseURL = "http://sms:8080/v1/sms"
-
-    static async send(body) {
-        return call(async () => {
-            return axios({
-                url: `/send`,
-                baseURL: this.baseURL,
-                method: 'post',
-                data: body,
-            })
-        })
-    }
-}
 
 /**
  * @swagger
@@ -62,6 +37,3 @@ class sms {
  *                   example: "success"
  *
  */
-smsRouter.post('/send', ...handleWithoutAuth1(async (req) => {
-    return await sms.send(req.body)
-}))

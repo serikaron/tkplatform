@@ -16,13 +16,16 @@ function todayTimestamp() {
 
 async function runTest(
     {
-        body = {phone: "13333333333", password: "123456"},
+        body = {phone: "13333333333", password: "123456", smsCode: "1234"},
         dbUsers = {},
         config = {daysForRegister: 7, daysForInvite: 3},
         verify = () => {
         },
         insertAndUpdate = undefined,
         tokenFn = undefined,
+        smsFn = async () => {
+            return new Response(200, {code: 0, msg: "success"})
+        },
         status, code, msg,
         data = {},
     }
@@ -44,6 +47,9 @@ async function runTest(
                     stubs: {
                         token: {
                             gen: tokenFn,
+                        },
+                        sms: {
+                            verify: smsFn
                         }
                     }
                 }
@@ -67,6 +73,7 @@ describe("test register", () => {
             {phone: "13333333333", inviter: {id: "13444444444"}},
             {password: "123456", inviter: {id: "13444444444"}},
             {phone: "13333333333", password: "123456", inviter: {}},
+            {phone: "13333333333", password: "123456"},
             {},
         ]
         it("should return InvalidArgument", async () => {
@@ -86,7 +93,7 @@ describe("test register", () => {
         }
         it("should return UserExists", async () => {
             await runTest({
-                body: {phone: "13333333333", password: "123456"},
+                body: {phone: "13333333333", password: "123456", smsCode: "1234"},
                 dbUsers,
                 status: 409,
                 code: -10001,
@@ -97,17 +104,30 @@ describe("test register", () => {
     describe("inviter can not be found", () => {
         it("should return UserNotExists", async () => {
             await runTest({
-                body: {phone: "13333333333", password: "123456", inviter: {id: "abcde"}},
+                body: {phone: "13333333333", password: "123456", smsCode: "1234", inviter: {id: "abcde"}},
                 status: 404,
                 code: -10002,
                 msg: "邀请人不存在"
             })
         })
     })
+    test("invalid sms code should return error", async () => {
+        const smsFn = jest.fn(async () => {
+            return new Response(400, {code: -1})
+        })
+        await runTest({
+            body: {phone: "13333333333", password: "123456", smsCode: "1234"},
+            smsFn,
+            status: 400,
+            code: -10006,
+            msg: "验证码错误"
+        })
+        expect(smsFn).toHaveBeenCalledWith("13333333333", "1234")
+    })
     describe("processing register logic", () => {
         it("should return encrypted password", async () => {
             await runTest({
-                body: {phone: "13333333333", password: "123456"},
+                body: {phone: "13333333333", password: "123456", smsCode: "1234"},
                 insertAndUpdate: () => {
                 },
                 tokenFn: () => {
@@ -158,6 +178,7 @@ describe("test register", () => {
                             inviter: config.inviterExpiration === undefined ? undefined : {
                                 id: "13444444444",
                             },
+                            smsCode: "1234"
                         },
                         dbUsers: config.inviterExpiration === undefined ? {} : {
                             "13444444444": {
@@ -219,7 +240,7 @@ describe("test register", () => {
                 await parallelRun(configurations, async (c) => {
                     await runTest({
                         body: {
-                            phone: c.userPhone, password: "123456",
+                            phone: c.userPhone, password: "123456", smsCode: "1234",
                             inviter: c.inviterPhone === undefined ? undefined : {
                                 id: c.inviterPhone,
                             }
@@ -254,7 +275,7 @@ describe("test register", () => {
     })
     test("update db failed should return RegisterError", async () => {
         await runTest({
-            body: {phone: "13333333333", password: "123456"},
+            body: {phone: "13333333333", password: "123456", smsCode: "1234"},
             insertAndUpdate: async () => {
                 return null
             },
@@ -265,8 +286,8 @@ describe("test register", () => {
     })
     describe("with various scenarios", () => {
         const scenarios = [
-            {phone: "13333333333", password: "123456"},
-            {phone: "13333333333", password: "123456", inviter: {id: "13444444444"}}
+            {phone: "13333333333", password: "123456", smsCode: "1234"},
+            {phone: "13333333333", password: "123456", smsCode: "1234", inviter: {id: "13444444444"}}
         ]
         it("should update db correctly", async () => {
             const insertAndUpdate = jest.fn(() => {
@@ -328,12 +349,12 @@ describe("test register", () => {
         })
     })
     test.concurrent.each([
-        {body: {phone: "13333333333", password: "12345"}},
-        {body: {phone: "13333333333", password: "12345", inviter: {id: "13444444444"}}},
+        {body: {phone: "13333333333", password: "12345", smsCode: "1234"}},
+        {body: {phone: "13333333333", password: "12345", smsCode: "1234", inviter: {id: "13444444444"}}},
     ])('(well done scenarios ($#) should return with token', async (scenarios) => {
         const tokenFn = jest.fn(() => {
             return new Response(200, {
-                code:0, msg: "success", data: {
+                code: 0, msg: "success", data: {
                     accessToken: "accessToken",
                     refreshToken: "refreshToken"
                 }

@@ -8,8 +8,14 @@ import createApp from "../common/app.mjs";
 
 const app = createApp()
 
+const logMiddleware = (req, res, next) => {
+    console.log(`captch-service, handling ${req.url}`)
+    next()
+}
+
 setup(app, {
     setup: diContainer.setup([
+        logMiddleware,
         makeRedisMiddleware('redis://captcha_cache'),
         (req, res, next) => {
             req.context.redis.setCaptcha = async (phone, captcha) => {

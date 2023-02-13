@@ -1,5 +1,5 @@
 group default {
-  targets = ["tk-node", "user", "token", "sms", "captcha"]
+  targets = ["tk-node", "api", "user", "token", "sms", "captcha"]
 }
 
 variable "GITHUB_SHA" {
@@ -20,6 +20,20 @@ target "tk-node" {
   cache-from = ["type=gha,scope=tk-node"]
   cache-to   = ["type=gha,mode=max,scope=tk-node"]
   tags       = ["tk-node"]
+}
+
+target "api" {
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "api"
+  }
+  tags = [
+    tag_name("api"),
+  ]
+  cache-from = ["type=gha,scope=api"]
+  cache-to   = ["type=gha,mode=max,scope=api"]
 }
 
 target "user" {

@@ -8,8 +8,12 @@ describe('register and login', () => {
             path: '/v1/user/register',
             body: {
                 phone: "13333333333",
-                password: "123456"
+                password: "123456",
+                smsCode: "2065"
             },
+            verify: response => {
+                    expect(response.status).toBe(201)
+            }
         })
         await test({
             path: '/v1/user/login',
@@ -17,19 +21,6 @@ describe('register and login', () => {
                 phone: "13333333333",
                 password: "123456"
             },
-        })
-    })
-
-    it("should return error when argument invalid", async () => {
-        await test({
-            path: '/v1/user/register',
-            body: {
-                password: "123456"
-            },
-            verify: (response) => {
-                expect(response.status).toBe(400)
-                expect(response.code).toBe(-100)
-            }
         })
     })
 })

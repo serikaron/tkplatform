@@ -18,6 +18,15 @@ export function setupStub(req) {
                     data: payload,
                 })
             }
+        },
+        sms: {
+            verify: async (phone, code) => {
+                return await axiosCall({
+                    url: `/v1/sms/verify/${phone}/${code}`,
+                    baseURL: "http://sms:8080",
+                    method: 'GET',
+                })
+            }
         }
     }
 }

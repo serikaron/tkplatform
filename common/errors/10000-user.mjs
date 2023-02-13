@@ -53,3 +53,13 @@ export class RegisterFailed extends TKError {
         });
     }
 }
+
+export class VerifySmsCodeFailed extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase - 6,
+            msg: "验证码错误"
+        });
+    }
+}
