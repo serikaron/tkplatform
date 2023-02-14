@@ -1,7 +1,7 @@
 'use strict'
 
 import axios from "axios";
-import {Response} from "../../../common/response.mjs";
+import {TKResponse} from "../../../common/TKResponse.mjs";
 import {sign} from "./sign.mjs";
 import * as dotenv from 'dotenv'
 
@@ -47,10 +47,10 @@ function makeCall({path, query, body}) {
 async function call({path, query, body}) {
     try {
         const r = await makeCall({path, query, body})
-        return new Response(r.status, r.data)
+        return new TKResponse(r.status, r.data)
     } catch (e) {
         // console.log(e)
-        return new Response(e.response.status, {code: e.response.data.code, msg: e.response.data.msg})
+        return new TKResponse(e.response.status, {code: e.response.data.code, msg: e.response.data.msg})
     }
 }
 

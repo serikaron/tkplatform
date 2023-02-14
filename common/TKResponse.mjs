@@ -1,6 +1,6 @@
 'use strict'
 
-export class Response {
+export class TKResponse {
     constructor(status, res) {
         this._status = status
         this.res = res
@@ -32,5 +32,17 @@ export class Response {
 
     toString() {
         return JSON.stringify(this.res)
+    }
+
+    static success({data = {}} = {}) {
+        return new TKResponse(200, {
+            code: 0, msg: "success", data
+        })
+    }
+
+    static fromError(tkError) {
+        return new TKResponse(tkError.status, {
+            code: tkError.constructor, msg: tkError.message
+        })
     }
 }

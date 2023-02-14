@@ -3,7 +3,7 @@
 import {makeMiddleware} from "../../common/flow.mjs";
 import {RegisterFailed, UserExists, UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs"
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
-import argon2i from "argon2";
+// import argon2i from "argon2";
 
 function checkInput(req) {
     function isBadField(field) {
@@ -62,7 +62,8 @@ async function registerHandler(req) {
             return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
         }
 
-        registerUser.password = await argon2i.hash(registerUser.password)
+        // registerUser.password = await argon2i.hash(registerUser.password)
+        registerUser.password = await req.context.password.encode(registerUser.password)
         registerUser.member = {
             expiration: todayTimestamp() + config.daysForRegister * 86400
         }

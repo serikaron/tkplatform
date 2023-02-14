@@ -1,6 +1,5 @@
 'use strict'
 
-import argon2i from "argon2";
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 import {LoginFailed, PasswordNotMatch} from "../../common/errors/10000-user.mjs";
@@ -38,7 +37,8 @@ async function getUser(req) {
 
 async function checkPassword(req) {
     console.log(`checkPassword, server:${req.user.password}, plain:${req.body.password}`)
-    const matched = await argon2i.verify(req.user.password, req.body.password)
+    // const matched = await argon2i.verify(req.user.password, req.body.password)
+    const matched = await req.context.password.verify(req.user.password, req.body.password)
     if (!matched) {
         throw new PasswordNotMatch()
     }

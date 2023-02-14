@@ -1,12 +1,13 @@
 'use strict'
 
 import express from "express";
-import {errorHandler, injection, responseHandler} from "../common/flow.mjs";
 import {route as routeRegister} from "./handlers/register.mjs";
 import {route as routeLogin} from "./handlers/login.mjs"
-// import 'express-async-errors'
+import {route as routeResetPassword} from "./handlers/resetPassword.mjs"
 
-export function setup(app, {setup= (router) => {}, teardown= (router) => {}} = {}) {
+export function setup(app, {
+    setup, teardown
+} = {}) {
     const router = express.Router()
     app.use('/v1/user', router)
 
@@ -14,6 +15,7 @@ export function setup(app, {setup= (router) => {}, teardown= (router) => {}} = {
 
     routeRegister(router)
     routeLogin(router)
+    routeResetPassword(router)
 
     teardown(router)
 }

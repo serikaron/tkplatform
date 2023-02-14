@@ -7,12 +7,24 @@ import diContainer from "../common/dicontainer.mjs";
 import {makeMiddleware} from "../common/flow.mjs";
 import {cleanMongo, setupMongo} from "./mongo.mjs";
 import {setupStub} from "./stubs.mjs";
+import argon2i from "argon2";
 
 const app = createApp()
 setup(app, {
         setup: diContainer.setup(
             makeMiddleware([
-                setupMongo, setupStub
+                setupMongo, setupStub,
+                (req, res, next) => {
+                    req.context.password = {
+                        encode: async (password) => {
+                            return await argon2i.hash(password)
+                        },
+                        verify: async (encodedPassword, rawPassword) => {
+                            return await argon2i.verify(encodedPassword, rawPassword)
+                        }
+                    }
+                    next()
+                }
             ])
         ),
         teardown: diContainer.teardown(

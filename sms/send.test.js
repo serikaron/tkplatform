@@ -4,14 +4,14 @@ import createApp from "../common/app.mjs";
 import supertest from "supertest";
 import {simpleCheckResponse} from "../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals"
-import {Response} from "../common/response.mjs";
+import {TKResponse} from "../common/TKResponse.mjs";
 import testDIContainer from "../tests/unittest/dicontainer.mjs";
 import {setup} from "./setup.mjs";
 import {InternalError} from "../common/errors/00000-basic.mjs";
 
 const defaultBody = {phone: "13333333333", captcha: "a1b2"}
 const successVerifyFn = async () => {
-    return new Response(200, {code: 0, msg: "success"})
+    return new TKResponse(200, {code: 0, msg: "success"})
 }
 
 async function runTest(
@@ -81,7 +81,7 @@ test.concurrent.each([
     {
         name: "check captcha failed",
         verifyFn: jest.fn(async () => {
-            return new Response(200, {code: -1, msg: "error"})
+            return new TKResponse(200, {code: -1, msg: "error"})
         }),
         status: 400, code: -30001, msg: "图形验证码错误"
     }

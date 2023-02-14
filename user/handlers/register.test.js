@@ -1,6 +1,5 @@
 'use strict'
 
-import argon2i from "argon2";
 import {setup as setupServer} from '../server.mjs'
 import createApp from "../../common/app.mjs";
 import supertest from 'supertest'
@@ -8,7 +7,7 @@ import {makeMiddleware} from "../../common/flow.mjs";
 import {parallelRun, serialTest, simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals"
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
-import {Response} from "../../common/response.mjs";
+import {TKResponse} from "../../common/TKResponse.mjs";
 
 function todayTimestamp() {
     return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
@@ -24,7 +23,10 @@ async function runTest(
         insertAndUpdate = undefined,
         tokenFn = undefined,
         smsFn = async () => {
-            return new Response(200, {code: 0, msg: "success"})
+            return new TKResponse(200, {code: 0, msg: "success"})
+        },
+        encodeFn = async () => {
+            return "encodedPassword"
         },
         status, code, msg,
         data = {},
@@ -51,6 +53,9 @@ async function runTest(
                         sms: {
                             verify: smsFn
                         }
+                    },
+                    password: {
+                        encode: encodeFn
                     }
                 }
             },
@@ -113,7 +118,7 @@ describe("test register", () => {
     })
     test("invalid sms code should return error", async () => {
         const smsFn = jest.fn(async () => {
-            return new Response(400, {code: -1})
+            return new TKResponse(400, {code: -1})
         })
         await runTest({
             body: {phone: "13333333333", password: "123456", smsCode: "1234"},
@@ -126,23 +131,29 @@ describe("test register", () => {
     })
     describe("processing register logic", () => {
         it("should return encrypted password", async () => {
+            const encodePassword = jest.fn(async () => {
+                return "encodedPassword"
+            })
             await runTest({
                 body: {phone: "13333333333", password: "123456", smsCode: "1234"},
                 insertAndUpdate: () => {
                 },
                 tokenFn: () => {
-                    return new Response(200, {code: 0})
+                    return new TKResponse(200, {code: 0})
                 },
                 verify: async (req) => {
                     expect(req.updateDB.registerUser.phone).toBe("13333333333")
-                    expect(req.updateDB.registerUser.password === "123456").not.toBe(true)
-                    const passwordMatched = await argon2i.verify(req.updateDB.registerUser.password, "123456")
-                    expect(passwordMatched).toBe(true)
+                    expect(req.updateDB.registerUser.password).toBe("encodedPassword")
+                    // expect(req.updateDB.registerUser.password === "123456").not.toBe(true)
+                    // const passwordMatched = await argon2i.verify(req.updateDB.registerUser.password, "123456")
+                    // expect(passwordMatched).toBe(true)
                 },
+                encodeFn: encodePassword,
                 status: 201,
                 code: 0,
                 msg: "注册成功"
             })
+            expect(encodePassword).toHaveBeenCalledWith("123456")
         })
         describe("with difference configs", () => {
             const configs = [
@@ -195,7 +206,7 @@ describe("test register", () => {
                         insertAndUpdate: () => {
                         },
                         tokenFn: () => {
-                            return new Response(200, {code: 0})
+                            return new TKResponse(200, {code: 0})
                         },
                         verify: (req) => {
                             expect(req.updateDB.registerUser.member.expiration).toBe(config.expectUserExpiration)
@@ -255,7 +266,7 @@ describe("test register", () => {
                         insertAndUpdate: () => {
                         },
                         tokenFn: () => {
-                            return new Response(200, {code: 0})
+                            return new TKResponse(200, {code: 0})
                         },
                         verify: (req) => {
                             expect(req.updateDB.registerUser.upLine).toBe(c.expectUpLine)
@@ -304,7 +315,7 @@ describe("test register", () => {
                     },
                     insertAndUpdate,
                     tokenFn: async () => {
-                        return new Response(200, {code: 0})
+                        return new TKResponse(200, {code: 0})
                     },
                     verify: (req) => {
                         if (s.inviter === undefined) {
@@ -337,7 +348,7 @@ describe("test register", () => {
                 insertAndUpdate: () => {
                 },
                 tokenFn: () => {
-                    return new Response(500, {
+                    return new TKResponse(500, {
                         code: -20001,
                         msg: "error"
                     })
@@ -353,7 +364,7 @@ describe("test register", () => {
         {body: {phone: "13333333333", password: "12345", smsCode: "1234", inviter: {id: "13444444444"}}},
     ])('(well done scenarios ($#) should return with token', async (scenarios) => {
         const tokenFn = jest.fn(() => {
-            return new Response(200, {
+            return new TKResponse(200, {
                 code: 0, msg: "success", data: {
                     accessToken: "accessToken",
                     refreshToken: "refreshToken"

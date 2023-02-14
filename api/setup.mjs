@@ -2,15 +2,26 @@
 
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from 'swagger-jsdoc'
-import './stubs/user.mjs'
-import './stubs/captcha.mjs'
-import './stubs/sms.mjs'
+import './doc/user.mjs'
+import './doc/captcha.mjs'
+import './doc/sms.mjs'
 import routeInfo from "./routeInfo.mjs";
 import {dispatch} from "./dispatcher.mjs";
 import {checkToken} from "./middleware.mjs";
 
 export function setup(app, {setup, teardown}) {
-    const jsdocOpt = {
+    setupDoc(app)
+
+    setup(app)
+
+    useTokenCheck(app)
+    useDispatcher(app)
+
+    teardown(app)
+}
+
+function setupDoc(app) {
+       const jsdocOpt = {
         definition: {
             openapi: '3.0.0',
             info: {
@@ -22,18 +33,11 @@ export function setup(app, {setup, teardown}) {
             {name: "user(用户相关)"},
             {name: "captcha(图形码)"},
         ],
-        apis: ['./api/src/stubs/*.mjs']
+        apis: ['./api/doc/*.mjs']
     }
 
     const swaggerSpec = swaggerJsdoc(jsdocOpt)
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
-
-    setup(app)
-
-    useTokenCheck(app)
-    useDispatcher(app)
-
-    teardown(app)
 }
 
 function useDispatcher(router) {
