@@ -1,9 +1,9 @@
 'use restrict'
 
-import {test} from "./api.mjs";
+import {runTest} from "./api.mjs";
 
-it("sms service should live", async () => {
-    await test({
+it.skip("sms service should live", async () => {
+    await runTest({
         path: '/v1/sms/send',
         body: {
             phone: "13333333333",

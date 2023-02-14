@@ -22,16 +22,17 @@ function url(path, query) {
     return encodeURI(`${path}?${queryString}`)
 }
 
-function headers({url, body}) {
+function headers({url, body, authentication}) {
     const timestamp = Math.floor(Date.now() / 1000)
     const s = sign(url, body, timestamp, process.env.SECRET_KEY)
     return {
         timestamp,
-        signature: s.signature
+        signature: s.signature,
+        authentication: authentication === undefined ? undefined : authentication.accessToken
     }
 }
 
-function makeCall({path, query, body}) {
+function makeCall({path, query, body, authentication}) {
     return axios({
         baseURL,
         url: url(path, query),
@@ -39,14 +40,15 @@ function makeCall({path, query, body}) {
         method: body === undefined ? "GET" : "POST",
         headers: headers({
             url: url(path, query),
-            body
+            body,
+            authentication
         })
     });
 }
 
-async function call({path, query, body}) {
+async function call({path, query, body, authentication}) {
     try {
-        const r = await makeCall({path, query, body})
+        const r = await makeCall({path, query, body, authentication})
         return new TKResponse(r.status, r.data)
     } catch (e) {
         // console.log(e)
@@ -60,8 +62,28 @@ function simpleVerification(response) {
     expect(JSON.stringify(response.data) !== "{}").toBe(true)
 }
 
-export async function test({path, query, body, verify = simpleVerification}) {
-    const response = await call({path, query, body})
+export async function runTest({path, query, body, verify = simpleVerification, authentication = {}}) {
+    const response = await call({path, query, body, authentication})
     verify(response)
 }
 
+export async function requireAuthenticatedClient(phone) {
+    const authenticatedClient = {
+        phone,
+        password: "123456",
+        smsCode: "2065",
+        captcha: "v53J",
+        accessToken: undefined
+    }
+    const registerResponse = await call({
+        path: "/v1/user/register",
+        body: {
+            phone, password: authenticatedClient.password,
+            smsCode: authenticatedClient.smsCode
+        }
+    })
+    expect(registerResponse.isSuccess()).toBe(true)
+    authenticatedClient.accessToken = registerResponse.data.accessToken
+    authenticatedClient.refreshToken = registerResponse.data.refreshToken
+    return authenticatedClient
+}
