@@ -4,6 +4,7 @@ import {isBadFieldString} from "../../common/utils.mjs";
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 import {UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs";
+import {tokenPayload} from "../stubs.mjs";
 
 function checkInput(req) {
     if (isBadFieldString(req.body.smsCode) || isBadFieldString(req.body.newPassword)) {
@@ -33,10 +34,17 @@ async function reset(req) {
     await req.context.mongo.updatePassword(req.headers.id, encodedPassword)
 }
 
-function allDone(req, res) {
-    res.response({
-        status: 200, code: 0, msg: "密码更新成功"
-    })
+async function genToken(req, res) {
+    const response = await req.context.stubs.token.gen(tokenPayload(req.headers.id, req.headers.phone))
+    if (response.isError()) {
+        res.response({
+            status: 200, code: 0, msg: "更新成功，请重新登录"
+        })
+    } else {
+        res.response({
+            status: 200, code: 0, msg: "更新成功", data: response.data
+        })
+    }
 }
 
 export function route(router) {
@@ -45,6 +53,6 @@ export function route(router) {
         checkUser,
         checkSms,
         reset,
-        allDone
+        genToken
     ]))
 }

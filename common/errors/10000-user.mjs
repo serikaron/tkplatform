@@ -63,3 +63,13 @@ export class VerifySmsCodeFailed extends TKError {
         });
     }
 }
+
+export class ResetAccountFailed extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase - 7,
+            msg: "更新失败"
+        });
+    }
+}

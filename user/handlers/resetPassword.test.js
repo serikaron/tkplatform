@@ -6,7 +6,7 @@ import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import supertest from "supertest";
 import {simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from '@jest/globals'
-import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 const defaultBody = {
@@ -29,14 +29,22 @@ const defaultSmsFn = async () => {
     return TKResponse.success()
 }
 
+const defaultResponseData = {
+    accessToken: "accessToken",
+    refreshToken: "refreshToken",
+}
+
 async function runTest(
     {
         body = defaultBody,
         headers = defaultHeaders,
         getFn = defaultGetFn,
         smsFn = defaultSmsFn,
-        setFn,
-        encodeFn,
+        setFn = async () => {},
+        encodeFn = async () => {
+            return "encodedNewPassword"
+        },
+        tokenFn = async () => { return TKResponse.success({data: defaultResponseData})},
         status, code, msg, data = {}
     }
 ) {
@@ -52,6 +60,9 @@ async function runTest(
                     stubs: {
                         sms: {
                             verify: smsFn
+                        },
+                        token: {
+                            gen: tokenFn
                         }
                     },
                     password: {
@@ -123,8 +134,27 @@ test("password should be encoded and save to db", async () => {
     await runTest({
         setFn: updatePassword,
         encodeFn,
-        status: 200, code: 0, msg: "密码更新成功"
+        status: 200, code: 0, msg: "更新成功", data: defaultResponseData
     })
     expect(updatePassword).toHaveBeenCalledWith("f82a5acf-8860-4cec-b0c5-9650afeaccef", "encodedPassword")
     expect(encodeFn).toHaveBeenCalledWith("123456")
+})
+
+test.concurrent.each([
+    {
+        tokenResponse: TKResponse.fromError(new InternalError()),
+        status: 200, code: 0, msg: "更新成功，请重新登录", data: {}
+    },
+    {
+        tokenResponse: TKResponse.success({data: defaultResponseData}),
+        status: 200, code: 0, msg: "更新成功", data: defaultResponseData
+    }
+]) ("($#) should check response", async ({tokenResponse, status, code, msg, data}) => {
+    const tokenFn = jest.fn(async () => {
+        return tokenResponse
+    })
+    await runTest({
+        tokenFn, status, code, msg, data
+    })
+    expect(tokenFn).toHaveBeenCalledWith({id: defaultHeaders.id, phone: defaultHeaders.phone})
 })

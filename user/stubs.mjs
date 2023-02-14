@@ -2,6 +2,12 @@
 
 import {axiosCall} from "../common/call.mjs";
 
+export function tokenPayload(id, phone) {
+    return {
+        id, phone
+    }
+}
+
 export function setupStub(req) {
     if (req.context === undefined) {
         req.context = {}
