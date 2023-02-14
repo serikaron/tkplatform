@@ -55,8 +55,5 @@ export function makeMiddleware(handlers) {
     })
 }
 
-export async function handle(handlers) {
-    return [injection, ...makeMiddleware(handlers), errorHandler, response]
-}
 
 

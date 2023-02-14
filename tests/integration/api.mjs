@@ -1,7 +1,7 @@
 'use strict'
 
 import axios from "axios";
-import {TKResponse} from "../../../common/TKResponse.mjs";
+import {TKResponse} from "../../common/TKResponse.mjs";
 import {sign} from "./sign.mjs";
 import * as dotenv from 'dotenv'
 

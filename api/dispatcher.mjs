@@ -16,11 +16,12 @@ function getBaseURL(url) {
 }
 
 export async function dispatch(req, res, next) {
+    console.log(`dispatch, extractedToken::${JSON.stringify(req.extractedToken)}`)
     const axiosConfig = {
         baseURL: getBaseURL(req.url),
         method: req.method,
         url: req.url,
-        // headers: req.headers
+        headers: req.extractedToken !== undefined ? req.extractedToken : {}
     };
     console.log(`dispatch, ${JSON.stringify(axiosConfig)}`)
     if (req.method === 'POST' || req.method === 'PUT') {

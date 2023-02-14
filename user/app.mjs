@@ -14,7 +14,7 @@ setup(app, {
         setup: diContainer.setup(
             makeMiddleware([
                 setupMongo, setupStub,
-                (req, res, next) => {
+                (req) => {
                     req.context.password = {
                         encode: async (password) => {
                             return await argon2i.hash(password)
@@ -23,7 +23,6 @@ setup(app, {
                             return await argon2i.verify(encodedPassword, rawPassword)
                         }
                     }
-                    next()
                 }
             ])
         ),

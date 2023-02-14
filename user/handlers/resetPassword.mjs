@@ -13,6 +13,7 @@ function checkInput(req) {
 }
 
 async function checkUser(req) {
+    console.log(`checkUser, headers:${JSON.stringify(req.headers)}`)
     const user = await req.context.mongo.getUserById(req.headers.id)
     if (user === null) {
         throw new UserNotExists()

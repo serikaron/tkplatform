@@ -43,15 +43,18 @@ export async function checkToken(req, res, next) {
         return
     }
     const verifyResult = await axiosCall({
-        url: `/token/${token}/verify`,
-        baseURL: this.baseURL,
+        url: `/v1/token/${token}/verify`,
+        baseURL: "http://token:8080",
         method: 'get'
     })
+    // console.log(verifyResult.toString())
     if (verifyResult.isError()) {
         console.log("invalid token")
         res.status(401).end()
         return
     }
+
+    req.extractedToken = verifyResult.data
     next()
 }
 
