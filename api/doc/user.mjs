@@ -196,9 +196,6 @@
  *                   password:
  *                     type: string
  *                     example: "123456"
- *               smsCode:
- *                 type: string
- *                 example: "1234"
  *               new:
  *                 type: object
  *                 properties:

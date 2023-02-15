@@ -17,13 +17,20 @@ async function runTest(
     {
         body = {phone: "13333333333", password: "123456", smsCode: "1234"},
         dbUsers = {},
-        config = {daysForRegister: 7, daysForInvite: 3},
         verify = () => {
+        },
+        systemFn = async () => {
+            return TKResponse.Success({
+                data: {
+                    daysForRegister: 7,
+                    daysForInvite: 3,
+                }
+            })
         },
         insertAndUpdate = undefined,
         tokenFn = undefined,
         smsFn = async () => {
-            return new TKResponse(200, {code: 0, msg: "success"})
+            return TKResponse.Success()
         },
         encodeFn = async () => {
             return "encodedPassword"
@@ -52,16 +59,18 @@ async function runTest(
                         },
                         sms: {
                             verify: smsFn
-                        }
+                        },
+                        system: {
+                            settings: {
+                                get: systemFn
+                            }
+                        },
                     },
                     password: {
                         encode: encodeFn
                     }
                 }
             },
-            (req) => {
-                req.config = config
-            }
         ])),
         teardown: testDIContainer.teardown(makeMiddleware([verify]))
     })
@@ -155,73 +164,77 @@ describe("test register", () => {
             })
             expect(encodePassword).toHaveBeenCalledWith("123456")
         })
-        describe("with difference configs", () => {
-            const configs = [
-                {daysForRegister: 7, daysForInvite: 3, expectUserExpiration: todayTimestamp() + 7 * 86400},
-                {
-                    daysForRegister: 7,
-                    daysForInvite: 3,
-                    expectUserExpiration: todayTimestamp() + 7 * 86400,
-                    inviterExpiration: todayTimestamp(),
-                    expectInviterExpiration: todayTimestamp() + 3 * 86400
-                },
-                {
-                    daysForRegister: 6,
-                    daysForInvite: 2,
-                    expectUserExpiration: todayTimestamp() + 6 * 86400,
-                    inviterExpiration: todayTimestamp() - 86400,
-                    expectInviterExpiration: todayTimestamp() + 2 * 86400
-                },
-                {
-                    daysForRegister: 5,
-                    daysForInvite: 1,
-                    expectUserExpiration: todayTimestamp() + 5 * 86400,
-                    inviterExpiration: todayTimestamp() + 3 * 86400,
-                    expectInviterExpiration: todayTimestamp() + 4 * 86400
-                },
-            ]
-            it("should extend member expiration correctly", async () => {
-                for (const config of configs) {
-                    await runTest({
-                        body: {
-                            phone: "13333333333",
-                            password: "123456",
-                            inviter: config.inviterExpiration === undefined ? undefined : {
-                                id: "13444444444",
-                            },
-                            smsCode: "1234"
-                        },
-                        dbUsers: config.inviterExpiration === undefined ? {} : {
-                            "13444444444": {
-                                id: "13444444444",
-                                member: {
-                                    expiration: config.inviterExpiration
-                                }
-                            }
-                        },
-                        config: {
-                            daysForRegister: config.daysForRegister,
-                            daysForInvite: config.daysForInvite
-                        },
-                        insertAndUpdate: () => {
-                        },
-                        tokenFn: () => {
-                            return new TKResponse(200, {code: 0})
-                        },
-                        verify: (req) => {
-                            expect(req.updateDB.registerUser.member.expiration).toBe(config.expectUserExpiration)
-                            if (config.expectInviterExpiration === undefined) {
-                                expect(req.updateDB.inviter).toBe(undefined)
-                            } else {
-                                expect(req.updateDB.inviter.member.expiration).toBe(config.expectInviterExpiration)
-                            }
-                        },
-                        status: 201,
-                        code: 0,
-                        msg: "注册成功"
-                    })
-                }
+        test.concurrent.each([
+            {daysForRegister: 7, daysForInvite: 3, expectUserExpiration: todayTimestamp() + 7 * 86400},
+            {
+                daysForRegister: 7,
+                daysForInvite: 3,
+                expectUserExpiration: todayTimestamp() + 7 * 86400,
+                inviterExpiration: todayTimestamp(),
+                expectInviterExpiration: todayTimestamp() + 3 * 86400
+            },
+            {
+                daysForRegister: 6,
+                daysForInvite: 2,
+                expectUserExpiration: todayTimestamp() + 6 * 86400,
+                inviterExpiration: todayTimestamp() - 86400,
+                expectInviterExpiration: todayTimestamp() + 2 * 86400
+            },
+            {
+                daysForRegister: 5,
+                daysForInvite: 1,
+                expectUserExpiration: todayTimestamp() + 5 * 86400,
+                inviterExpiration: todayTimestamp() + 3 * 86400,
+                expectInviterExpiration: todayTimestamp() + 4 * 86400
+            },
+        ])("($#) should extend member expiration correctly", async (
+            {
+                daysForInvite,
+                daysForRegister,
+                expectInviterExpiration,
+                expectUserExpiration,
+                inviterExpiration
+            }
+        ) => {
+            const systemFn = jest.fn(async () => {
+                return TKResponse.Success({data: {daysForRegister, daysForInvite}})
             })
+            await runTest({
+                body: {
+                    phone: "13333333333",
+                    password: "123456",
+                    inviter: inviterExpiration === undefined ? undefined : {
+                        id: "13444444444",
+                    },
+                    smsCode: "1234"
+                },
+                dbUsers: inviterExpiration === undefined ? {} : {
+                    "13444444444": {
+                        id: "13444444444",
+                        member: {
+                            expiration: inviterExpiration
+                        }
+                    }
+                },
+                insertAndUpdate: () => {
+                },
+                tokenFn: () => {
+                    return new TKResponse(200, {code: 0})
+                },
+                verify: (req) => {
+                    expect(req.updateDB.registerUser.member.expiration).toBe(expectUserExpiration)
+                    if (expectInviterExpiration === undefined) {
+                        expect(req.updateDB.inviter).toBe(undefined)
+                    } else {
+                        expect(req.updateDB.inviter.member.expiration).toBe(expectInviterExpiration)
+                    }
+                },
+                systemFn,
+                status: 201,
+                code: 0,
+                msg: "注册成功"
+            })
+            expect(systemFn).toHaveBeenCalledWith("registerPrice")
         })
         describe("has inviter or not", () => {
             const configurations = [

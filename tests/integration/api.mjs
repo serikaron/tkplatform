@@ -32,8 +32,8 @@ function headers({url, body, authentication}) {
     }
 }
 
-function makeCall({path, query, body, authentication}) {
-    return axios({
+function axiosConfig({path, query, body, authentication}) {
+    return {
         baseURL,
         url: url(path, query),
         data: body,
@@ -43,12 +43,14 @@ function makeCall({path, query, body, authentication}) {
             body,
             authentication
         })
-    });
+    }
 }
 
 async function call({path, query, body, authentication}) {
     try {
-        const r = await makeCall({path, query, body, authentication})
+        const config = axiosConfig({path, query, body, authentication})
+        console.log(`axiosConfig: ${JSON.stringify(config)}`)
+        const r = await axios(config)
         return new TKResponse(r.status, r.data)
     } catch (e) {
         // console.log(e)

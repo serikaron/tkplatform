@@ -34,7 +34,7 @@ export class TKResponse {
         return JSON.stringify(this.res)
     }
 
-    static success({data = {}} = {}) {
+    static Success({data = {}} = {}) {
         return new TKResponse(200, {
             code: 0, msg: "success", data
         })

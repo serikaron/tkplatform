@@ -8,6 +8,14 @@ const routeInfo = [
 
     {url: '/v1/user/account', method: "POST", needAuth: true},
     {url: '/v1/user/password', method: "POST", needAuth: true},
+
+    // settings
+    {
+        url: '/v1/system/sites', method: "GET", needAuth: true,
+        service: {
+            url: '/v1/system/setting/sites'
+        }
+    },
 ]
 
 export default routeInfo

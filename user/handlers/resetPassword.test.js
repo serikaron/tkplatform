@@ -26,7 +26,7 @@ const defaultGetFn = async () => {
 }
 
 const defaultSmsFn = async () => {
-    return TKResponse.success()
+    return TKResponse.Success()
 }
 
 const defaultResponseData = {
@@ -44,7 +44,7 @@ async function runTest(
         encodeFn = async () => {
             return "encodedNewPassword"
         },
-        tokenFn = async () => { return TKResponse.success({data: defaultResponseData})},
+        tokenFn = async () => { return TKResponse.Success({data: defaultResponseData})},
         status, code, msg, data = {}
     }
 ) {
@@ -146,7 +146,7 @@ test.concurrent.each([
         status: 200, code: 0, msg: "更新成功，请重新登录", data: {}
     },
     {
-        tokenResponse: TKResponse.success({data: defaultResponseData}),
+        tokenResponse: TKResponse.Success({data: defaultResponseData}),
         status: 200, code: 0, msg: "更新成功", data: defaultResponseData
     }
 ]) ("($#) should check response", async ({tokenResponse, status, code, msg, data}) => {

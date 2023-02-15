@@ -42,9 +42,15 @@ function setupDoc(app) {
 
 function useDispatcher(router) {
     routeInfo.forEach(info => {
+        router.use((req, res, next) => {
+            req.routeInfo = info
+            next()
+        })
         if (info.method.toUpperCase() === "POST") {
+            console.log(`${info.url} POST`)
             router.post(info.url, dispatch)
         } else {
+            console.log(`${info.url} GET`)
             router.get(info.url, dispatch)
         }
     })
@@ -53,6 +59,7 @@ function useDispatcher(router) {
 function useTokenCheck(router) {
     routeInfo.forEach(info => {
         if (info.needAuth) {
+            console.log(`${info.url} need auth`)
             router.use(info.url, checkToken)
         }
     })

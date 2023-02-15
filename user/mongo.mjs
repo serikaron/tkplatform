@@ -1,30 +1,23 @@
 'use strict'
 
-import {MongoClient, MongoServerError, ObjectId} from 'mongodb'
+import {MongoServerError, ObjectId} from 'mongodb'
 import * as dotenv from 'dotenv'
 import {UserExists} from "../common/errors/10000-user.mjs";
+import {connectUser} from "../common/mongo.mjs";
 
 dotenv.config()
-
-async function connect() {
-    const uri = `mongodb://${process.env.MONGO_USER_USER}:${process.env.MONGO_USER_PASS}@${process.env.MONGO_USER_HOST}:27017`
-    const client = new MongoClient(uri)
-    await client.connect()
-    return client
-}
 
 export async function setupMongo(req) {
     if (req.context === undefined) {
         req.context = {}
     }
 
-    const client = await connect()
-    const db = client.db(process.env.MONGO_USER_DB)
+    const user = await connectUser()
     const collection = {
-        users: db.collection("users")
+        users: user.db.collection("users")
     }
     req.context.mongo = {
-        client, db, collection,
+        client: user.client, db: user.db, collection,
         getUserByPhone: async (find, projection) => {
             return await collection.users
                 .findOne(find, projection)

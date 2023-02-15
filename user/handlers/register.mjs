@@ -2,7 +2,8 @@
 
 import {makeMiddleware} from "../../common/flow.mjs";
 import {RegisterFailed, UserExists, UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs"
-import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
+
 // import argon2i from "argon2";
 
 function checkInput(req) {
@@ -44,9 +45,13 @@ async function getInviter(req) {
 }
 
 async function getConfig(req) {
-    req.body.config = {
-        daysForRegister: 7, daysForInvite: 3
+    const response = await req.context.stubs.system.settings.get("registerPrice")
+    if (response.isError()) {
+        throw new InternalError()
     }
+    req.config = (Object.keys(response.data).length === 0) ? {
+        daysForRegister: 7, daysForInvite: 3
+    } : response.data
 }
 
 async function verifySms(req) {

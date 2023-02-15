@@ -5,6 +5,7 @@ import {sign} from "./sign.mjs";
 import {axiosCall} from "../common/call.mjs";
 
 export function checkSign(req, res, next) {
+    console.log("checkSign")
     const s = sign(req.originalUrl, req.body, req.header("timestamp"), process.env.SECRET_KEY)
     if (s.signature !== req.header("signature")) {
         console.log(s.source)
@@ -13,10 +14,12 @@ export function checkSign(req, res, next) {
         res.status(400).end()
         return
     }
+    console.log("checkSign next")
     next()
 }
 
 export function checkTime(req, res, next) {
+    console.log("checkTime")
     const now = Math.floor(Date.now() / 1000)
     const tHeader = req.header("timestamp")
     const timestamp = Number(tHeader)
@@ -36,6 +39,7 @@ export function checkTime(req, res, next) {
 
 
 export async function checkToken(req, res, next) {
+    console.log("checkToken")
     const token = req.header("authentication")
     if (token === "") {
         console.log("empty token")

@@ -5,6 +5,7 @@ import {TKError} from "./errors/error.mjs";
 
 export function injection(req, res, next) {
     res.response = ({status = 200, code = 0, msg = "success", data = {}}) => {
+        console.log(`injection, response, req: ${req.url}, res: ${res}`)
         req.res = {
             status,
             response: {
@@ -16,15 +17,18 @@ export function injection(req, res, next) {
 }
 
 export function responseHandler(req, res) {
-    res.status(req.res.status).json(req.res.response)
-}
-
-export function response(req, res) {
-    res.status(req.res.status).json(req.res.response)
+    try {
+        console.log(`req ${req.url}, status: ${req.res.status}`)
+        res.status(req.res.status).json(req.res.response)
+    } catch (e) {
+        console.log(e)
+    } finally {
+        res.status(500).end()
+    }
 }
 
 export function errorHandler(error, req, res, next) {
-    console.log(error)
+    console.log(`errorHeandler ${error}`)
     if (req.method === "GET") {
         console.log(`path:${req.path}, query:${JSON.stringify(req.query)}, params:${JSON.stringify(req.params)}`)
     } else {

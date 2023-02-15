@@ -1,5 +1,5 @@
 group default {
-  targets = ["tk-node", "api", "user", "token", "sms", "captcha"]
+  targets = ["tk-node", "api", "user", "token", "sms", "captcha", "system", "migration"]
 }
 
 group push {
@@ -94,4 +94,32 @@ target "captcha" {
   ]
   cache-from = ["type=gha,scope=captcha"]
   cache-to   = ["type=gha,mode=max,scope=captcha"]
+}
+
+target "system" {
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "system"
+  }
+  tags = [
+    tag_name("system"),
+  ]
+  cache-from = ["type=gha,scope=system"]
+  cache-to   = ["type=gha,mode=max,scope=system"]
+}
+
+target "migration" {
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "migration"
+  }
+  tags = [
+    tag_name("migration"),
+  ]
+  cache-from = ["type=gha,scope=migration"]
+  cache-to   = ["type=gha,mode=max,scope=migration"]
 }

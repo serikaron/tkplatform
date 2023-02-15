@@ -25,6 +25,7 @@ export async function call(f) {
 
 export async function axiosCall(config) {
     try {
+        config.timeout = 5000
         const r = await axios(config)
         return new TKResponse(r.status, r.data)
     } catch (e) {

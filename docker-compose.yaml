@@ -74,3 +74,35 @@ services:
   sms_cache:
     image: redis:alpine
     restart: always
+
+  system:
+    image: car.daoyi365.com:5000/tk-system
+    restart: always
+    entrypoint: node /app/system/app.mjs
+    depends_on:
+      - system_db
+    ports:
+      - "9005:8080"
+    volumes:
+      - .env:/app/.env
+
+  system_db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_SYSTEM_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_SYSTEM_PASS}
+      MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_SYSTEM_DB}
+
+
+  migration:
+    image: car.daoyi365.com:5000/tk-migration
+    entrypoint: node /app/migration/migration.mjs
+#    entrypoint: ls -la /app/migration
+#    entrypoint: cat /app/migration/.env
+    depends_on:
+      - system_db
+      - user_db
+    volumes:
+      - ./migration/migration.mjs:/app/migration/migration.mjs
+      - .env:/app/.env

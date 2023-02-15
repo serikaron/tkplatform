@@ -42,7 +42,7 @@ const defaultVerifyFn = async () => {
 }
 
 const defaultSmsFn = async () => {
-    return TKResponse.success()
+    return TKResponse.Success()
 }
 
 const defaultResponseData = {
@@ -51,7 +51,7 @@ const defaultResponseData = {
 }
 
 const defaultTokenFn = async () => {
-    return TKResponse.success({
+    return TKResponse.Success({
         data: defaultResponseData
     })
 }
@@ -214,7 +214,7 @@ test.concurrent.each([
         status: 200, code: 0, msg: "更新成功，请重新登录", data: {}
     },
     {
-        tokenResponse: TKResponse.success({data: defaultResponseData}),
+        tokenResponse: TKResponse.Success({data: defaultResponseData}),
         status: 200, code: 0, msg: "更新成功", data: defaultResponseData
     }
 ])("($#) refresh token", async ({tokenResponse, status, code, msg, data}) => {

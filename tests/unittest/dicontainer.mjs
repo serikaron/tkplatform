@@ -8,7 +8,7 @@ function mockErrorHandler(err, req, res, next) {
         errorHandler(err, req, res, next)
     } else {
         // console.log("mockErrorHandler")
-        // console.log(err)
+        console.log(err)
         // throw err
         // next(err)
         res.response({

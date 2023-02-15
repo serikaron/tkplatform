@@ -16,11 +16,11 @@ function getBaseURL(url) {
 }
 
 export async function dispatch(req, res, next) {
-    console.log(`dispatch, extractedToken::${JSON.stringify(req.extractedToken)}`)
+    console.log(`dispatch req: ${req.url}, extractedToken::${JSON.stringify(req.extractedToken)}`)
     const axiosConfig = {
-        baseURL: getBaseURL(req.url),
+        baseURL: req.routeInfo.service === undefined || req.routeInfo.service.baseURL === undefined ? getBaseURL(req.url) : req.routeInfo.service.baseURL,
         method: req.method,
-        url: req.url,
+        url: req.routeInfo.service === undefined || req.routeInfo.service.url === undefined ? req.url : req.routeInfo.service.url,
         headers: req.extractedToken !== undefined ? req.extractedToken : {}
     };
     console.log(`dispatch, ${JSON.stringify(axiosConfig)}`)
