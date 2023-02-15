@@ -1,14 +1,8 @@
 'use strict'
 
-import {requireAuthenticatedClient, runTest} from "./api.mjs";
+import client from './client.json' assert {type: "json"}
 
-let authentication = {}
-
-beforeAll(async () => {
-    authentication = await requireAuthenticatedClient("13444444444")
-})
-
-describe('register and login', () => {
+describe.skip('register and login', () => {
     it("should return ok", async () => {
         await runTest({
             path: '/v1/user/register',
@@ -18,7 +12,7 @@ describe('register and login', () => {
                 smsCode: "2065"
             },
             verify: response => {
-                    expect(response.status).toBe(201)
+                expect(response.status).toBe(201)
             }
         })
         await runTest({
@@ -35,28 +29,28 @@ test("user change password", async () => {
     await runTest({
         path: "/v1/user/password",
         body: {
-            newPassword: authentication.password,
-            smsCode: authentication.smsCode
+            newPassword: client.password,
+            smsCode: client.smsCode
         },
-        authentication: authentication,
+        authentication: client,
         verify: (response) => {
             expect(response.status).toBe(200)
-            authentication.accessToken = response.data.accessToken
+            client.accessToken = response.data.accessToken
         }
     })
     await runTest({
         path: "/v1/user/account",
         body: {
             old: {
-                phone: authentication.phone,
-                password: authentication.password
+                phone: client.phone,
+                password: client.password
             },
             new: {
-                phone: authentication.phone,
-                password: authentication.password
+                phone: client.phone,
+                password: client.password
             },
-            smsCode: authentication.smsCode
+            smsCode: client.smsCode
         },
-        authentication: authentication,
+        authentication: client,
     })
 })

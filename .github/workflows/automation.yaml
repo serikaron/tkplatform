@@ -34,6 +34,8 @@ jobs:
         run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
       - name: delay
         run: sleep 5s
+      - name: prepare user
+        run: node ./tests/integration/prepare.mjs
       - name: integration test
         run: npm run test:integration
 

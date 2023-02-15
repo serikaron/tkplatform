@@ -49,7 +49,7 @@ function axiosConfig({path, query, body, authentication}) {
 async function call({path, query, body, authentication}) {
     try {
         const config = axiosConfig({path, query, body, authentication})
-        console.log(`axiosConfig: ${JSON.stringify(config)}`)
+        // console.log(`axiosConfig: ${JSON.stringify(config)}`)
         const r = await axios(config)
         return new TKResponse(r.status, r.data)
     } catch (e) {
