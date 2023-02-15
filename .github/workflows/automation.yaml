@@ -35,7 +35,7 @@ jobs:
       - name: delay
         run: sleep 5s
       - name: prepare user
-        run: node ./tests/integration/prepare.mjs
+        run: node ./tests/integration/prepare.mjs && cat ./tests/integration/client.json
       - name: integration test
         run: npm run test:integration
 
