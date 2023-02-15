@@ -1,6 +1,7 @@
 'use restrict'
 
 import client from "./client.json" assert {type: "json"}
+import {runTest} from "./api.mjs";
 
 
 test.each`

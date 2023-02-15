@@ -1,6 +1,7 @@
 'use strict'
 
 import client from './client.json' assert {type: "json"}
+import {runTest} from "./api.mjs";
 
 describe.skip('register and login', () => {
     it("should return ok", async () => {
