@@ -18,7 +18,25 @@ const routeInfo = [
         }
     },
     {
-        url: '/v1/user/:userID/sites', method: "GET", needAuth: true,
+        url: '/v1/user/sites', method: "GET", needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+        }
+    },
+    {
+        url: "/v1/user/site/:siteId", method: "PUT", needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+        }
+    },
+    {
+        url: "/v1/user/site", method: "POST", needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+        }
+    },
+    {
+        url: "/v1/user/sites", method: "PUT", needAuth: true,
         service: {
             baseURL: "http://site:8080",
         }

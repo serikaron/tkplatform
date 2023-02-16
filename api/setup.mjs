@@ -49,6 +49,9 @@ function useDispatcher(router) {
         if (info.method.toUpperCase() === "POST") {
             console.log(`${info.url} POST`)
             router.post(info.url, dispatch)
+        } else if (info.method.toUpperCase() === "PUT") {
+            console.log(`${info.url} PUT`)
+            router.put(info.url, dispatch)
         } else {
             console.log(`${info.url} GET`)
             router.get(info.url, dispatch)

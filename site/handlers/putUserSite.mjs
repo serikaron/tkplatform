@@ -11,9 +11,4 @@ export function routePutUserSite(router) {
         }))
         next()
     })
-    router.put('/user/site', async (req, res, next) => {
-        await req.context.mongo.setUserSiteWhole(req.headers.id, req.body)
-        res.tkResponse(TKResponse.Success())
-        next()
-    })
 }

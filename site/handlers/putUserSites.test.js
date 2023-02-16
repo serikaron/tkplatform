@@ -1,5 +1,3 @@
-'use restrict'
-
 import createApp from "../../common/app.mjs";
 import {setup} from "../setup.mjs";
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
@@ -8,11 +6,11 @@ import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
-async function runTest(
+export async function runTestWhole(
     {
         body,
         headers,
-        setUserSiteOne,
+        setUserSiteWhole,
         tkResponse
     }
 ) {
@@ -22,7 +20,7 @@ async function runTest(
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        setUserSiteOne
+                        setUserSiteWhole
                     }
                 }
                 next()
@@ -32,34 +30,27 @@ async function runTest(
     })
 
     const response = await supertest(app)
-        .put('/v1/user/site/fake-site-id')
+        .put('/v1/user/site')
         .send(body)
         .set(headers)
     simpleCheckTKResponse(response, tkResponse)
 }
 
-test('set one site according to site id', async () => {
-    const setUserSiteOne = jest.fn()
-    await runTest({
-        body: {
-            id: "possible bad id",
-            site: {name: "site-name", icon: "site-icon"}
-        },
+test("set the whole user site for saving", async () => {
+    const setUserSiteWhole = jest.fn()
+    await runTestWhole({
+        body: [
+            {msg: "a user site body"},
+            {msg: "a user site body too"}
+        ],
         headers: {
             id: "fake user id",
-            phone: "13333333333",
         },
-        setUserSiteOne,
-        tkResponse: TKResponse.Success({
-            data: {
-                id: "fake-site-id",
-                site: {name: "site-name", icon: "site-icon"},
-            },
-        })
+        setUserSiteWhole,
+        tkResponse: TKResponse.Success()
     })
-    expect(setUserSiteOne).toHaveBeenCalledWith("fake user id", "fake-site-id", {
-        id: "fake-site-id",
-        site: {name: "site-name", icon: "site-icon"},
-    })
-});
-
+    expect(setUserSiteWhole).toHaveBeenCalledWith("fake user id", [
+        {msg: "a user site body"},
+        {msg: "a user site body too"}
+    ])
+})

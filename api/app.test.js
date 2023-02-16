@@ -33,6 +33,9 @@ async function callAgent(app, url, method, needAuth, body) {
         case "POST":
             agent = agent.post(url).send(body)
             break
+        case "PUT":
+            agent = agent.put(url).send(body)
+            break
     }
 
     agent.set(makeHeaders(url, body, needAuth))
@@ -171,12 +174,39 @@ test.each([
         }
     },
     {
-        url: "/v1/user/fake_user_id/sites",
+        url: "/v1/user/sites",
         method: "GET",
         needAuth: true,
         service: {
             baseURL: "http://site:8080",
-            url: "/v1/user/fake_user_id/sites"
+            url: "/v1/user/sites"
+        }
+    },
+    {
+        url: "/v1/user/site",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site"
+        }
+    },
+    {
+        url: "/v1/user/site/fake-site-id",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id"
+        }
+    },
+    {
+        url: "/v1/user/sites",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/sites"
         }
     }
 ])("$url should dispatch correctly", async (argument) => {
