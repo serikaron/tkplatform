@@ -2,7 +2,7 @@
 
 import {runTest, simpleVerification} from "./api.mjs";
 
-describe.skip('user test about auth', () => {
+describe('user test about auth', () => {
     let accessToken = undefined
     const phone = "13444444444"
 
@@ -38,12 +38,10 @@ describe.skip('user test about auth', () => {
         await runTest({
             path: "/v1/user/password",
             body: {
-                newPassword: client.password,
-                smsCode: client.smsCode
+                newPassword: "123456",
+                smsCode: "2065",
             },
-            authentication: {
-                accessToken
-            },
+            authentication: {accessToken},
             verify: (response) => {
                 simpleVerification(response)
                 accessToken = response.data.accessToken
@@ -56,14 +54,14 @@ describe.skip('user test about auth', () => {
             path: "/v1/user/account",
             body: {
                 old: {
-                    phone: client.phone,
-                    password: client.password
+                    phone: "13333333333",
+                    password: "123456",
                 },
                 new: {
-                    phone: client.phone,
-                    password: client.password
+                    phone: "13333333333",
+                    password: "123456",
                 },
-                smsCode: client.smsCode
+                smsCode: "2065",
             },
             authentication: {accessToken}
         })
