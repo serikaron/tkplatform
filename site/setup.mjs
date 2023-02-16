@@ -2,7 +2,9 @@
 
 import express from "express";
 import {routeGetSite} from "./handlers/getSites.mjs";
-import {routeAddUserSite} from "./handlers/addUserSite.mjs";
+import {routePostUserSite} from "./handlers/postUserSite.mjs";
+import {routeGetUserSites} from "./handlers/getUserSites.mjs";
+import {routePostSiteAccount} from "./handlers/postSiteAccount.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -11,7 +13,9 @@ export function setup(app, {setup, teardown}) {
     setup(router)
 
     routeGetSite(router)
-    routeAddUserSite(router)
+    routePostUserSite(router)
+    routeGetUserSites(router)
+    routePostSiteAccount(router)
 
     teardown(router)
 }
