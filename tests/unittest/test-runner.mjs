@@ -21,3 +21,7 @@ export function simpleCheckResponse(response, status, code, msg, data) {
     expect(response.body.msg).toEqual(msg)
     expect(response.body.data).toEqual(data)
 }
+
+export function simpleCheckTKResponse(response, tkResponse) {
+    simpleCheckResponse(response, tkResponse.status, tkResponse.code, tkResponse.msg, tkResponse.data)
+}

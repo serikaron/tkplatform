@@ -105,3 +105,4 @@ dist
 
 .idea
 ignore
+client.json
