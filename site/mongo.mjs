@@ -36,14 +36,17 @@ export async function setupMongo(req) {
                 {userId: new ObjectId(userId)}, {sites: 1}
             ).toArray()
         },
-        addSiteAccount: async (userId, siteId, siteAccount) => {
+        setUserSiteOne: async (userId, siteId, site) => {
             await collection.userSites.updateOne(
-                {userId: new ObjectId(userId), "sites.id": new ObjectId(siteId)},
-                {
-                    $addToSet: {
-                        "sites.$.accounts": siteAccount,
-                    }
-                }
+                {userId: new ObjectId(userId)},
+                {$set: {"sites.$[site]": site}},
+                {arrayFilters: [{"site.id": siteId}]}
+            )
+        },
+        setUserSiteWhole: async (userId, sites) => {
+            await collection.userSites.updateOne(
+                {userId: new ObjectId(userId)},
+                {$set: {sites}}
             )
         }
     }
@@ -51,25 +54,4 @@ export async function setupMongo(req) {
 
 export async function cleanMongo(req) {
     await req.context.mongo.client.close()
-}
-
-
-export function prepareBillAccount(context, account) {
-    account.id = context.mongo.objectId()
-}
-
-export function prepareSiteAccount(context, account) {
-    account.id = context.mongo.objectId()
-    if (account.billAccounts !== undefined) {
-        account.billAccounts.forEach(ba => {
-            prepareBillAccount(context, ba)
-        })
-    }
-}
-
-export function prepareUserSite(context, site) {
-    site.id = context.mongo.objectId()
-    if (site.account !== undefined) {
-        prepareSiteAccount(context, site.account)
-    }
 }

@@ -35,7 +35,6 @@ export function responseHandler(req, res) {
         res.status(req.res.status).json(req.res.response)
     } catch (e) {
         console.log(e)
-    } finally {
         res.status(500).end()
     }
 }
