@@ -15,6 +15,20 @@ function getBaseURL(url) {
     return `http://${service}:8080`
 }
 
+export function dispatchContext(req, res, next) {
+    if (req.context === undefined) {
+        req.context = {
+            stubs: {}
+        }
+    }
+    req.context.stubs.service = {
+        call: async (axiosConfig) => {
+            return await axiosCall(axiosConfig)
+        }
+    }
+    next()
+}
+
 export async function dispatch(req, res, next) {
     console.log(`dispatch req: ${req.url}, extractedToken::${JSON.stringify(req.extractedToken)}`)
     const axiosConfig = {
@@ -27,7 +41,7 @@ export async function dispatch(req, res, next) {
     if (req.method === 'POST' || req.method === 'PUT') {
         axiosConfig.data = req.body;
     }
-    const response = await axiosCall(axiosConfig)
+    const response = await req.context.stubs.service.call(axiosConfig)
     res.response({
         status: response.status,
         code: response.code,

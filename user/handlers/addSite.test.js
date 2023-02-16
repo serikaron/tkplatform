@@ -29,6 +29,16 @@ async function runTest(
     simpleCheckResponse(response, tkResponse.status, tkResponse.code, tkResponse.msg, tkResponse.data)
 }
 
-test("must success", () => {
-    expect(true).toBe(true)
-})
+describe('test add site', function () {
+    it("should work as expect", async () => {
+        await runTest({
+            body: {
+                site: {
+                    id: "site-id",
+                    name: "site-name",
+                    icon: "site-icon",
+                }
+            }
+        })
+    })
+});

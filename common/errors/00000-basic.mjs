@@ -32,3 +32,13 @@ export class UnknownError extends TKError {
         });
     }
 }
+
+export class NeedAuth extends TKError {
+    constructor() {
+        super({
+            status: 401,
+            code: codeBase - 4,
+            msg: "请先登录"
+        });
+    }
+}
