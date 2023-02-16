@@ -30,7 +30,7 @@ export async function runTestWhole(
     })
 
     const response = await supertest(app)
-        .put('/v1/user/site')
+        .put('/v1/user/sites')
         .send(body)
         .set(headers)
     simpleCheckTKResponse(response, tkResponse)

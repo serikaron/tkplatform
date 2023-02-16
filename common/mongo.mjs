@@ -29,7 +29,7 @@ export async function connectSite() {
 }
 
 async function connect({user, pass, host, name}) {
-    console.log(`connecting ${name}`)
+    // console.log(`connecting ${name}`)
     const uri = `mongodb://${user}:${pass}@${host}:27017`
     const client = new MongoClient(uri)
     await client.connect()

@@ -7,7 +7,7 @@ import {TKResponse} from "../common/TKResponse.mjs";
 import {NeedAuth} from "../common/errors/00000-basic.mjs";
 
 export function checkSign(req, res, next) {
-    console.log("checkSign")
+    // console.log("checkSign")
     const s = sign(req.originalUrl, req.body, req.header("timestamp"), process.env.SECRET_KEY)
     if (s.signature !== req.header("signature")) {
         console.log(s.source)
@@ -16,12 +16,11 @@ export function checkSign(req, res, next) {
         res.status(400).end()
         return
     }
-    console.log("checkSign next")
     next()
 }
 
 export function checkTime(req, res, next) {
-    console.log("checkTime")
+    // console.log("checkTime")
     const now = Math.floor(Date.now() / 1000)
     const tHeader = req.header("timestamp")
     const timestamp = Number(tHeader)
@@ -47,7 +46,7 @@ export async function tokenContext(req, res, next) {
     }
     req.context.stubs.token = {
         verify: async (token) => {
-            console.log("checkToken")
+            // console.log("checkToken")
             if (token === "") {
                 console.log("empty token")
                 return TKResponse.fromError(new NeedAuth())

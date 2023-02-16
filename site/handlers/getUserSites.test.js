@@ -38,15 +38,24 @@ async function runTest(
 
 test("should return sites from db", async () => {
     const getUserSites = jest.fn(async () => {
-        return {msg: "fake user sites"}
+        return {
+            sites: [
+                {msg: "fake user sites"},
+                {msg: "fake user sites too"}
+            ]
+        }
     })
     await runTest({
         header: {id: "fake user id"},
         getUserSites,
         tkResponse: TKResponse.Success({
-            data: {msg: "fake user sites"}
+            data: [
+                {msg: "fake user sites"},
+                {msg: "fake user sites too"},
+            ]
         })
     })
     expect(getUserSites).toHaveBeenCalledWith("fake user id")
 })
 
+// TODO: check db return null

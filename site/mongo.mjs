@@ -32,15 +32,15 @@ export async function setupMongo(req) {
             )
         },
         getUserSites: async (userId) => {
-            return await collection.userSites.find(
-                {userId: new ObjectId(userId)}, {sites: 1}
-            ).toArray()
+            return await collection.userSites.findOne(
+                {userId: new ObjectId(userId)}
+            )
         },
         setUserSiteOne: async (userId, siteId, site) => {
             await collection.userSites.updateOne(
                 {userId: new ObjectId(userId)},
                 {$set: {"sites.$[site]": site}},
-                {arrayFilters: [{"site.id": siteId}]}
+                {arrayFilters: [{"site.id": new ObjectId(siteId)}]}
             )
         },
         setUserSiteWhole: async (userId, sites) => {

@@ -50,12 +50,7 @@ test('set one site according to site id', async () => {
             phone: "13333333333",
         },
         setUserSiteOne,
-        tkResponse: TKResponse.Success({
-            data: {
-                id: "fake-site-id",
-                site: {name: "site-name", icon: "site-icon"},
-            },
-        })
+        tkResponse: TKResponse.Success()
     })
     expect(setUserSiteOne).toHaveBeenCalledWith("fake user id", "fake-site-id", {
         id: "fake-site-id",

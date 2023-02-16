@@ -4,6 +4,7 @@ export const version = "0003"
 
 export async function migrate(mongoClient) {
     await moveSiteFromSystemToSite(mongoClient)
+    await createIndexUserSites(mongoClient)
 }
 
 async function moveSiteFromSystemToSite(mongoClient) {
@@ -32,4 +33,10 @@ async function moveSiteFromSystemToSite(mongoClient) {
                 ]
             }
         ])
+}
+
+async function createIndexUserSites(mongoClient) {
+    await mongoClient.site.db
+        .collection("userSites")
+        .createIndex({userId: 1}, {unique: true})
 }

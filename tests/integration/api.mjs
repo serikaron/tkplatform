@@ -25,6 +25,7 @@ function url(path, query) {
 function headers({url, body, authentication}) {
     const timestamp = Math.floor(Date.now() / 1000)
     const s = sign(url, body, timestamp, process.env.SECRET_KEY)
+    console.log(JSON.stringify(s))
     return {
         timestamp,
         signature: s.signature,
@@ -32,12 +33,18 @@ function headers({url, body, authentication}) {
     }
 }
 
-function axiosConfig({path, query, body, authentication}) {
+function axiosConfig({path, query, body, authentication, method}) {
+    const getMethod = () => {
+        if (method !== undefined) {
+            return method
+        }
+        return body === undefined ? "GET" : "POST"
+    }
     return {
         baseURL,
         url: url(path, query),
         data: body,
-        method: body === undefined ? "GET" : "POST",
+        method: getMethod(),
         headers: headers({
             url: url(path, query),
             body,
@@ -46,9 +53,9 @@ function axiosConfig({path, query, body, authentication}) {
     }
 }
 
-async function call({path, query, body, authentication}) {
+async function call({path, query, body, authentication, method}) {
     try {
-        const config = axiosConfig({path, query, body, authentication})
+        const config = axiosConfig({path, query, body, authentication, method})
         // console.log(`axiosConfig: ${JSON.stringify(config)}`)
         const r = await axios(config)
         return new TKResponse(r.status, r.data)
@@ -64,8 +71,8 @@ export function simpleVerification(response) {
     expect(JSON.stringify(response.data) !== "{}").toBe(true)
 }
 
-export async function runTest({path, query, body, verify = simpleVerification, authentication = {}}) {
-    const response = await call({path, query, body, authentication})
+export async function runTest({method, path, query, body, verify = simpleVerification, authentication = {}}) {
+    const response = await call({path, query, body, authentication, method})
     verify(response)
 }
 
