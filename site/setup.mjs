@@ -5,7 +5,7 @@ import {routeGetSite} from "./handlers/getSites.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
-    app.use("/v1/site", router)
+    app.use("/v1", router)
 
     setup(router)
 

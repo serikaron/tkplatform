@@ -4,7 +4,7 @@
 import fs from 'fs'
 import path from 'path'
 import * as dotenv from 'dotenv'
-import {connectSystem, connectUser} from "../common/mongo.mjs";
+import {connectSite, connectSystem, connectUser} from "../common/mongo.mjs";
 
 dotenv.config()
 
@@ -66,7 +66,8 @@ async function doMigrate(mongoClient, filePath, version, migrateFn) {
 
 const mongoClient = {
     user: await connectUser(),
-    system: await connectSystem()
+    system: await connectSystem(),
+    site: await connectSite(),
 }
 
 await callFiles(mongoClient)

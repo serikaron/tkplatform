@@ -17,6 +17,9 @@ export async function setupMongo(req) {
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
+        getSites: async () => {
+            return await collection.sites.find().toArray()
+        }
     }
 }
 

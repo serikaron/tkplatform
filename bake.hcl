@@ -1,5 +1,5 @@
 group default {
-  targets = ["tk-node", "api", "user", "token", "sms", "captcha", "system", "migration"]
+  targets = ["tk-node", "api", "user", "token", "sms", "captcha", "system", "site", "migration"]
 }
 
 group push {
@@ -122,4 +122,18 @@ target "migration" {
   ]
   cache-from = ["type=gha,scope=migration"]
   cache-to   = ["type=gha,mode=max,scope=migration"]
+}
+
+target "site" {
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "site"
+  }
+  tags = [
+    tag_name("site"),
+  ]
+  cache-from = ["type=gha,scope=site"]
+  cache-to   = ["type=gha,mode=max,scope=site"]
 }

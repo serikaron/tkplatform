@@ -30,7 +30,7 @@ async function runTest(
     })
 
     const response = await supertest(app)
-        .get('/v1/site')
+        .get('/v1/sites')
     simpleCheckTKResponse(response, tkResponse)
 }
 

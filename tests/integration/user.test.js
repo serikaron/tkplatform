@@ -1,14 +1,16 @@
 'use strict'
 
-import client from './client.json' assert {type: "json"}
-import {runTest} from "./api.mjs";
+import {runTest, simpleVerification} from "./api.mjs";
 
-describe.skip('register and login', () => {
-    it("should return ok", async () => {
+describe.skip('user test about auth', () => {
+    let accessToken = undefined
+    const phone = "13444444444"
+
+    test("first register", async () => {
         await runTest({
             path: '/v1/user/register',
             body: {
-                phone: "13333333333",
+                phone: phone,
                 password: "123456",
                 smsCode: "2065"
             },
@@ -16,42 +18,54 @@ describe.skip('register and login', () => {
                 expect(response.status).toBe(201)
             }
         })
+    })
+
+    test("second login", async () => {
         await runTest({
             path: '/v1/user/login',
             body: {
                 phone: "13333333333",
                 password: "123456"
             },
+            verify: response => {
+                simpleVerification(response)
+                accessToken = response.data.accessToken
+            }
         })
     })
-})
 
-test("user change password", async () => {
-    await runTest({
-        path: "/v1/user/password",
-        body: {
-            newPassword: client.password,
-            smsCode: client.smsCode
-        },
-        authentication: client,
-        verify: (response) => {
-            expect(response.status).toBe(200)
-            client.accessToken = response.data.accessToken
-        }
+    test("and then change password", async () => {
+        await runTest({
+            path: "/v1/user/password",
+            body: {
+                newPassword: client.password,
+                smsCode: client.smsCode
+            },
+            authentication: {
+                accessToken
+            },
+            verify: (response) => {
+                simpleVerification(response)
+                accessToken = response.data.accessToken
+            }
+        })
     })
-    await runTest({
-        path: "/v1/user/account",
-        body: {
-            old: {
-                phone: client.phone,
-                password: client.password
+
+    test("last change account", async () => {
+        await runTest({
+            path: "/v1/user/account",
+            body: {
+                old: {
+                    phone: client.phone,
+                    password: client.password
+                },
+                new: {
+                    phone: client.phone,
+                    password: client.password
+                },
+                smsCode: client.smsCode
             },
-            new: {
-                phone: client.phone,
-                password: client.password
-            },
-            smsCode: client.smsCode
-        },
-        authentication: client,
+            authentication: {accessToken}
+        })
     })
 })

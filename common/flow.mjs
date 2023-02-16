@@ -3,9 +3,14 @@
 import {TKError} from "./errors/error.mjs";
 
 
+export function enteringLog(req, res, next) {
+    console.log(`receive request ${req.url}`)
+    next()
+}
+
 export function injection(req, res, next) {
     res.response = ({status = 200, code = 0, msg = "success", data = {}}) => {
-        console.log(`injection, response, req: ${req.url}, res: ${res}`)
+        console.log(`response, req: ${req.url}, res: ${JSON.stringify(data, null, 4)}`)
         req.res = {
             status,
             response: {

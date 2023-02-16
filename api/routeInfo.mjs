@@ -11,9 +11,10 @@ const routeInfo = [
 
     // settings
     {
-        url: '/v1/system/sites', method: "GET", needAuth: true,
+        url: '/v1/sites', method: "GET", needAuth: true,
         service: {
-            url: '/v1/system/setting/sites'
+            baseURL: "http://site:8080",
+            url: '/v1/sites'
         }
     },
 ]

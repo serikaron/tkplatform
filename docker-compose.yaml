@@ -94,6 +94,24 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_SYSTEM_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_SYSTEM_DB}
 
+  site:
+    image: car.daoyi365.com:5000/tk-site
+    restart: always
+    entrypoint: node /app/site/app.mjs
+    depends_on:
+      - site_db
+    ports:
+      - "9006:8080"
+    volumes:
+      - .env:/app/.env
+
+  site_db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_SITE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_SITE_PASS}
+      MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_SITE_DB}
 
   migration:
     image: car.daoyi365.com:5000/tk-migration

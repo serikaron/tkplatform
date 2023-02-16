@@ -1,10 +1,11 @@
 'use strict'
 
-import {errorHandler, injection, responseHandler} from "./flow.mjs";
+import {enteringLog, errorHandler, injection, responseHandler} from "./flow.mjs";
 
 const diContainer = {
     setup: (middlewares) => {
         return (router) => {
+            router.use(enteringLog)
             router.use(injection)
             middlewares.forEach(middleware => {
                 router.use(middleware)
