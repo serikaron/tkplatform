@@ -47,7 +47,7 @@ export async function setupMongo(req) {
             }
 
             const withInviter = async () => {
-                const session = client.startSession()
+                const session = user.client.startSession()
                 session.startTransaction()
                 try {
                     const result = await collection.users

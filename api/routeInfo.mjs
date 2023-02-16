@@ -17,6 +17,12 @@ const routeInfo = [
             url: '/v1/sites'
         }
     },
+    {
+        url: '/v1/user/:userID/sites', method: "GET", needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+        }
+    }
 ]
 
 export default routeInfo

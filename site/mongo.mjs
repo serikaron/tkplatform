@@ -2,6 +2,7 @@
 
 import * as dotenv from 'dotenv'
 import {connectSite} from "../common/mongo.mjs";
+import {ObjectId} from "mongodb";
 
 dotenv.config()
 
@@ -19,6 +20,17 @@ export async function setupMongo(req) {
         client: site.client, db: site.db, collection,
         getSites: async () => {
             return await collection.sites.find().toArray()
+        },
+        objectId: () => {
+            return new ObjectId()
+        },
+        addUserSite: async (userId, siteId, siteInfo) => {
+            siteInfo.userId = new ObjectId(userId)
+            await collection.userSites.updateOne(
+                {userId: new ObjectId(userId)},
+                {$addToSet: {sites: siteInfo}},
+                {upsert: true}
+            )
         }
     }
 }

@@ -169,6 +169,15 @@ test.each([
             baseURL: "http://site:8080",
             url: "/v1/sites"
         }
+    },
+    {
+        url: "/v1/user/fake_user_id/sites",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/fake_user_id/sites"
+        }
     }
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)

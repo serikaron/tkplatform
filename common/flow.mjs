@@ -18,12 +18,20 @@ export function injection(req, res, next) {
             }
         }
     }
+    res.tkResponse = (tkResponse) => {
+        res.response({
+            status: tkResponse.status,
+            code: tkResponse.code,
+            msg: tkResponse.msg,
+            data: tkResponse.data
+        })
+    }
     next()
 }
 
 export function responseHandler(req, res) {
     try {
-        console.log(`req ${req.url}, status: ${req.res.status}`)
+        // console.log(`req ${req.url}, status: ${req.res.status}`)
         res.status(req.res.status).json(req.res.response)
     } catch (e) {
         console.log(e)
