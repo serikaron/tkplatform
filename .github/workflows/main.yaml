@@ -1,0 +1,44 @@
+name: Automation
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  Automation:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "19.x"
+
+      - name: unit test
+        run: npm install && npm run test:unit
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: bake
+        uses: docker/bake-action@v2.3.0
+        with:
+          files: bake.hcl
+          load: true
+
+      - name: start services for integration test
+        run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
+      - name: delay
+        run: sleep 5s
+      - name: prepare user
+        run: docker compose logs api && node ./tests/integration/prepare.mjs && cat ./tests/integration/client.json
+      - name: integration test
+        run: npm run test:integration
+
+      - name: show logs when failed
+        if: failure()
+        run: docker compose logs
