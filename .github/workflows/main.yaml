@@ -17,7 +17,8 @@ jobs:
           node-version: "19.x"
 
       - name: setup env
-        run: npm install
+        run: npm install && sh scripts/gen_integration_env.sh
+
       - name: unit test
         run: npm run test:unit
 
@@ -33,7 +34,7 @@ jobs:
           load: true
 
       - name: start services for integration test
-        run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
+        run: sh scripts/start_for_integration.sh
       - name: delay
         run: sleep 5s
       - name: prepare user
