@@ -17,7 +17,7 @@ jobs:
           node-version: "19.x"
 
       - name: setup env
-        run: npm install && sh scripts/gen_integration_env.sh
+        run: npm install && sh scripts/gen_test_env.sh
 
       - name: unit test
         run: npm run test:unit

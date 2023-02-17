@@ -16,8 +16,11 @@ jobs:
         with:
           node-version: "19.x"
 
+      - name: setup env
+        run: npm install && sh scripts/gen_test_env.sh
+
       - name: unit test
-        run: npm install && npm run test:unit
+        run: npm run test:unit
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
@@ -31,7 +34,7 @@ jobs:
           load: true
 
       - name: start services for integration test
-        run: sh scripts/gen_integration_env.sh && sh scripts/start_for_integration.sh
+        run: sh scripts/start_for_integration.sh
       - name: delay
         run: sleep 5s
       - name: prepare user
