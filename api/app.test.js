@@ -109,7 +109,7 @@ async function runTest(
     expect(serviceFn).toHaveBeenCalledWith(expectConfig)
 }
 
-test.each([
+test.concurrent.each([
     {
         url: "/v1/captcha/require",
         method: "POST",

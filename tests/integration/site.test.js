@@ -6,7 +6,7 @@ import {runTest, simpleVerification} from "./api.mjs";
 let firstSiteId = undefined
 let secondSiteId = undefined
 
-test.each([
+test.concurrent.each([
     {name: "Get system sites", method: "GET", path: "/v1/sites"},
     {name: "Get user sites", method: "GET", path: "/v1/user/sites"},
     {

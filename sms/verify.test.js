@@ -34,7 +34,7 @@ async function runTest(
     simpleCheckResponse(response, status, code, msg, data)
 }
 
-test.each([
+test.concurrent.each([
     {
         params: {phone: "13333333333", code: "abcd"},
     },
@@ -48,7 +48,7 @@ test.each([
     })
 })
 
-test.each([
+test.concurrent.each([
     {
         params: {phone: "13333333333", code: "1234"},
         redisGet: jest.fn(async () => {

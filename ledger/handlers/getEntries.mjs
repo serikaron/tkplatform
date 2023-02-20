@@ -27,10 +27,26 @@ const checkInput = (req, res, next) => {
     next()
 }
 
-const get = async (req, res, next) => {
-    const ledgerEntries = await req.context.mongo.getLedgerEntries(req.context.mongo.arguments.minDate, req.context.mongo.arguments.maxDate, req.context.mongo.arguments.offset, req.context.mongo.arguments.limit);
+async function getLedger(req, res, next) {
+    const entries = await req.context.mongo.getLedgerEntries(req.context.mongo.arguments.minDate, req.context.mongo.arguments.maxDate, req.context.mongo.arguments.offset, req.context.mongo.arguments.limit);
+    entries.forEach(x => {
+        x.id = x._id
+        x._id = undefined
+    })
     res.tkResponse(TKResponse.Success({
-        data: ledgerEntries
+        data: entries
+    }))
+    next()
+}
+
+async function getJournal(req, res, next) {
+    const entries = await req.context.mongo.getJournalEntries(req.context.mongo.arguments.minDate, req.context.mongo.arguments.maxDate, req.context.mongo.arguments.offset, req.context.mongo.arguments.limit);
+    entries.forEach(x => {
+        x.id = x._id
+        x._id = undefined
+    })
+    res.tkResponse(TKResponse.Success({
+        data: entries
     }))
     next()
 }
@@ -38,10 +54,10 @@ const get = async (req, res, next) => {
 export function routeGetEntries(router) {
     router.get('/ledger/entries', ...[
         checkInput,
-        get
+        getLedger
     ])
     router.get('/journal/entries', ...[
         checkInput,
-        get
+        getJournal
     ])
 }

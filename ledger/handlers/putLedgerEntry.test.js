@@ -38,7 +38,7 @@ async function runTest(
     simpleCheckTKResponse(response, tkResponse)
 }
 
-test.each([
+test.concurrent.each([
     {body: {kept: true}, update: {kept: true}},
     {body: {kept: false}, update: null},
     {body: {commission: true, principle: false}, update: {commission: {refunded: true}, principle: {refunded: false}}},

@@ -119,7 +119,7 @@ test.concurrent.each([
     }
 })
 
-test.each([
+test.concurrent.each([
     {smsCode: 0, status: 200, code: 0, msg: "发送成功"},
     {smsCode: -1, status: 500, code: -30002, msg: "发送短信失败"},
     {smsCode: -2, status: 500, code: -30002, msg: "发送短信失败"},

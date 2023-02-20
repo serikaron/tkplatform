@@ -64,7 +64,7 @@ describe("test login", () => {
         })
     })
 
-    test.each([
+    test.concurrent.each([
         {
             name: "user not found",
             body: {phone: "13333333333", password: "12345"},

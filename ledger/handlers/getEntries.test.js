@@ -15,7 +15,8 @@ async function runTest(
         params,
         headers,
         tkResponse,
-        dbFn
+        ledgerFn,
+        journalFn
     }
 ) {
     const app = createApp()
@@ -24,7 +25,8 @@ async function runTest(
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        getLedgerEntries: dbFn
+                        getLedgerEntries: ledgerFn,
+                        getJournalEntries: journalFn
                     }
                 }
                 next()
@@ -41,9 +43,25 @@ async function runTest(
 }
 
 describe.each([
-    "/v1/ledger/entries",
-    "/v1/journal/entries"
-])("%s", (path) => {
+    {
+        path: "/v1/ledger/entries",
+        ledgerFn: jest.fn(async () => {
+            return [{
+                msg: "a fake entry",
+                _id: "a fake entry id"
+            }]
+        })
+    },
+    {
+        path: "/v1/journal/entries",
+        journalFn: jest.fn(async () => {
+            return [{
+                msg: "a fake entry",
+                _id: "a fake entry id"
+            }]
+        })
+    }
+])("%path", ({path, ledgerFn, journalFn}) => {
     test.concurrent.each([
         '',
         "minDate=abc",
@@ -84,18 +102,24 @@ describe.each([
             dbArguments: {minDate: 123, maxDate: 234, offset: 1, limit: 10}
         },
     ])("($#) query db and return", async ({params, dbArguments}) => {
-        const getEntries = jest.fn(async () => {
-            return [{msg: "a fake entry"}]
-        })
         await runTest({
             path,
             params,
             headers: {id: "a fake user id"},
             tkResponse: TKResponse.Success({
-                data: [{msg: "a fake entry"}]
+                data: [{
+                    msg: "a fake entry",
+                    id: "a fake entry id"
+                }]
             }),
-            dbFn: getEntries
+            ledgerFn,
+            journalFn
         })
-        expect(getEntries).toHaveBeenCalledWith(dbArguments.minDate, dbArguments.maxDate, dbArguments.offset, dbArguments.limit)
+        if (ledgerFn !== undefined) {
+            expect(ledgerFn).toHaveBeenCalledWith(dbArguments.minDate, dbArguments.maxDate, dbArguments.offset, dbArguments.limit)
+        }
+        if (journalFn !== undefined) {
+            expect(journalFn).toHaveBeenCalledWith(dbArguments.minDate, dbArguments.maxDate, dbArguments.offset, dbArguments.limit)
+        }
     })
 })
