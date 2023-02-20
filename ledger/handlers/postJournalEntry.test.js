@@ -11,19 +11,17 @@ import {now} from "../../common/utils.mjs";
 
 async function runTest(
     {
-        body,
-        headers,
-        tkResponse,
-        dbFn
+        dbFn,
+        tkResponse
     }
-){
+) {
     const app = createApp()
     setup(app, {
         setup: testDIContainer.setup([
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        addLedgerEntry: dbFn
+                        addJournalEntry: dbFn
                     }
                 }
                 next()
@@ -33,39 +31,37 @@ async function runTest(
     })
 
     const response = await supertest(app)
-        .post("/v1/ledger/entry")
-        .send(body)
-        .set(headers)
-
+        .post("/v1/journal/entry")
+        .send({msg: "a fake entry"})
+        .set({id: "a fake user id"})
     simpleCheckTKResponse(response, tkResponse)
 }
 
 const RealDate = Date.now
 
 beforeAll(() => {
-    global.Date.now = () => { return 0 }
+    global.Date.now = () => {
+        return 0
+    }
 })
 
 afterAll(() => {
     global.Date.now = RealDate
 })
 
-test("should add entry to db", async () => {
-    const addEntry = jest.fn(async () => {
+test("should add journal entry to db", async () => {
+    const addJournalEntry = jest.fn(async () => {
         return "a fake entry id"
     })
     await runTest({
-        body: {msg: "a fake entry body"},
-        headers: {id: "a fake user id"},
+        dbFn: addJournalEntry,
         tkResponse: TKResponse.Success({
             data: {entryId: "a fake entry id"}
-        }),
-        dbFn: addEntry
+        })
     })
-    expect(addEntry).toHaveBeenCalledWith( {
+    expect(addJournalEntry).toHaveBeenCalledWith({
         userId: "a fake user id",
-        msg: "a fake entry body",
-        kept: false,
-        createAt: now()
+        msg: "a fake entry",
+        createdAt: now()
     })
 })

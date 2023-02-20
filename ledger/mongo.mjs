@@ -13,7 +13,8 @@ export async function setupMongo(req) {
 
     const ledger = await connectLedger()
     const collection = {
-        ledgerEntries: ledger.db.collection("ledgerEntries")
+        ledgerEntries: ledger.db.collection("ledgerEntries"),
+        withdrawJournalEntries: ledger.db.collection("withdrawJournalEntries")
     }
     req.context.mongo = {
         client: ledger.client, db: ledger.db, collection,
@@ -21,15 +22,13 @@ export async function setupMongo(req) {
             const r = await collection.ledgerEntries.insertOne(entry)
             return r.insertedId
         },
-        updateLedgerEntry: async (entryId, userId) => {
+        updateLedgerEntry: async (entryId, userId, update) => {
             await collection.ledgerEntries.updateOne(
                 {
                     _id: new ObjectId(entryId),
                     userId: new ObjectId(userId)
                 },
-                {
-                    kept: true
-                }
+                update
             )
         },
         getLedgerEntries: async (minDate, maxDate, offset, limit) => {
@@ -44,6 +43,16 @@ export async function setupMongo(req) {
             }
 
             return await query.toArray()
+        },
+        addJournalEntry: async (entry) => {
+            const r = await collection.withdrawJournalEntries.insertOne(entry)
+            return r.insertedId
+        },
+        updateJournalEntry: async (userId, entryId, update) => {
+            await collection.withdrawJournalEntries.updateOne(
+                {_id: new ObjectId(entryId), userId: new ObjectId(userId)},
+                update
+            )
         }
     }
 }

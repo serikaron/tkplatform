@@ -35,8 +35,12 @@ const get = async (req, res, next) => {
     next()
 }
 
-export function routeGetLedgerEntries(router) {
+export function routeGetEntries(router) {
     router.get('/ledger/entries', ...[
+        checkInput,
+        get
+    ])
+    router.get('/journal/entries', ...[
         checkInput,
         get
     ])
