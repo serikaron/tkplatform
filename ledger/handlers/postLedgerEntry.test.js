@@ -8,6 +8,7 @@ import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {jest} from "@jest/globals";
 import {now} from "../../common/utils.mjs";
+import {ObjectId} from "mongodb";
 
 async function runTest(
     {
@@ -56,16 +57,16 @@ test("should add entry to db", async () => {
     })
     await runTest({
         body: {msg: "a fake entry body"},
-        headers: {id: "a fake user id"},
+        headers: {id: "60f6a4b4f4b2384f8c40b1af"},
         tkResponse: TKResponse.Success({
             data: {entryId: "a fake entry id"}
         }),
         dbFn: addEntry
     })
     expect(addEntry).toHaveBeenCalledWith( {
-        userId: "a fake user id",
+        userId: new ObjectId("60f6a4b4f4b2384f8c40b1af"),
         msg: "a fake entry body",
         kept: false,
-        createAt: now()
+        createdAt: now()
     })
 })

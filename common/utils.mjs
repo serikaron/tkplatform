@@ -28,5 +28,5 @@ export function now() {
 export function today() {
     const now = new Date(); // get the current date and time
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // set the time to 00:00:00
-    return startOfToday.getTime(); // get the timestamp in milliseconds
+    return Math.floor(startOfToday.getTime() / 1000); // get the timestamp in milliseconds
 }

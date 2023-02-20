@@ -4,6 +4,7 @@ import axios from "axios";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {sign} from "./sign.mjs";
 import * as dotenv from 'dotenv'
+import {simpleVerification} from "./verification.mjs";
 
 dotenv.config()
 
@@ -63,12 +64,6 @@ async function call({path, query, body, authentication, method}) {
         // console.log(e)
         return new TKResponse(e.response.status, {code: e.response.data.code, msg: e.response.data.msg})
     }
-}
-
-export function simpleVerification(response) {
-    expect(response.status).toBe(200)
-    expect(response.code).toBe(0)
-    expect(JSON.stringify(response.data) !== "{}").toBe(true)
 }
 
 export async function runTest({method, path, query, body, verify = simpleVerification, authentication = {}}) {

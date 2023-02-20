@@ -51,7 +51,7 @@ export async function setupMongo(req) {
             const r = await collection.withdrawJournalEntries.insertOne(entry)
             return r.insertedId
         },
-        updateJournalEntry: async (userId, entryId, update) => {
+        updateJournalEntry: async (entryId, userId, update) => {
             await collection.withdrawJournalEntries.updateOne(
                 {_id: new ObjectId(entryId), userId: new ObjectId(userId)},
                 {$set: update}

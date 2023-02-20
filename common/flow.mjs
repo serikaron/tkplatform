@@ -4,7 +4,7 @@ import {TKError} from "./errors/error.mjs";
 
 
 export function enteringLog(req, res, next) {
-    console.log(`receive request ${req.url}`)
+    console.log(`receive request ${req.method} ${req.url}`)
     next()
 }
 
@@ -32,6 +32,12 @@ export function injection(req, res, next) {
 export function responseHandler(req, res) {
     try {
         // console.log(`req ${req.url}, status: ${req.res.status}`)
+        if (typeof(req.res.status) == "function") {
+            console.log("invalid status")
+            console.log(req.res.status())
+            res.status(500).end()
+            return
+        }
         res.status(req.res.status).json(req.res.response)
     } catch (e) {
         console.log(e)

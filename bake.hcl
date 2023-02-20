@@ -137,3 +137,17 @@ target "site" {
   cache-from = ["type=gha,scope=site"]
   cache-to   = ["type=gha,mode=max,scope=site"]
 }
+
+target "ledger" {
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "ledger"
+  }
+  tags = [
+    tag_name("ledger"),
+  ]
+  cache-from = ["type=gha,scope=ledger"]
+  cache-to   = ["type=gha,mode=max,scope=ledger"]
+}

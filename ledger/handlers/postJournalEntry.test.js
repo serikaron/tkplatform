@@ -8,6 +8,7 @@ import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {jest} from "@jest/globals";
 import {now} from "../../common/utils.mjs";
+import {ObjectId} from "mongodb";
 
 async function runTest(
     {
@@ -33,7 +34,7 @@ async function runTest(
     const response = await supertest(app)
         .post("/v1/journal/entry")
         .send({msg: "a fake entry"})
-        .set({id: "a fake user id"})
+        .set({id: "60f6a4b4f4b2384f8c40b1af"})
     simpleCheckTKResponse(response, tkResponse)
 }
 
@@ -60,7 +61,7 @@ test("should add journal entry to db", async () => {
         })
     })
     expect(addJournalEntry).toHaveBeenCalledWith({
-        userId: "a fake user id",
+        userId: new ObjectId("60f6a4b4f4b2384f8c40b1af"),
         msg: "a fake entry",
         createdAt: now()
     })

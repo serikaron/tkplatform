@@ -1,7 +1,8 @@
 'use restrict'
 
 import client from "./client.json" assert {type: "json"}
-import {runTest, simpleVerification} from "./api.mjs";
+import {runTest} from "./api.mjs";
+import {simpleVerification} from "./verification.mjs";
 
 let firstSiteId = undefined
 let secondSiteId = undefined

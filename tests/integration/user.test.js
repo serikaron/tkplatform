@@ -1,6 +1,7 @@
 'use strict'
 
-import {runTest, simpleVerification} from "./api.mjs";
+import {runTest} from "./api.mjs";
+import {simpleVerification} from "./verification.mjs";
 
 describe('user test about auth', () => {
     let accessToken = undefined
