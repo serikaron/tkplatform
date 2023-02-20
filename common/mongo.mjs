@@ -28,6 +28,15 @@ export async function connectSite() {
     })
 }
 
+export async function connectLedger() {
+    return await connect({
+        user: process.env.MONGO_LEDGER_USER,
+        pass: process.env.MONGO_LEDGER_PASS,
+        host: process.env.MONGO_LEDGER_HOST,
+        name: process.env.MONGO_LEDGER_DB
+    })
+}
+
 async function connect({user, pass, host, name}) {
     // console.log(`connecting ${name}`)
     const uri = `mongodb://${user}:${pass}@${host}:27017`

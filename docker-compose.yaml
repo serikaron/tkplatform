@@ -113,6 +113,25 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_SITE_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_SITE_DB}
 
+  ledger:
+    image: car.daoyi365.com:5000/tk-ledger
+    restart: always
+    entrypoint: node /app/ledger/app.mjs
+    depends_on:
+      - ledger_db
+    ports:
+      - "9007:8080"
+    volumes:
+      - .env:/app/.env
+
+  ledger_db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_LEDGER_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_LEDGER_PASS}
+      MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_LEDGER_DB}
+
   migration:
     image: car.daoyi365.com:5000/tk-migration
     entrypoint: node /app/migration/migration.mjs

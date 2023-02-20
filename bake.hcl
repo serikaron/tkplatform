@@ -1,9 +1,9 @@
 group default {
-  targets = ["tk-node", "api", "user", "token", "sms", "captcha", "system", "site", "migration"]
+  targets = ["tk-node", "api", "user", "token", "sms", "captcha", "system", "site", "ledger", "migration"]
 }
 
 group push {
-  targets = ["api", "user", "token", "sms", "captcha", "system", "site", "migration"]
+  targets = ["api", "user", "token", "sms", "captcha", "system", "site", "ledger", "migration"]
 }
 
 variable "GITHUB_SHA" {
