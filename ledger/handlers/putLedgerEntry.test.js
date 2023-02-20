@@ -5,8 +5,8 @@ import {setup} from "../setup.mjs";
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
-import {TKResponse} from "../../common/TKResponse.mjs";
 import {jest} from "@jest/globals";
+import {TKResponse} from "../../common/TKResponse.mjs";
 
 async function runTest(
     {
@@ -15,14 +15,14 @@ async function runTest(
         tkResponse,
         dbFn
     }
-){
+) {
     const app = createApp()
     setup(app, {
         setup: testDIContainer.setup([
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        addEntry: dbFn
+                        updateLedgerEntry: dbFn
                     }
                 }
                 next()
@@ -32,24 +32,28 @@ async function runTest(
     })
 
     const response = await supertest(app)
-        .post("/v1/user/site/fake-site-id/entry")
+        .put("/v1/ledger/entry/fake-entry-id")
         .send(body)
         .set(headers)
-
     simpleCheckTKResponse(response, tkResponse)
 }
 
-test("should add entry to db", async () => {
-    const addEntry = jest.fn(async () => {
-        return "a fake entry id"
-    })
+test.each([
+    {body: {kept: true}, update: {kept: true}},
+    {body: {kept: false}, update: null},
+    {body: {commission: true, principle: false}, update: {commission: {refunded: true}, principle: {refunded: false}}},
+    {body: {}, update: null},
+    {body: {willNotHandle: false}, update: null},
+    {body: {commission: 123}, update: null},
+])("should update entry according to body", async ({body, update}) => {
+    const setKept = jest.fn()
     await runTest({
-        body: {msg: "a fake entry body"},
+        body,
         headers: {id: "a fake user id"},
-        tkResponse: TKResponse.Success({
-            data: {entryId: "a fake entry id"}
-        }),
-        dbFn: addEntry
+        tkResponse: TKResponse.Success(),
+        dbFn: setKept,
     })
-    expect(addEntry).toHaveBeenCalledWith("a fake user id", "fake-site-id", {msg: "a fake entry body"})
+    if (update !== null) {
+        expect(setKept).toHaveBeenCalledWith("fake-entry-id", "a fake user id", update)
+    }
 })

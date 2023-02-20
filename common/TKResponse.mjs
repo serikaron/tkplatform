@@ -42,7 +42,7 @@ export class TKResponse {
 
     static fromError(tkError) {
         return new TKResponse(tkError.status, {
-            code: tkError.constructor, msg: tkError.message
+            code: tkError.code, msg: tkError.message
         })
     }
 }

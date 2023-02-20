@@ -1,7 +1,9 @@
 'use strict'
 
 import express from "express";
-import {routePostEntry} from "./handlers/postEntry.mjs";
+import {routePostLedgerEntry} from "./handlers/postLedgerEntry.mjs";
+import {routePutLedgerEntry} from "./handlers/putLedgerEntry.mjs";
+import {routeGetLedgerEntries} from "./handlers/getLedgerEntries.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -9,7 +11,9 @@ export function setup(app, {setup, teardown}) {
 
     setup(router)
 
-    routePostEntry(router)
+    routePostLedgerEntry(router)
+    routePutLedgerEntry(router)
+    routeGetLedgerEntries(router)
 
     teardown(router)
 }
