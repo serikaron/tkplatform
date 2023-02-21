@@ -3,8 +3,8 @@
 /**
  * @swagger
  * /v1/sites(查询站点):
- *   tags: ["site(站点)"]
  *   get:
+ *     tags: ["site(站点)"]
  *     description: 查询站点
  *     responses:
  *       200:
@@ -28,8 +28,8 @@
 /**
  * @swagger
  * /v1/user/sites(查询用户站点):
- *   tags: ["site(站点)"]
  *   get:
+ *     tags: ["site(站点)"]
  *     description: 结构中除了 id, name:站点1 icon:连接1 两个字段以外，其余为可选项有可能为空
  *     responses:
  *       200:
@@ -98,8 +98,8 @@
 /**
  * @swagger
  * /v1/user/sites(更新用户站点,用于保存备份时调用):
- *   tags: ["site(站点)"]
  *   put:
+ *     tags: ["site(站点)"]
  *     description: 结构中除了 id, name:站点1 icon:连接1 两个字段以外，其余为可选项有可能为空
  *     requestBody:
  *       content:
@@ -166,8 +166,8 @@
 /**
  * @swagger
  * /v1/user/site(添加用户站点):
- *   tags: ["site(站点)"]
  *   post:
+ *     tags: ["site(站点)"]
  *     description: 结构中除了 name:站点1 icon:连接1 两个字段以外，其余为可选项有可能为空
  *     requestBody:
  *       content:
@@ -229,8 +229,8 @@
 /**
  * @swagger
  * /v1/user/site/:siteId(更新用户站点):
- *   tags: ["site(站点)"]
  *   put:
+ *     tags: ["site(站点)"]
  *     description: 结构中除了 id, name:站点1, icon:连接1 两个字段以外，其余为可选项有可能为空
  *     requestBody:
  *       content:

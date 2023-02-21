@@ -9,7 +9,7 @@ const routeInfo = [
     {url: '/v1/user/account', method: "POST", needAuth: true},
     {url: '/v1/user/password', method: "POST", needAuth: true},
 
-    // settings
+    // site
     {
         url: '/v1/sites', method: "GET", needAuth: true,
         service: {
@@ -40,7 +40,20 @@ const routeInfo = [
         service: {
             baseURL: "http://site:8080",
         }
-    }
+    },
+
+    // ledger
+    {url: "/v1/stores", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/accounts", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/user/ledger/accounts", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/user/ledger/account", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/user/ledger/account/:accountId", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/entries", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/entry", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/entry/:entry", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/journal/entry/:entry", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 ]
 
 export default routeInfo

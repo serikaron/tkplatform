@@ -208,7 +208,106 @@ test.concurrent.each([
             baseURL: "http://site:8080",
             url: "/v1/user/sites"
         }
-    }
+    },
+    {
+        url: "/v1/stores",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/stores"
+        }
+    },
+    {
+        url: "/v1/ledger/accounts",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/accounts"
+        }
+    },
+    {
+        url: "/v1/user/ledger/accounts",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/user/ledger/accounts",
+        }
+    },
+    {
+        url: "/v1/user/ledger/account",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/user/ledger/account",
+        }
+    },
+    {
+        url: "/v1/user/ledger/account/fake-account-id",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/user/ledger/account/fake-account-id",
+        }
+    },
+    {
+        url: "/v1/ledger/entries",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entries",
+        }
+    },
+    {
+        url: "/v1/ledger/entry",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entry",
+        }
+    },
+    {
+        url: "/v1/ledger/entry/fake-entry-id",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entry/fake-entry-id",
+        }
+    },
+    {
+        url: "/v1/journal/entries",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entries",
+        }
+    },
+    {
+        url: "/v1/journal/entry",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entry",
+        }
+    },
+    {
+        url: "/v1/journal/entry/fake-entry-id",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entry/fake-entry-id",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
