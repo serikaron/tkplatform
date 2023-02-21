@@ -1,14 +1,13 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {isGoodFieldBool} from "../../common/utils.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 
 const makeUpdate = (req) => {
-    req.update = {}
-    if (isGoodFieldBool(req.body.credited)) {
-        req.update.credited = req.body.credited
-    }
+    req.update = req.body
+    delete req.update.id
+    delete req.update.userId
+    delete req.update.createdAt
 }
 
 const updateDb = async (req) => {

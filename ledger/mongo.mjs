@@ -3,6 +3,7 @@
 import * as dotenv from 'dotenv'
 import {connectLedger} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
+import {now} from "../common/utils.mjs";
 
 dotenv.config()
 
@@ -25,13 +26,24 @@ export async function setupMongo(req) {
             const r = await collection.ledgerEntries.insertOne(entry)
             return r.insertedId
         },
-        updateLedgerEntry: async (entryId, userId, update) => {
+        setLedgerEntry: async (entryId, userId, update) => {
             await collection.ledgerEntries.updateOne(
                 {
                     _id: new ObjectId(entryId),
                     userId: new ObjectId(userId)
                 },
                 {$set: update}
+            )
+        },
+        keepALedger: async (entryId, userId) => {
+            await collection.ledgerEntries.updateOne(
+                {
+                    _id: new ObjectId(entryId),
+                    userId: new ObjectId(userId),
+                    keptAt: {$exists: false}
+                }, {
+                    $set: {keptAt: now()}
+                }
             )
         },
         getLedgerEntries: async (minDate, maxDate, offset, limit) => {

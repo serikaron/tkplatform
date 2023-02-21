@@ -10,6 +10,8 @@ const userId = "60f6a4b4f4b2384f8c40b1ac"
 class Box {
     constructor() {
         this._entryId = undefined
+        this._keptAt = undefined
+        this._createdAt = undefined
     }
 
     get entryId() {
@@ -18,6 +20,22 @@ class Box {
 
     set entryId(id) {
         this._entryId = id
+    }
+
+    get keptAt() {
+        return this._keptAt
+    }
+
+    set keptAt(time) {
+        this._keptAt = time
+    }
+
+    get createdAt() {
+        return this._createdAt
+    }
+
+    set createdAt(time) {
+        this._createdAt = time
     }
 }
 
@@ -60,6 +78,7 @@ describe("test ledger entries db", () => {
                         expect(entry.userId).toBe(userId)
                         expect(entry.msg).toBe("a test ledger entry")
                         expect(entry.createdAt).not.toBe(undefined)
+                        box.createdAt = entry.createdAt
                     })
             }
         })
@@ -69,7 +88,7 @@ describe("test ledger entries db", () => {
         await runTest({
             method: "PUT",
             path: `/v1/ledger/entry/${box.entryId}`,
-            body: {kept: true, commission: true, principle: true},
+            body: {msg: "a new test body"},
             baseURL,
             userId,
             verify: response => {
@@ -98,11 +117,51 @@ describe("test ledger entries db", () => {
                     .forEach(entry => {
                         expect(entry.id).toBe(box.entryId)
                         expect(entry.userId).toBe(userId)
-                        expect(entry.msg).toBe("a test ledger entry")
-                        expect(entry.createdAt).not.toBeUndefined()
-                        expect(entry.kept).toBe(true)
-                        expect(entry.commission.refunded).toBe(true)
-                        expect(entry.principle.refunded).toBe(true)
+                        expect(entry.msg).toBe("a new test body")
+                        expect(entry.createdAt).toBe(box.createdAt)
+                        expect(entry.keptAt).not.toBeUndefined()
+                        box.keptAt = entry.keptAt
+                    })
+            }
+        })
+    })
+
+    test("update entry the second time", async () => {
+        await runTest({
+            method: "PUT",
+            path: `/v1/ledger/entry/${box.entryId}`,
+            body: {msg: "a new new test body"},
+            baseURL,
+            userId,
+            verify: response => {
+                expect(response.status).toBe(200)
+            }
+        })
+    })
+
+    test("check entry after updating the second time", async () => {
+        await runTest({
+            method: "GET",
+            path: "/v1/ledger/entries",
+            query: {
+                minDate: today(),
+                maxDate: today() + 86400,
+            },
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(Array.isArray(response.data)).toBe(true)
+                const entries = response.data
+                    .filter(entry => entry.id === box.entryId)
+                expect(entries.length).toBe(1)
+                entries
+                    .forEach(entry => {
+                        expect(entry.id).toBe(box.entryId)
+                        expect(entry.userId).toBe(userId)
+                        expect(entry.msg).toBe("a new new test body")
+                        expect(entry.createdAt).toBe(box.createdAt)
+                        expect(entry.keptAt).toBe(box.keptAt)
                     })
             }
         })
@@ -144,6 +203,7 @@ describe("test journal entries db", () => {
                     expect(entry.userId).toBe(userId)
                     expect(entry.msg).toBe("a journal entry")
                     expect(entry.createdAt).not.toBeUndefined()
+                    box.createdAt = entry.createdAt
                 })
             }
         })
@@ -153,7 +213,7 @@ describe("test journal entries db", () => {
         await runTest({
             method: "PUT",
             path: `/v1/journal/entry/${box.entryId}`,
-            body: {credited: true},
+            body: {msg: "a new entry body"},
             baseURL,
             userId,
             verify: response => {
@@ -177,9 +237,8 @@ describe("test journal entries db", () => {
                 entries.forEach(entry => {
                     expect(entry.id).toBe(box.entryId)
                     expect(entry.userId).toBe(userId)
-                    expect(entry.msg).toBe("a journal entry")
-                    expect(entry.createdAt).not.toBeUndefined()
-                    expect(entry.credited).toBe(true)
+                    expect(entry.msg).toBe("a new entry body")
+                    expect(entry.createdAt).toBe(box.createdAt)
                 })
             }
         })

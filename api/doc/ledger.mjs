@@ -287,3 +287,83 @@
  *         description: 返回成功
  *
  */
+
+/**
+ * @swagger
+ * /v1/journal/entries?minDate=&maxDate=(查询提现帐本记录):
+ *   get:
+ *     tags: ["ledger(记帐帐本)"]
+ *     description: 查询提现帐本记录
+ *     parameters:
+ *     - in: path
+ *       name: minDate
+ *       schema:
+ *         type: Number
+ *         example: 1676951437
+ *       required: true
+ *     - in: path
+ *       name: maxDate
+ *       schema:
+ *         type: Number
+ *         example: 1676951437
+ *       required: true
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: Number
+ *         example: 10
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: Number
+ *         example: 10
+ *     responses:
+ *       200:
+ *         description: 返回列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   createdAt:
+ *                     type: Number
+ *                     example: 1676951437
+ *                   site:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                          type: string
+ *                          example: 站点1
+ *                       icon:
+ *                          type: string
+ *                          example: 连接1
+ *                   account:
+ *                     type: string
+ *                     example: 对应用户站点中的 credential.account
+ *                   commission:
+ *                     type: object
+ *                     properties:
+ *                       amount:
+ *                         type: Number
+ *                         example: 5.5
+ *                       refunded:
+ *                         type: Boolean
+ *                         example: false
+ *                   principle:
+ *                     type: object
+ *                     properties:
+ *                       amount:
+ *                         type: Number
+ *                         example: 85.0
+ *                       refunded:
+ *                         type: Boolean
+ *                         example: false
+ *                   status:
+ *                     type: Boolean
+ *                     example: false(正常/异常)
+ *                   comment:
+ *                     type: string
+ *                     example: 备注
+ */

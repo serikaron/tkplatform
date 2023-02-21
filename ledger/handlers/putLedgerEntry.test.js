@@ -13,7 +13,8 @@ async function runTest(
         body,
         headers,
         tkResponse,
-        dbFn
+        setFn,
+        keepFn,
     }
 ) {
     const app = createApp()
@@ -22,7 +23,8 @@ async function runTest(
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        updateLedgerEntry: dbFn
+                        setLedgerEntry: setFn,
+                        keepALedger: keepFn,
                     }
                 }
                 next()
@@ -39,21 +41,28 @@ async function runTest(
 }
 
 test.concurrent.each([
-    {body: {kept: true}, update: {kept: true}},
-    {body: {kept: false}, update: null},
-    {body: {commission: true, principle: false}, update: {commission: {refunded: true}, principle: {refunded: false}}},
-    {body: {}, update: null},
-    {body: {willNotHandle: false}, update: null},
-    {body: {commission: 123}, update: null},
+    {
+        body: {
+            msg: "an entry body",
+            userId: "should ignore user id",
+            id: "should ignore id",
+            createdAt: "should ignore create time",
+            keptAt: "should ignore keep time"
+        },
+        update: {
+            msg: "an entry body",
+        }
+    },
 ])("should update entry according to body", async ({body, update}) => {
-    const setKept = jest.fn()
+    const setFn = jest.fn()
+    const keepFn = jest.fn()
     await runTest({
         body,
         headers: {id: "a fake user id"},
         tkResponse: TKResponse.Success(),
-        dbFn: setKept,
+        setFn,
+        keepFn,
     })
-    if (update !== null) {
-        expect(setKept).toHaveBeenCalledWith("fake-entry-id", "a fake user id", update)
-    }
+    expect(setFn).toHaveBeenCalledWith("fake-entry-id", "a fake user id", update)
+    expect(keepFn).toHaveBeenCalledWith("fake-entry-id", "a fake user id")
 })

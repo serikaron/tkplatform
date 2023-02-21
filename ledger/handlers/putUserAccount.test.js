@@ -35,7 +35,6 @@ test("update account", async () => {
         .set({id: "a fake user id"})
     simpleCheckTKResponse(response, TKResponse.Success())
     expect(setUserAccount).toHaveBeenCalledWith("a fake user id", "fake-account-id", {
-        userId: "a fake user id",
         msg: "a fake account body",
     })
 })

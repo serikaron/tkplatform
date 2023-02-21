@@ -1,25 +1,21 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {isGoodFieldBool} from "../../common/utils.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 
 const makeUpdate = (req) => {
-    req.update = {}
-    if (isGoodFieldBool(req.body.kept) && req.body.kept) {
-        req.update.kept = true
-    }
-    if (isGoodFieldBool(req.body.commission)) {
-        req.update.commission = {refunded: req.body.commission}
-    }
-    if (isGoodFieldBool(req.body.principle)) {
-        req.update.principle = {refunded: req.body.principle}
-    }
+    req.update = req.body
+    delete req.update.userId
+    delete req.update.id
+    delete req.update.createdAt
+    delete req.update.keptAt
 }
 
 const updateDb = async (req) => {
+    console.log(`update ledger entry: ${JSON.stringify(req.update, null, 4)}`)
     if (Object.keys(req.update).length !== 0) {
-        await req.context.mongo.updateLedgerEntry(req.params.entryId, req.headers.id, req.update)
+        await req.context.mongo.setLedgerEntry(req.params.entryId, req.headers.id, req.update)
+        await req.context.mongo.keepALedger(req.params.entryId, req.headers.id)
     }
 }
 

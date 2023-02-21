@@ -38,9 +38,17 @@ async function runTest(
 }
 
 test.concurrent.each([
-    {body: {credited: true}, update: {credited: true}},
-    {body: {kept: false}, update: null},
-    {body: {}, update: null},
+    {
+        body: {
+            msg: "a fake entry body",
+            id: "should ignore id",
+            userId: "should ignore user id",
+            createdAt: "should ignore create time"
+        },
+        update: {
+            msg: "a fake entry body"
+        }
+    }
 ])("only credited can be updated", async ({body, update}) => {
     const updateJournalEntry = jest.fn()
     await runTest({
@@ -48,7 +56,5 @@ test.concurrent.each([
         tkResponse: TKResponse.Success(),
         dbFn: updateJournalEntry,
     })
-    if (update !== null) {
-        expect(updateJournalEntry).toHaveBeenCalledWith("fake-entry-id", "a fake user id", update)
-    }
+    expect(updateJournalEntry).toHaveBeenCalledWith("fake-entry-id", "a fake user id", update)
 })
