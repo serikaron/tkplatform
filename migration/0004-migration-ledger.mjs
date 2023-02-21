@@ -8,7 +8,7 @@ export async function migrate(mongoClient) {
 }
 
 async function addSystemStoresAndAccouts(mongoClient) {
-    await mongoClient.leger.db
+    await mongoClient.ledger.db
         .collection("stores")
         .insertMany([
             {
@@ -37,7 +37,7 @@ async function addSystemStoresAndAccouts(mongoClient) {
             },
         ])
 
-    await mongoClient.leger.db
+    await mongoClient.ledger.db
         .collection("accounts")
         .insertMany([
             {

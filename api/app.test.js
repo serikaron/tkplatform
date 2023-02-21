@@ -254,6 +254,42 @@ test.concurrent.each([
             url: "/v1/user/ledger/account/fake-account-id",
         }
     },
+        {
+        url: "/v1/journal/accounts",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/accounts"
+        }
+    },
+    {
+        url: "/v1/user/journal/accounts",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/user/journal/accounts",
+        }
+    },
+    {
+        url: "/v1/user/journal/account",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/user/journal/account",
+        }
+    },
+    {
+        url: "/v1/user/journal/account/fake-account-id",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/user/journal/account/fake-account-id",
+        }
+    },
     {
         url: "/v1/ledger/entries",
         method: "GET",

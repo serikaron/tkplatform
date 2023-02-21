@@ -68,7 +68,7 @@ const mongoClient = {
     user: await connectUser(),
     system: await connectSystem(),
     site: await connectSite(),
-    leger: await connectLedger(),
+    ledger: await connectLedger(),
 }
 
 await callFiles(mongoClient)
