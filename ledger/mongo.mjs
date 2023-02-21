@@ -17,8 +17,10 @@ export async function setupMongo(req) {
         ledgerEntries: ledger.db.collection("ledgerEntries"),
         withdrawJournalEntries: ledger.db.collection("withdrawJournalEntries"),
         stores: ledger.db.collection("stores"),
-        accounts: ledger.db.collection("accounts"),
-        userAccounts: ledger.db.collection("userAccounts")
+        ledgerAccounts: ledger.db.collection("ledgerAccounts"),
+        journalAccounts: ledger.db.collection("journalAccounts"),
+        userLedgerAccounts: ledger.db.collection("userLedgerAccounts"),
+        userJournalAccounts: ledger.db.collection("userJournalAccounts"),
     }
     req.context.mongo = {
         client: ledger.client, db: ledger.db, collection,
@@ -85,18 +87,35 @@ export async function setupMongo(req) {
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()
         },
-        getAccounts: async () => {
-            return await collection.accounts.find({}, {_id: 0}).toArray()
+        getLedgerAccounts: async () => {
+            return await collection.ledgerAccounts.find({}, {_id: 0}).toArray()
         },
-        getUserAccounts: async (userId) => {
-            return await collection.userAccounts.find({userId}).toArray()
+        getJournalAccounts: async () => {
+            return await collection.journalAccounts.find({}, {_id: 0}).toArray()
         },
-        addUserAccount: async (account) => {
-            const r = await collection.userAccounts.insertOne(account)
+        getUserLedgerAccounts: async (userId) => {
+            return await collection.userLedgerAccounts.find({userId}).toArray()
+        },
+        getUserJournalAccounts: async (userId) => {
+            return await collection.userJournalAccounts.find({userId}).toArray()
+        },
+        addUserLedgerAccount: async (account) => {
+            const r = await collection.userLedgerAccounts.insertOne(account)
             return r.insertedId
         },
-        setUserAccount: async (userId, accountId, account) => {
-            await collection.userAccounts
+        addUserJournalAccount: async (account) => {
+            const r = await collection.userJournalAccounts.insertOne(account)
+            return r.insertedId
+        },
+        setUserLedgerAccount: async (userId, accountId, account) => {
+            await collection.userLedgerAccounts
+                .updateOne(
+                    {userId: new ObjectId(userId), _id: new ObjectId(accountId)},
+                    {$set: account}
+                )
+        },
+        setUserJournalAccount: async (userId, accountId, account) => {
+            await collection.userJournalAccounts
                 .updateOne(
                     {userId: new ObjectId(userId), _id: new ObjectId(accountId)},
                     {$set: account}

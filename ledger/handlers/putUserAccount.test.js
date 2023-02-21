@@ -8,15 +8,25 @@ import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
+describe.each([
+    {
+        path: "/v1/user/ledger/account/fake-account-id",
+        ledgerFn: jest.fn(),
+    },
+    {
+        path: "/v1/user/journal/account/fake-account-id",
+        journalFn: jest.fn(),
+    },
+])("$path", ({path, journalFn, ledgerFn}) => {
 test("update account", async () => {
-    const setUserAccount = jest.fn()
     const app = createApp()
     setup(app, {
         setup: testDIContainer.setup([
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        setUserAccount
+                        setUserLedgerAccount: ledgerFn,
+                        setUserJournalAccount: journalFn,
                     }
                 }
                 next()
@@ -26,7 +36,7 @@ test("update account", async () => {
     })
 
     const response = await supertest(app)
-        .put("/v1/user/ledger/account/fake-account-id")
+        .put(path)
         .send({
             msg: "a fake account body",
             id: "an illegal account id",
@@ -34,7 +44,15 @@ test("update account", async () => {
         })
         .set({id: "a fake user id"})
     simpleCheckTKResponse(response, TKResponse.Success())
-    expect(setUserAccount).toHaveBeenCalledWith("a fake user id", "fake-account-id", {
-        msg: "a fake account body",
-    })
+    if (ledgerFn !== undefined) {
+        expect(ledgerFn).toHaveBeenCalledWith("a fake user id", "fake-account-id", {
+            msg: "a fake account body",
+        })
+    }
+    if (journalFn !== undefined) {
+        expect(journalFn).toHaveBeenCalledWith("a fake user id", "fake-account-id", {
+            msg: "a fake account body",
+        })
+    }
+})
 })

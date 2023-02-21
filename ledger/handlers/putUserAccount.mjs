@@ -7,7 +7,15 @@ export function routePutUserAccount(router) {
         const account = req.body
         delete req.body.userId
         delete req.body.id
-        await req.context.mongo.setUserAccount(req.headers.id, req.params.accountId, account)
+        await req.context.mongo.setUserLedgerAccount(req.headers.id, req.params.accountId, account)
+        res.tkResponse(TKResponse.Success())
+        next()
+    })
+    router.put("/user/journal/account/:accountId", async (req, res, next) => {
+        const account = req.body
+        delete req.body.userId
+        delete req.body.id
+        await req.context.mongo.setUserJournalAccount(req.headers.id, req.params.accountId, account)
         res.tkResponse(TKResponse.Success())
         next()
     })

@@ -9,33 +9,57 @@ import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
-test("get account from db", async () => {
-    const getAccounts = jest.fn( async () => {
-        return [{
-            msg: "a fake account",
+describe.each([
+    {
+        path: "/v1/ledger/accounts",
+        ledgerFn: jest.fn(async () => {
+            return [{
+                msg: "a fake ledger account",
+            }]
+        }),
+        rspBody: [{
+            msg: "a fake ledger account"
         }]
-    })
-    const app = createApp()
-    setup(app, {
-        setup: testDIContainer.setup([
-            (req, res, next) => {
-                req.context = {
-                    mongo: {
-                        getAccounts
+    },
+    {
+        path: "/v1/journal/accounts",
+        journalFn: jest.fn(async () => {
+            return [{
+                msg: "a fake journal account",
+            }]
+        }),
+        rspBody: [{
+            msg: "a fake journal account"
+        }]
+    },
+])("$path", ({path, journalFn, ledgerFn, rspBody}) => {
+    test("get account from db", async () => {
+        const app = createApp()
+        setup(app, {
+            setup: testDIContainer.setup([
+                (req, res, next) => {
+                    req.context = {
+                        mongo: {
+                            getLedgerAccounts: ledgerFn,
+                            getJournalAccounts: journalFn,
+                        }
                     }
+                    next()
                 }
-                next()
-            }
-        ]),
-        teardown: testDIContainer.teardown([])
-    })
+            ]),
+            teardown: testDIContainer.teardown([])
+        })
 
-    const response = await supertest(app)
-        .get('/v1/ledger/accounts')
-    simpleCheckTKResponse(response, TKResponse.Success({
-        data: [{
-            msg: "a fake account",
-        }]
-    }))
-    expect(getAccounts).toHaveBeenCalled()
+        const response = await supertest(app)
+            .get(path)
+        simpleCheckTKResponse(response, TKResponse.Success({
+            data: rspBody
+        }))
+        if (journalFn !== undefined) {
+            expect(journalFn).toHaveBeenCalled()
+        }
+        if (ledgerFn !== undefined) {
+            expect(ledgerFn).toHaveBeenCalled()
+        }
+    })
 })
