@@ -7,7 +7,10 @@ it.skip("sms service should live", async () => {
         path: '/v1/sms/send',
         body: {
             phone: "13333333333",
-            captcha: "v53J"
+            captcha: {
+                key: "v53J",
+                code: "v53J"
+            }
         },
         verify: (response) => {
             expect(response.status).toBe(500)

@@ -7,7 +7,7 @@ async function gen(req, res) {
     const captcha = await req.context.captcha.get()
     await req.context.redis.setCaptcha(captcha.key, captcha.text)
 
-    console.log(`phone: ${captcha.key}, captcha:${captcha.text}`)
+    console.log(`key: ${captcha.key}, captcha:${captcha.text}`)
 
     // res.type('svg')
     res.tkResponse(TKResponse.Success({

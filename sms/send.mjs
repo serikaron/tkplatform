@@ -1,20 +1,23 @@
 'use strict'
 
 import {makeMiddleware} from "../common/flow.mjs";
-import {isBadFieldString, isBadPhone} from "../common/utils.mjs";
+import {isBadFieldObject, isBadFieldString, isBadPhone} from "../common/utils.mjs";
 import {InvalidArgument} from "../common/errors/00000-basic.mjs";
 import {InvalidCaptcha, SendSmsFailed} from "../common/errors/30000-sms-captcha.mjs";
 
 function checkInput(req) {
-    if (isBadFieldString(req.body.phone) ||
-        isBadFieldString(req.body.captcha) ||
-        isBadPhone(req.body.phone)) {
+    if (isBadFieldString(req.body.phone)
+        || isBadFieldObject(req.body.captcha)
+        || isBadFieldString(req.body.captcha.code)
+        || isBadFieldString(req.body.captcha.key)
+        || isBadPhone(req.body.phone)
+    ) {
         throw new InvalidArgument()
     }
 }
 
 async function checkCaptcha(req) {
-    const response = await req.context.stubs.captcha.verify(req.body.phone, req.body.captcha)
+    const response = await req.context.stubs.captcha.verify(req.body.captcha.key, req.body.captcha.code)
     if (response.isError()) {
         throw new InvalidCaptcha()
     }

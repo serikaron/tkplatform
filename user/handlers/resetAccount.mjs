@@ -1,16 +1,16 @@
 'use strict'
 
-import {isBadFieldString, isBadFiledObject, isBadPhone} from "../../common/utils.mjs";
+import {isBadFieldString, isBadFieldObject, isBadPhone} from "../../common/utils.mjs";
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 import {ResetAccountFailed, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs";
 import {tokenPayload} from "../stubs.mjs";
 
 function checkInput(req) {
-    if (isBadFiledObject(req.body.old)
+    if (isBadFieldObject(req.body.old)
         || isBadFieldString(req.body.old.phone)
         || isBadFieldString(req.body.old.password)
-        || isBadFiledObject(req.body.new)
+        || isBadFieldObject(req.body.new)
         || isBadFieldString(req.body.new.phone)
         || isBadFieldString(req.body.new.password)
         || isBadPhone(req.body.new.phone)

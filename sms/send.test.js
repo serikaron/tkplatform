@@ -9,7 +9,7 @@ import testDIContainer from "../tests/unittest/dicontainer.mjs";
 import {setup} from "./setup.mjs";
 import {InternalError} from "../common/errors/00000-basic.mjs";
 
-const defaultBody = {phone: "13333333333", captcha: "a1b2"}
+const defaultBody = {phone: "13333333333", captcha: {key: "1234", code: "a1b2"}}
 const successVerifyFn = async () => {
     return new TKResponse(200, {code: 0, msg: "success"})
 }
@@ -58,9 +58,10 @@ async function runTest(
 }
 
 test.concurrent.each([
-    {phone: "13333333333"},
-    {captcha: "1a2b"},
-    {phone: "1234", captcha: "1a2b"}
+    {phone: "13333333333", captcha: {key: "1234"}},
+    {captcha: {code: "1a2b", key: "1234"}},
+    {phone: "13333333333", captcha: {code: "1a2b"}},
+    {phone: "1234", captcha: {code: "1a2b", key: "1234"}},
 ])("invalid body ($#) should return InvalidArgument", async (body) => {
     await runTest({
         body,
@@ -89,7 +90,7 @@ test.concurrent.each([
     await runTest({
         verifyFn, status, code, msg
     })
-    expect(verifyFn).toHaveBeenCalledWith("13333333333", "a1b2")
+    expect(verifyFn).toHaveBeenCalledWith("1234", "a1b2")
 })
 
 test.concurrent.each([
@@ -130,7 +131,9 @@ test.concurrent.each([
 
     await runTest({
         smsFn: fn,
-        redisGet: async () => { return "8888" },
+        redisGet: async () => {
+            return "8888"
+        },
         status, code, msg
     })
     expect(fn).toHaveBeenCalledWith("13333333333", "8888")

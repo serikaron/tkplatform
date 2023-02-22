@@ -18,8 +18,14 @@
  *                 type: string
  *                 example: "13333333333"
  *               captcha:
- *                  type: string
- *                  example: "4iF9"
+ *                  type: object
+ *                  properties:
+ *                    key:
+ *                      type: string
+ *                      example: "1234"
+ *                    code:
+ *                      type: string
+ *                      example: "4iF9"
  *
  *     responses:
  *       200:

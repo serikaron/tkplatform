@@ -4,7 +4,7 @@ export function isBadFieldString(field) {
     return (typeof field !== "string") || field.length === 0;
 }
 
-export function isBadFiledObject(field) {
+export function isBadFieldObject(field) {
     return (field === null) || (typeof field !== "object") || Object.keys(field).length === 0
 }
 
