@@ -149,7 +149,7 @@ test.concurrent.each([
     {
         url: "/v1/user/account",
         method: "POST",
-        needAuth: true,
+        needAuth: false,
         service: {
             baseURL: "http://user:8080",
             url: "/v1/user/account"
@@ -158,7 +158,7 @@ test.concurrent.each([
     {
         url: "/v1/user/password",
         method: "POST",
-        needAuth: true,
+        needAuth: false,
         service: {
             baseURL: "http://user:8080",
             url: "/v1/user/password"

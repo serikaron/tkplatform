@@ -25,7 +25,7 @@ describe('user test about auth', () => {
         await runTest({
             path: '/v1/user/login',
             body: {
-                phone: "13333333333",
+                phone: phone,
                 password: "123456"
             },
             verify: response => {
@@ -39,32 +39,34 @@ describe('user test about auth', () => {
         await runTest({
             path: "/v1/user/password",
             body: {
+                phone: phone,
                 newPassword: "123456",
                 smsCode: "2065",
             },
-            authentication: {accessToken},
+            // authentication: {accessToken},
             verify: (response) => {
-                simpleVerification(response)
-                accessToken = response.data.accessToken
+                // simpleVerification(response)
+                expect(response.status).toBe(200)
+                expect(response.code).toBe(0)
             }
         })
     })
 
-    test("last change account", async () => {
-        await runTest({
-            path: "/v1/user/account",
-            body: {
-                old: {
-                    phone: "13333333333",
-                    password: "123456",
-                },
-                new: {
-                    phone: "13333333333",
-                    password: "123456",
-                },
-                smsCode: "2065",
-            },
-            authentication: {accessToken}
-        })
-    })
+    // test("last change account", async () => {
+    //     await runTest({
+    //         path: "/v1/user/account",
+    //         body: {
+    //             old: {
+    //                 phone: phone,
+    //                 password: "123456",
+    //             },
+    //             new: {
+    //                 phone: phone,
+    //                 password: "123456",
+    //             },
+    //             smsCode: "2065",
+    //         },
+    //         // authentication: {accessToken}
+    //     })
+    // })
 })

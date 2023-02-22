@@ -71,9 +71,9 @@ export async function setupMongo(req) {
                 return await withInviter()
             }
         },
-        updatePassword: async (id, password) => {
+        updatePassword: async (phone, password) => {
             await collection.users
-                .updateOne({_id: id}, {$set: {password}})
+                .updateOne({phone}, {$set: {password}})
         },
         updateAccount: async (id, phone, password) => {
             await collection.users
