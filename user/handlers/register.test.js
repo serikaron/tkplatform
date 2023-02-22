@@ -89,6 +89,7 @@ describe("test register", () => {
             {phone: "13333333333", password: "123456", inviter: {}},
             {phone: "13333333333", password: "123456"},
             {},
+            {"inviter":{"phone":"14711111111"},"password":"111111","phone":"18938901487","qq":"2KIP","smsCode":"3059"},
         ]
         it("should return InvalidArgument", async () => {
             await Promise.all(bodies.map(body => {
