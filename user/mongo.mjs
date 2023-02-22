@@ -78,7 +78,7 @@ export async function setupMongo(req) {
         updateAccount: async (id, phone, password) => {
             await collection.users
                 .updateOne({_id: id}, {$set: {phone, password}})
-        }
+        },
     }
 }
 

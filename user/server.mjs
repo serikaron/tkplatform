@@ -5,6 +5,7 @@ import {route as routeRegister} from "./handlers/register.mjs";
 import {route as routeLogin} from "./handlers/login.mjs"
 import {route as routeResetPassword} from "./handlers/resetPassword.mjs"
 import {route as routeResetAccount} from "./handlers/resetAccount.mjs"
+import {routeGetUserMember} from "./handlers/getUserMember.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -18,6 +19,7 @@ export function setup(app, {
     routeLogin(router)
     routeResetPassword(router)
     routeResetAccount(router)
+    routeGetUserMember(router)
 
     teardown(router)
 }

@@ -1,21 +1,16 @@
 'use strict'
 
-import {create as createCaptcha} from 'svg-captcha'
+import {create as createCaptcha, randomText} from 'svg-captcha'
 import {setup} from "./setup.mjs";
 import diContainer from "../common/dicontainer.mjs";
 import {cleanRedis, makeRedisMiddleware} from "../common/redis.mjs";
 import createApp from "../common/app.mjs";
+import {Resvg} from "@resvg/resvg-js";
 
 const app = createApp()
 
-const logMiddleware = (req, res, next) => {
-    console.log(`captch-service, handling ${req.url}`)
-    next()
-}
-
 setup(app, {
     setup: diContainer.setup([
-        logMiddleware,
         makeRedisMiddleware('redis://captcha_cache'),
         (req, res, next) => {
             req.context.redis.setCaptcha = async (phone, captcha) => {
@@ -28,8 +23,19 @@ setup(app, {
         },
         (req, res, next) => {
             req.context.captcha = {
-                get: () => {
-                    return createCaptcha()
+                get: async () => {
+                    const captcha = createCaptcha()
+
+                    const resvg = new Resvg(captcha.data, {})
+                    const pngData = resvg.render()
+                    const pngBuffer = pngData.asPng()
+
+                    const key = randomText(4)
+                    return {
+                        key,
+                        text: captcha.text,
+                        image: pngBuffer
+                    }
                 }
             }
             next()

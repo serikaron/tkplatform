@@ -5,8 +5,6 @@ import {runTest} from "./api.mjs";
 it("captcha service should work", async () => {
     await runTest({
         path: '/v1/captcha/require',
-        body: {
-            phone: "13333333333"
-        }
+        body: {}
     })
 })

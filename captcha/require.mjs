@@ -1,32 +1,24 @@
 'use strict'
 
 import {makeMiddleware} from "../common/flow.mjs";
-import {isBadFieldString, isBadPhone} from "../common/utils.mjs";
-import {InvalidArgument} from "../common/errors/00000-basic.mjs";
-
-function checkInput(req) {
-    if (isBadFieldString(req.body.phone) ||
-        isBadPhone(req.body.phone)) {
-        throw new InvalidArgument()
-    }
-}
+import {TKResponse} from "../common/TKResponse.mjs";
 
 async function gen(req, res) {
-    const captcha = req.context.captcha.get()
-    await req.context.redis.setCaptcha(req.body.phone, captcha.text)
+    const captcha = await req.context.captcha.get()
+    await req.context.redis.setCaptcha(captcha.key, captcha.text)
 
-    console.log(`phone: ${req.body.phone}, captcha:${captcha.text}`)
+    console.log(`phone: ${captcha.key}, captcha:${captcha.text}`)
 
     // res.type('svg')
-    res.response({
-        status: 200,
+    res.tkResponse(TKResponse.Success({
         data: {
-            captcha: captcha.data
+            key: captcha.key,
+            image: captcha.image,
         }
-    })
+    }))
 }
 export function route(router) {
     router.post("/require", ...makeMiddleware([
-        checkInput, gen
+        gen
     ]))
 }

@@ -8,6 +8,7 @@ const routeInfo = [
 
     {url: '/v1/user/account', method: "POST", needAuth: true},
     {url: '/v1/user/password', method: "POST", needAuth: true},
+    {url: "/v1/user/member", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
 
     // site
     {
