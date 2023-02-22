@@ -8,16 +8,6 @@
  *   post:
  *     tags: ["captcha(图形码)"]
  *     description: 获取图形码
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               phone:
- *                 type: string
- *                 example: "13333333333"
- *
  *     responses:
  *       200:
  *         description: 获取成功
@@ -35,8 +25,11 @@
  *                 data:
  *                   type: object
  *                   properties:
- *                     captcha:
+ *                     key:
  *                       type: string
- *                       example: "html"
+ *                       example: 1234
+ *                     image:
+ *                       type: string
+ *                       example: baas64 图片字节
  *
  */
