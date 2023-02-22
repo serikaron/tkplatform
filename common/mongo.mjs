@@ -37,6 +37,15 @@ export async function connectLedger() {
     })
 }
 
+export async function connectPayment() {
+    return await connect({
+        user: process.env.MONGO_PAYMENT_USER,
+        pass: process.env.MONGO_PAYMENT_PASS,
+        host: process.env.MONGO_PAYMENT_HOST,
+        name: process.env.MONGO_PAYMENT_DB
+    })
+}
+
 async function connect({user, pass, host, name}) {
     // console.log(`connecting ${name}`)
     const uri = `mongodb://${user}:${pass}@${host}:27017`

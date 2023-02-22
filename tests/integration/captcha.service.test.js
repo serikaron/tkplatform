@@ -33,6 +33,7 @@ describe("test captcha service", () => {
             verify: response => {
                 simpleVerification(response)
                 expect(response.data.image).not.toBeUndefined()
+                expect(typeof response.data.image).toBe("string")
                 box.key = response.data.key
             }
         })
