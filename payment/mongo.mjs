@@ -2,6 +2,7 @@
 
 import * as dotenv from 'dotenv'
 import {connectPayment} from "../common/mongo.mjs";
+import {ObjectId} from "mongodb";
 
 dotenv.config()
 
@@ -14,6 +15,7 @@ export async function setupMongo(req) {
     const collection = {
         memberItems: payment.db.collection("memberItems"),
         riceItems: payment.db.collection("riceItems"),
+        wallets: payment.db.collection("wallets"),
     }
     req.context.mongo = {
         client: payment.client, db: payment.db, collection,
@@ -22,6 +24,9 @@ export async function setupMongo(req) {
         },
         getRiceItems: async () => {
             return await collection.riceItems.find().toArray()
+        },
+        getWallet: async (userId) => {
+            return await collection.wallets.findOne({userId: new ObjectId(userId)})
         }
     }
 }
