@@ -30,11 +30,13 @@ setup(app, {
                     const pngData = resvg.render()
                     const pngBuffer = pngData.asPng()
 
+                    const encoded = pngBuffer.toString("base64")
+
                     const key = randomText(4)
                     return {
                         key,
                         text: captcha.text,
-                        image: pngBuffer
+                        image: encoded
                     }
                 }
             }
