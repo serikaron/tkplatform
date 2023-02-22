@@ -239,3 +239,23 @@
  *                       type: string
  *                       example: "96defd9f-1a54-4cb8-b501-9076d8709074"
  */
+
+/**
+ * @swagger
+ * /v1/user/member(会员信息):
+ *   get:
+ *     tags: ["user(用户相关)"]
+ *     description: 会员信息
+ *     responses:
+ *       200:
+ *         description: 会员信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 expiration:
+ *                   type: number
+ *                   example: 过期时间timestamp
+ *
+ */
