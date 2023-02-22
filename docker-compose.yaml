@@ -31,6 +31,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_USER_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_USER_DB}
+    volumes:
+      - ./mongo-data/user_db:/data/db
 
   token:
     image: car.daoyi365.com:5000/tk-token
@@ -93,6 +95,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_SYSTEM_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_SYSTEM_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_SYSTEM_DB}
+    volumes:
+      - ./mongo-data/system_db:/data/db
 
   site:
     image: car.daoyi365.com:5000/tk-site
@@ -112,6 +116,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_SITE_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_SITE_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_SITE_DB}
+    volumes:
+      - ./mongo-data/site_db:/data/db
 
   ledger:
     image: car.daoyi365.com:5000/tk-ledger
@@ -131,6 +137,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_LEDGER_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_LEDGER_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_LEDGER_DB}
+    volumes:
+      - ./mongo-data/ledger_db:/data/db
 
   payment:
     image: car.daoyi365.com:5000/tk-payment
@@ -150,6 +158,8 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${MONGO_PAYMENT_USER}
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PAYMENT_PASS}
       MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_PAYMENT_DB}
+    volumes:
+      - ./mongo-data/payment_db:/data/db
 
   migration:
     image: car.daoyi365.com:5000/tk-migration
