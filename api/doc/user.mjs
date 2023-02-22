@@ -259,3 +259,95 @@
  *                   example: 过期时间timestamp
  *
  */
+
+/**
+ * @swagger
+ * /v1/user/overview(帐号总览):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     parameters:
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: 会员信息
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
+ *                   type: string
+ *                 registeredAt:
+ *                   type: number
+ *                 activeDays:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: number
+ *                     30:
+ *                       type: number
+ *                 rechargeCount:
+ *                   type: number
+ *                 memberExpiration:
+ *                   type: number
+ *                 siteCount:
+ *                   type: number
+ *                 phone:
+ *                   type: string
+ *                 qq:
+ *                   type: string
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/downLines(下线管理):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     parameters:
+ *     - in: path
+ *       name: phone
+ *       schema:
+ *         type: string
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: number
+ *     responses:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                   example: 筛选前的下级总人数
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       phone:
+ *                         type: string
+ *                       lastLogin:
+ *                         type: number
+ *                       registeredAt:
+ *                         type: number
+ *                       memberExpiration:
+ *                         type: number
+ *                       name:
+ *                         type: string
+ *                       alias:
+ *                         type: string
+ *
+ *
+ */
