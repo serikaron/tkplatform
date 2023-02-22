@@ -641,23 +641,56 @@
 
 /**
  * @swagger
- * /v1/journal/entries?minDate=&maxDate=(查询提现帐本记录):
+ * /v1/ledger/entries/count/:year(统计帐本数量):
+ *   get:
+ *     tags: ["ledger(记帐帐本)"]
+ *     response:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   month:
+ *                     type: number
+ *                   count:
+ *                     type: number
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/ledger/entries(删除帐本数据):
+ *   delete:
+ *     tags: ["ledger(记帐帐本)"]
+ *     parameters:
+ *     - in: path
+ *       name: year
+ *       schema:
+ *         type: number
+ *     - in: path
+ *       name: month
+ *       schema:
+ *         type: array
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/ledger/entries/refunded(全部设置为已返):
+ *   put:
+ *     tags: ["ledger(记帐帐本)"]
+ */
+
+/**
+ * @swagger
+ * /v1/journal/entries/:minDate/:maxDate(查询提现帐本记录):
  *   get:
  *     tags: ["ledger(记帐帐本)"]
  *     description: 查询提现帐本记录
  *     parameters:
- *     - in: path
- *       name: minDate
- *       schema:
- *         type: Number
- *         example: 1676951437
- *       required: true
- *     - in: path
- *       name: maxDate
- *       schema:
- *         type: Number
- *         example: 1676951437
- *       required: true
  *     - in: path
  *       name: offset
  *       schema:
@@ -668,6 +701,45 @@
  *       schema:
  *         type: Number
  *         example: 10
+ *     - in: path
+ *       name: siteName
+ *       schema:
+ *         type: string
+ *         example: 站点为名
+ *     - in: path
+ *       name: siteId
+ *       schema:
+ *         type: string
+ *         example: 站点ID
+ *     - in: path
+ *       name: credited
+ *       schema:
+ *         type: number
+ *         example: 0-全部，1-已到帐，2-未到帐
+ *     - in: path
+ *       name: account
+ *       schema:
+ *         type: string
+ *     - in: path
+ *       name: journalAccount
+ *       schema:
+ *         type: string
+ *         example: 收款号
+ *     - in: path
+ *       name: orderId
+ *       schema:
+ *         type: string
+ *         example: 订单号
+ *     - in: path
+ *       name: minAmount
+ *       schema:
+ *         type: number
+ *         example: 金额
+ *     - in: path
+ *       name: maxAmount
+ *       schema:
+ *         type: number
+ *         example: 金额
  *     responses:
  *       200:
  *         description: 返回列表
@@ -757,3 +829,173 @@
  *         description: 返回成功
  *
  */
+
+/**
+ * @swagger
+ * /v1/journal/statistics/:minDate/:maxDate(提现帐本统计):
+ *   get:
+ *     tags: ["ledger(记帐帐本)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 notYetCredited:
+ *                   type: number
+ *                 credited:
+ *                   type: number
+ *                 principle:
+ *                   type: number
+ */
+
+/**
+ * @swagger
+ * /v1/journal/entries/count/:year(统计提现帐本数量):
+ *   get:
+ *     tags: ["ledger(记帐帐本)"]
+ *     response:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   month:
+ *                     type: number
+ *                   count:
+ *                     type: number
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/journal/entries(删除提现帐本数据):
+ *   delete:
+ *     tags: ["ledger(记帐帐本)"]
+ *     parameters:
+ *     - in: path
+ *       name: year
+ *       schema:
+ *         type: number
+ *     - in: path
+ *       name: month
+ *       schema:
+ *         type: array
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/journal/entries/credited(全部设置为已到帐):
+ *   put:
+ *     tags: ["ledger(记帐帐本)"]
+ */
+
+/**
+ * @swagger
+ * /v1/ledger/analyse/detail/:minDate/:maxDate(记帐分析-明细):
+ *   get:
+ *     tags: ["ledger(记帐帐本)"]
+ *     responses:
+ *       200:
+ *         description: 明细列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   site:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                       account:
+ *                         type: string
+ *                   notYetRefunded:
+ *                     type: object
+ *                     properties:
+ *                       count:
+ *                         type: number
+ *                       principle:
+ *                         type: number
+ *                       commission:
+ *                         type: number
+ *                   withdrawingCount:
+ *                     type: number
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/ledger/analyse/overview/:minDate/:maxDate(记帐分析-总览):
+ *   get:
+ *     tags: ["ledger(记帐帐本)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 overview:
+ *                   type: object
+ *                   properties:
+ *                     commission:
+ *                       type: number
+ *                     principle:
+ *                       type: number
+ *                     notYetRefunded:
+ *                       type: number
+ *                     count:
+ *                       type: number
+ *                 exception:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: number
+ *                     amount:
+ *                       type: number
+ *                     principle:
+ *                       type: number
+ *                     commission:
+ *                       type: number
+ *                 commission:
+ *                   type: object
+ *                   properties:
+ *                     notYetRefunded:
+ *                       type: object
+ *                       properties:
+ *                         count:
+ *                           type: number
+ *                         amount:
+ *                           type: number
+ *                 principle:
+ *                   type: object
+ *                   properties:
+ *                     notYetRefunded:
+ *                       type: object
+ *                       properties:
+ *                         count:
+ *                           type: number
+ *                         amount:
+ *                           type: number
+ *                 cardDetail:
+ *                   type: object
+ *                   properties:
+ *                     notYetCredited:
+ *                       type: number
+ *                     credited:
+ *                       type: number
+ *                     count:
+ *                       type: number
+ *
+ *
+ *
+ */
+
