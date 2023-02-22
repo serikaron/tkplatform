@@ -21,6 +21,9 @@
  *               password:
  *                 type: string
  *                 example: "123456"
+ *               qq:
+ *                 type: string
+ *                 example: "1234567890"
  *               inviter:
  *                 type: object
  *                 properties:
@@ -143,6 +146,9 @@
  *           schema:
  *             type: object
  *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "13333333333"
  *               newPassword:
  *                 type: string
  *                 example: "123456"
