@@ -12,7 +12,7 @@
  *       schema:
  *         type: Number
  *     - in: path
- *       name: offset
+ *       name: limit
  *       schema:
  *         type: Number
  *     - in: path
@@ -363,50 +363,7 @@
 
 /**
  * @swagger
- * /v1/sites(缺失上报-待添加):
- *   get:
- *     tags: ["site(站点)"]
- *     parameters:
- *     - in: path
- *       name: offset
- *       schema:
- *         type: Number
- *     - in: path
- *       name: limit
- *       schema:
- *         type: Number
- *     description: 缺失上报-待添加
- *     responses:
- *       200:
- *         description: 返回列表
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 total:
- *                   type: number
- *                 list:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       name:
- *                         type: string
- *                         example: 站点1
- *                       status:
- *                         type: number
- *                         example: 0-正常，1-异常
- *                       comment:
- *                         type: string
- *                       thumb:
- *                         type: boolean
- *
- */
-
-/**
- * @swagger
- * /v1/site/:siteId/records(成功记录):
+ * /v1/site/:siteId/records/:minDate/:maxDate(成功记录):
  *   get:
  *     tags: ["site(站点)"]
  *     description: 成功记录
