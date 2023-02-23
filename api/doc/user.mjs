@@ -351,3 +351,100 @@
  *
  *
  */
+
+/**
+ * @swagger
+ * /v1/user/report(问题反馈):
+ *   post:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *               site:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *               detail:
+ *                 type: string
+ *               screenshot:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   example: 上传后的地址
+ *               video:
+ *                 type: string
+ *                 example: 上传后的地址
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/reports(反馈历史):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     parameters:
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: number
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   其余字段:
+ *                     type: 参考提交的接口
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/messages(消息):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     parameters:
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: number
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   type:
+ *                     type: string
+ *                   content:
+ *                     type: string
+ *                   createdAt:
+ *                     type: number
+ *
+ */
