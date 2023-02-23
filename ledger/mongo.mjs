@@ -21,6 +21,7 @@ export async function setupMongo(req) {
         journalAccounts: ledger.db.collection("journalAccounts"),
         userLedgerAccounts: ledger.db.collection("userLedgerAccounts"),
         userJournalAccounts: ledger.db.collection("userJournalAccounts"),
+        siteRecords: ledger.db.collection("siteRecords"),
     }
     req.context.mongo = {
         client: ledger.client, db: ledger.db, collection,
@@ -120,6 +121,11 @@ export async function setupMongo(req) {
                     {userId: new ObjectId(userId), _id: new ObjectId(accountId)},
                     {$set: account}
                 )
+        },
+        getSiteRecords: async (userId, siteId) => {
+            return await collection.siteRecords.find(
+                {userId: new ObjectId(userId), siteId: new ObjectId(siteId)}
+            ).toArray()
         }
     }
 }
