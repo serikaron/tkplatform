@@ -7,12 +7,8 @@ export async function migrate(mongoClient) {
         .collection("settings")
         .insertMany([
             {
-                name: "小吉他",
-                icon: "/static/sites/001.png"
+                key: "registerPrice",
+                value: {daysForRegister: 7, daysForInvite: 3}
             },
-            {
-                name: "皮卡单",
-                icon: "/static/sites/002.png"
-            }
         ])
 }

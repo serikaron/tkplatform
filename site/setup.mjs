@@ -5,7 +5,7 @@ import {routeGetSite} from "./handlers/getSites.mjs";
 import {routePostUserSite} from "./handlers/postUserSite.mjs";
 import {routeGetUserSites} from "./handlers/getUserSites.mjs";
 import {routePutUserSite} from "./handlers/putUserSite.mjs";
-import {routePutUserSites} from "./handlers/putUserSites.mjs";
+import {routeGetUserSite} from "./handlers/getUserSite.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -17,7 +17,7 @@ export function setup(app, {setup, teardown}) {
     routePostUserSite(router)
     routeGetUserSites(router)
     routePutUserSite(router)
-    routePutUserSites(router)
+    routeGetUserSite(router)
 
     teardown(router)
 }

@@ -13,9 +13,9 @@ import {ObjectId} from "mongodb";
 async function runTest(
     {
         body,
-        idFn,
         updateFn,
         getSite,
+        userId = new ObjectId(),
         tkResponse
     }
 ) {
@@ -25,7 +25,6 @@ async function runTest(
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        objectId: idFn,
                         addUserSite: updateFn,
                         getSite,
                     }
@@ -38,7 +37,7 @@ async function runTest(
 
     const response = await supertest(app)
         .post("/v1/user/site")
-        .set({id: "a fake user id"})
+        .set({id: `${userId}`})
         .send(body)
     simpleCheckResponse(response, tkResponse.status, tkResponse.code, tkResponse.msg, tkResponse.data)
 }
@@ -75,64 +74,63 @@ test("system site not found should return 404", async () => {
 })
 
 test('test add site should work as expect', async () => {
-        const userSiteId = new ObjectId()
-        const siteId = new ObjectId()
-        const objectId = jest.fn(() => {
-            return userSiteId
-        })
-        const getSite = async (id) => {
-            return {
-                _id: id,
-                name: "a fake site name"
-            }
+    const siteId = new ObjectId()
+    const userId = new ObjectId()
+    const userSiteId = new ObjectId()
+    const getSite = async (id) => {
+        return {
+            _id: id,
+            name: "a fake site name"
         }
-
-        const userSite = {
-            id: userSiteId,
-            site: {
-                id: siteId,
-                name: "a fake site name"
-            },
-            "credential": {
-                "account": "",
-                "password": ""
-            },
-            "verified": false,
-            "account": {
-                "list": []
-            },
-            "setting": {
-                "interval": {
-                    "min": 200,
-                    "max": 300,
-                },
-                "schedule": [
-                    {
-                        "from": "",
-                        "to": "",
-                    },
-                    {
-                        from: "",
-                        to: ""
-                    }
-                ]
-            }
-        }
-        const responseBody = JSON.parse(JSON.stringify(userSite))
-        responseBody.id = `${userSiteId}`
-        responseBody.site.id = `${siteId}`
-        const addUserSite = jest.fn()
-        await runTest({
-            body: {siteId},
-            idFn: objectId,
-            updateFn: addUserSite,
-            getSite,
-            tkResponse: TKResponse.Success({
-                data: responseBody
-            })
-        })
-        expect(objectId).toBeCalled()
-        expect(addUserSite).toHaveBeenCalledWith("a fake user id", userSite)
     }
-)
-;
+    const addUserSite = jest.fn(async (item) => {
+        item._id = userSiteId
+        return userSiteId
+    })
+
+    const userSite = {
+        id: userSiteId,
+        site: {
+            id: siteId,
+            name: "a fake site name"
+        },
+        "credential": {
+            "account": "",
+            "password": ""
+        },
+        "verified": false,
+        "account": {
+            "list": []
+        },
+        "setting": {
+            "interval": {
+                "min": 200,
+                "max": 300,
+            },
+            "schedule": [
+                {
+                    "from": "",
+                    "to": "",
+                },
+                {
+                    from: "",
+                    to: ""
+                }
+            ]
+        }
+    }
+    const responseBody = JSON.parse(JSON.stringify(userSite))
+    responseBody.id = `${userSiteId}`
+    responseBody.site.id = `${siteId}`
+    delete responseBody.userId
+    await runTest({
+        body: {siteId},
+        updateFn: addUserSite,
+        getSite,
+        userId,
+        tkResponse: TKResponse.Success({
+            data: responseBody
+        })
+    })
+    expect(addUserSite).toHaveBeenCalledWith(userSite)
+})

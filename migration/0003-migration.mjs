@@ -16,21 +16,12 @@ async function moveSiteFromSystemToSite(mongoClient) {
         .collection("sites")
         .insertMany([
             {
-                key: "registerPrice",
-                value: {daysForRegister: 7, daysForInvite: 3}
+                name: "小吉他",
+                icon: "/static/sites/001.png"
             },
             {
-                key: "sites",
-                value: [
-                    {
-                        name: "小吉他",
-                        icon: "/static/sites/001.png"
-                    },
-                    {
-                        name: "皮卡单",
-                        icon: "/static/sites/002.png"
-                    }
-                ]
+                name: "皮卡单",
+                icon: "/static/sites/002.png"
             }
         ])
 }

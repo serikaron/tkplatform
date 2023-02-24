@@ -38,20 +38,19 @@ async function runTest(
 
 test("should return sites from db", async () => {
     const getUserSites = jest.fn(async () => {
-        return {
-            sites: [
-                {msg: "fake user sites"},
-                {msg: "fake user sites too"}
-            ]
-        }
+        return [
+            {_id: "a fake site id", msg: "fake user sites", userId: "a fake user id"},
+            {_id: "a fake site id too", msg: "fake user sites too", userId: "a fake user id"}
+        ]
+
     })
     await runTest({
         header: {id: "fake user id"},
         getUserSites,
         tkResponse: TKResponse.Success({
             data: [
-                {msg: "fake user sites"},
-                {msg: "fake user sites too"},
+                {id: "a fake site id", msg: "fake user sites"},
+                {id: "a fake site id too", msg: "fake user sites too"}
             ]
         })
     })

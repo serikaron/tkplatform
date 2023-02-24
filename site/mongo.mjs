@@ -24,33 +24,28 @@ export async function setupMongo(req) {
         getSite: async objectId => {
             return await collection.sites.findOne({_id: objectId})
         },
-        objectId: () => {
-            return new ObjectId()
-        },
-        addUserSite: async (userId, userSite) => {
-            await collection.userSites.updateOne(
-                {userId: new ObjectId(userId)},
-                {$addToSet: {sites: userSite}},
-                {upsert: true}
-            )
+        addUserSite: async (userSite) => {
+            const r = await collection.userSites.insertOne(userSite)
+            return r.insertedId
         },
         getUserSites: async (userId) => {
-            return await collection.userSites.findOne(
+            return await collection.userSites.find(
                 {userId: new ObjectId(userId)}
-            )
+            ).toArray()
         },
         setUserSiteOne: async (userId, siteId, site) => {
-            await collection.userSites.updateOne(
-                {userId: new ObjectId(userId)},
-                {$set: {"sites.$[site]": site}},
-                {arrayFilters: [{"site.id": new ObjectId(siteId)}]}
-            )
+            await collection.userSites.updateOne({
+                userId: new ObjectId(userId),
+                _id: new ObjectId(siteId),
+            }, {
+                $set: site
+            })
         },
-        setUserSiteWhole: async (userId, sites) => {
-            await collection.userSites.updateOne(
-                {userId: new ObjectId(userId)},
-                {$set: {sites}}
-            )
+        getUserSite: async (siteId, userId) => {
+            return await collection.userSites.findOne({
+                _id: new ObjectId(siteId),
+                userId: new ObjectId(userId)
+            })
         }
     }
 }

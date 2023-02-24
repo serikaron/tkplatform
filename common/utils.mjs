@@ -53,3 +53,13 @@ export function dateRange(
         maxDate: Math.max(numMinDate, numMaxDate)
     }
 }
+
+export function replaceId(obj) {
+    obj.id = obj._id
+    delete obj._id
+    return obj
+}
+
+export function copy(obj) {
+    return JSON.parse(JSON.stringify(obj))
+}

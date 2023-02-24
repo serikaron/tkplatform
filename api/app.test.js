@@ -183,6 +183,15 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/user/site/fake-site-id",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id"
+        }
+    },
+    {
         url: "/v1/user/sites",
         method: "GET",
         needAuth: true,

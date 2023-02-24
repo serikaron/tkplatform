@@ -18,12 +18,8 @@ const routeInfo = [
             url: '/v1/sites'
         }
     },
-    {
-        url: '/v1/user/sites', method: "GET", needAuth: true,
-        service: {
-            baseURL: "http://site:8080",
-        }
-    },
+    {url: '/v1/user/site/:siteId', method: "GET", needAuth: true, service: {baseURL: "http://site:8080",}},
+    {url: '/v1/user/sites', method: "GET", needAuth: true, service: {baseURL: "http://site:8080",}},
     {
         url: "/v1/user/site/:siteId", method: "PUT", needAuth: true,
         service: {
@@ -48,11 +44,21 @@ const routeInfo = [
     {url: "/v1/ledger/accounts", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/user/ledger/accounts", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/user/ledger/account", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
-    {url: "/v1/user/ledger/account/:accountId", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {
+        url: "/v1/user/ledger/account/:accountId",
+        method: "PUT",
+        needAuth: true,
+        service: {baseURL: "http://ledger:8080"}
+    },
     {url: "/v1/journal/accounts", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/user/journal/accounts", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/user/journal/account", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
-    {url: "/v1/user/journal/account/:accountId", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {
+        url: "/v1/user/journal/account/:accountId",
+        method: "PUT",
+        needAuth: true,
+        service: {baseURL: "http://ledger:8080"}
+    },
     {url: "/v1/ledger/entries", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/entry", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/entry/:entry", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},

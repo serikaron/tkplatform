@@ -198,4 +198,40 @@ describe.only("test site service", () => {
             }
         })
     })
+
+    test("Update only one field", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/user/site/${box.firstUserSite.id}`,
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data).toEqual(box.firstUserSite)
+                expect(response.data.verified).toBe(false)
+            }
+        })
+        await runTest({
+            method: "PUT",
+            path: `/v1/user/site/${box.firstUserSite.id}`,
+            body: {verified: true},
+            baseURL,
+            userId,
+            verify: response => {
+                expect(response.status).toBe(200)
+                box.firstUserSite.verified = true
+            }
+        })
+        await runTest({
+            method: "GET",
+            path: `/v1/user/site/${box.firstUserSite.id}`,
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data).toEqual(box.firstUserSite)
+                expect(response.data.verified).toBe(true)
+            }
+        })
+    })
 })

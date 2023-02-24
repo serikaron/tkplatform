@@ -1,7 +1,7 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {isBadFieldString} from "../../common/utils.mjs";
+import {isBadFieldString, replaceId} from "../../common/utils.mjs";
 import {InvalidArgument, NotFound} from "../../common/errors/00000-basic.mjs";
 import {ObjectId} from "mongodb";
 import {makeMiddleware} from "../../common/flow.mjs";
@@ -24,9 +24,8 @@ const makeUserSite = async req => {
     }
     systemSite.id = systemSite._id
     delete systemSite._id
-    const id = req.context.mongo.objectId();
     req.userSite = {
-        id,
+        userId: new ObjectId(req.headers.id),
         site: systemSite,
         "credential": {
             "account": "",
@@ -56,7 +55,9 @@ const makeUserSite = async req => {
 }
 
 const addUserSite = async (req, res) => {
-    await req.context.mongo.addUserSite(req.headers.id, req.userSite)
+    await req.context.mongo.addUserSite(req.userSite)
+    delete req.userSite.userId
+    replaceId(req.userSite)
     res.tkResponse(TKResponse.Success({
         data: req.userSite
     }))
