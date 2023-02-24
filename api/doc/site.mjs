@@ -483,10 +483,14 @@
 
 /**
  * @swagger
- * /v1/site/:siteId/records/:minDate/:maxDate(成功记录):
+ * /v1/site/records/:minDate/:maxDate(成功记录):
  *   get:
  *     tags: ["site(站点)"]
- *     description: 成功记录
+ *     parameters:
+ *     - in: path
+ *       name: siteId
+ *       schema:
+ *         type: string
  *     responses:
  *       200:
  *         description: 返回列表
@@ -504,6 +508,8 @@
  *                   items:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       createdAt:
  *                         type: number
  *                       principle:

@@ -12,6 +12,10 @@ export function isBadFieldBool(field) {
     return (typeof field !== "boolean");
 }
 
+export function isBadFieldNumber(field) {
+    return (typeof field !== "number")
+}
+
 export function isGoodFieldBool(field) {
     return !isBadFieldBool(field)
 }

@@ -123,16 +123,31 @@ export async function setupMongo(req) {
                 )
         },
         getSiteRecords: async (userId, siteId, minDate, maxDate) => {
-            return await collection.siteRecords.find({
-                    userId: new ObjectId(userId),
-                    siteId: new ObjectId(siteId),
-                    createdAt: {$gte: minDate, $lt: maxDate},
-                }
-            ).toArray()
+            const filter = siteId === undefined ? {
+                userId: new ObjectId(userId),
+                createdAt: {$gte: minDate, $lt: maxDate},
+            } : {
+                userId: new ObjectId(userId),
+                createdAt: {$gte: minDate, $lt: maxDate},
+                siteId: new ObjectId(siteId),
+            }
+            return await collection.siteRecords.find(filter)
+                .sort({creaatedAt: -1})
+                .toArray()
         },
         addSiteRecord: async (record) => {
             const r = await collection.siteRecords.insertOne(record)
             return r.insertedId
+        },
+        keepRecord: async (recordId, userId, siteId) => {
+            await collection.siteRecords
+                .updateOne({
+                    _id: new ObjectId(recordId),
+                    userId: new ObjectId(userId),
+                    siteId: new ObjectId(siteId)
+                }, {
+                    $set: {kept: true}
+                })
         }
     }
 }

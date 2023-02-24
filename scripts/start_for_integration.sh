@@ -1,1 +1,1 @@
-docker compose rm -s -f && docker compose up -d
+docker compose rm -s -f && docker compose -f docker-compose.yaml -f tests/integration/docker-compose.yaml up -d

@@ -4,7 +4,7 @@ import {TKError} from "./errors/error.mjs";
 
 
 export function enteringLog(req, res, next) {
-    console.log(`receive request ${req.method} ${req.url}`)
+    console.log(`receive user:${req.headers.id} request ${req.method} ${req.url}`)
     next()
 }
 

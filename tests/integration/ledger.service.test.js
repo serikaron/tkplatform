@@ -2,7 +2,9 @@
 
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
-import {today} from "../../common/utils.mjs";
+import {now, today} from "../../common/utils.mjs";
+import {ObjectId} from "mongodb";
+import {integrationConnectMongo} from "./mongo.mjs";
 
 const baseURL = "http://localhost:9007"
 const userId = "60f6a4b4f4b2384f8c40b1ac"
@@ -12,6 +14,7 @@ class Box {
         this._entryId = undefined
         this._keptAt = undefined
         this._createdAt = undefined
+        this._data = undefined
     }
 
     get entryId() {
@@ -36,6 +39,14 @@ class Box {
 
     set createdAt(time) {
         this._createdAt = time
+    }
+
+    get data() {
+        return this._data
+    }
+
+    set data(d) {
+        this._data = d
     }
 }
 
@@ -240,6 +251,124 @@ describe("test journal entries db", () => {
                     expect(entry.msg).toBe("a new entry body")
                     expect(entry.createdAt).toBe(box.createdAt)
                 })
+            }
+        })
+    })
+})
+
+describe("test site record", () => {
+    const box = new Box()
+    const siteId = `${new ObjectId()}`
+    const userId = `${new ObjectId()}`
+
+    beforeAll(async () => {
+        const ledger = await integrationConnectMongo("ledger", 10003)
+        const r = await ledger.db.collection("siteRecords")
+            .insertMany([{
+                userId: new ObjectId(userId),
+                siteId: new ObjectId(siteId),
+                createdAt: now() - 2 * 86400,
+                kept: false
+            }, {
+                userId: new ObjectId(userId),
+                siteId: new ObjectId(),
+                createdAt: now(),
+                kept: false
+            }, {
+                userId: new ObjectId(),
+                siteId: new ObjectId(siteId),
+                createdAt: now(),
+                kept: false
+            }])
+        box.data = {
+            ids: Object.values(r.insertedIds).map(x => `${x}`)
+        }
+    })
+
+    test("add site record", async () => {
+        await runTest({
+            method: "POST",
+            path: `/v1/site/${siteId}/record`,
+            body: {principle: 100, commission: 200},
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.recordId).not.toBeUndefined()
+                box.entryId = response.data.recordId
+            }
+        })
+    })
+
+    test("get site record", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now()+100}`,
+            query: {siteId},
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(Array.isArray(response.data)).toBe(true)
+                expect(response.data.length).toBe(1)
+                const record = response.data[0]
+                expect(record.createdAt).toBeLessThanOrEqual(now())
+                expect(record.id).toBe(box.entryId)
+                expect(record.kept).toBe(false)
+                expect(record.principle).toBe(100)
+                expect(record.commission).toBe(200)
+            }
+        })
+    })
+
+    test("set site record", async () => {
+        await runTest({
+            method: "PUT",
+            path: `/v1/site/${siteId}/record/${box.entryId}`,
+            body: {kept: 1},
+            baseURL,
+            userId,
+            verify: response => {
+                expect(response.status).toBe(200)
+            }
+        })
+    })
+
+    test("check record to be correctly updated", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now()+100}`,
+            query: {siteId},
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(Array.isArray(response.data)).toBe(true)
+                expect(response.data.length).toBe(1)
+                const record = response.data[0]
+                expect(record.id).toBe(box.entryId)
+                expect(record.kept).toBe(true)
+                expect(record.createdAt).toBeLessThanOrEqual(now())
+                expect(record.principle).toBe(100)
+                expect(record.commission).toBe(200)
+            }
+        })
+    })
+
+    test("get today records all site", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now()+100}`,
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(Array.isArray(response.data)).toBe(true)
+                expect(response.data.length).toBe(2)
+                // check id only
+                const ids = response.data.map(x => x.id)
+                expect(ids.includes(box.entryId)).toBe(true)
+                expect(ids.includes(box.data.ids[1])).toBe(true)
             }
         })
     })
