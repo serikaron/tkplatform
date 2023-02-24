@@ -2,6 +2,7 @@
 import {TKError} from "./error.mjs";
 
 const codeBase = 0
+
 export class InvalidArgument extends TKError {
     constructor({code = codeBase - 1, msg = ""} = {}) {
         const m = msg === "" ? "" : `(${msg})`
@@ -39,6 +40,16 @@ export class NeedAuth extends TKError {
             status: 401,
             code: codeBase - 4,
             msg: "请先登录"
+        });
+    }
+}
+
+export class NotFound extends TKError {
+    constructor({msg = ""} = {}) {
+        super({
+            status: 404,
+            code: codeBase - 5,
+            msg
         });
     }
 }

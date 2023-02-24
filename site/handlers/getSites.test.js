@@ -7,6 +7,7 @@ import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from '@jest/globals'
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {setup} from "../setup.mjs";
+import {ObjectId} from "mongodb";
 
 async function runTest(
     {
@@ -35,14 +36,14 @@ async function runTest(
 }
 
 test("should get from db and return", async () => {
-    const sites = {msg: "a fake sites data"}
+    const id = new ObjectId()
     const getSites = jest.fn(async () => {
-        return sites
+        return [{_id: id, msg: "a fake sites data"}]
     })
     await runTest({
         dbFn: getSites,
         tkResponse: TKResponse.Success({
-            data: sites
+            data: [{id: `${id}`, msg: "a fake sites data"}]
         })
     })
     expect(getSites).toHaveBeenCalled()

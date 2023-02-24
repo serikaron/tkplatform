@@ -7,14 +7,16 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 import {simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
 import {setup} from "../setup.mjs";
 import {jest} from "@jest/globals";
+import {InvalidArgument, NotFound} from "../../common/errors/00000-basic.mjs";
+import {ObjectId} from "mongodb";
 
 async function runTest(
     {
         body,
-        headers,
         idFn,
         updateFn,
-        tkResponse = TKResponse.Success()
+        getSite,
+        tkResponse
     }
 ) {
     const app = createApp()
@@ -25,6 +27,7 @@ async function runTest(
                     mongo: {
                         objectId: idFn,
                         addUserSite: updateFn,
+                        getSite,
                     }
                 }
                 next()
@@ -35,34 +38,101 @@ async function runTest(
 
     const response = await supertest(app)
         .post("/v1/user/site")
-        .set(headers)
+        .set({id: "a fake user id"})
         .send(body)
     simpleCheckResponse(response, tkResponse.status, tkResponse.code, tkResponse.msg, tkResponse.data)
 }
 
-test('test add site should work as expect', async () => {
-    const objectId = jest.fn(() => {
-        return 'fake site id'
-    })
-    const addUserSite = jest.fn()
-    await runTest({
-        body: {site: {name: "site-name", icon: "site-icon"}},
-        headers: {
-            id: "fake user id",
-            phone: "13333333333",
-        },
-        idFn: objectId,
-        updateFn: addUserSite,
-        tkResponse: TKResponse.Success({
-            data: {
-                id: "fake site id",
-                site: {name: "site-name", icon: "site-icon"},
-            },
+describe.each([
+    {
+        body: {},
+    },
+    {
+        body: {siteId: 12345}
+    },
+    {
+        body: {siteId: "invalid object id"}
+    }
+])("($#) invalid body", ({body}) => {
+    test.concurrent("should return InvalidArgument", async () => {
+        await runTest({
+            body,
+            tkResponse: TKResponse.fromError(new InvalidArgument())
         })
     })
-    expect(objectId).toBeCalled()
-    expect(addUserSite).toHaveBeenCalledWith("fake user id", {
-        id: "fake site id",
-        site: {name: "site-name", icon: "site-icon"},
+})
+
+test("system site not found should return 404", async () => {
+    const getSite = jest.fn(async () => {
+        return null
     })
-});
+    await runTest({
+        body: {siteId: "63f8361d20edd1ae951230fd"},
+        getSite,
+        tkResponse: TKResponse.fromError(new NotFound({msg: "站点不存在"}))
+    })
+    expect(getSite).toHaveBeenCalledWith(new ObjectId("63f8361d20edd1ae951230fd"))
+})
+
+test('test add site should work as expect', async () => {
+        const userSiteId = new ObjectId()
+        const siteId = new ObjectId()
+        const objectId = jest.fn(() => {
+            return userSiteId
+        })
+        const getSite = async (id) => {
+            return {
+                _id: id,
+                name: "a fake site name"
+            }
+        }
+
+        const userSite = {
+            id: userSiteId,
+            site: {
+                id: siteId,
+                name: "a fake site name"
+            },
+            "credential": {
+                "account": "",
+                "password": ""
+            },
+            "verified": false,
+            "account": {
+                "list": []
+            },
+            "setting": {
+                "interval": {
+                    "min": 200,
+                    "max": 300,
+                },
+                "schedule": [
+                    {
+                        "from": "",
+                        "to": "",
+                    },
+                    {
+                        from: "",
+                        to: ""
+                    }
+                ]
+            }
+        }
+        const responseBody = JSON.parse(JSON.stringify(userSite))
+        responseBody.id = `${userSiteId}`
+        responseBody.site.id = `${siteId}`
+        const addUserSite = jest.fn()
+        await runTest({
+            body: {siteId},
+            idFn: objectId,
+            updateFn: addUserSite,
+            getSite,
+            tkResponse: TKResponse.Success({
+                data: responseBody
+            })
+        })
+        expect(objectId).toBeCalled()
+        expect(addUserSite).toHaveBeenCalledWith("a fake user id", userSite)
+    }
+)
+;

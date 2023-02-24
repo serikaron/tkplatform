@@ -44,13 +44,8 @@ export function dateRange(
     }
     const numMinDate = parse(minDate, defaultMinDate)
     const numMaxDate = parse(maxDate, defaultMaxDate)
-    if (isNaN(numMinDate)) {
-        numMinDate = defaultMinDate
-    }
-    if (isNaN(numMaxDate)) {
-        numMaxDate = defaultMaxDate
-    }
-    if (numMinDate > numMaxDate) {
-
+    return {
+        minDate: Math.min(numMinDate, numMaxDate),
+        maxDate: Math.max(numMinDate, numMaxDate)
     }
 }

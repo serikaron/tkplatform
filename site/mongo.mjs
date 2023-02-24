@@ -21,6 +21,9 @@ export async function setupMongo(req) {
         getSites: async () => {
             return await collection.sites.find().toArray()
         },
+        getSite: async objectId => {
+            return await collection.sites.findOne({_id: objectId})
+        },
         objectId: () => {
             return new ObjectId()
         },
