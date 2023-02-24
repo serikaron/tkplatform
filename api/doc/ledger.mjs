@@ -826,7 +826,7 @@
  * @swagger
  * /v1/ledger/template/:templateId(更新记帐模板):
  *   put:
- *     tags: ["ledger(记帐帐本)", "已实现"
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 更新记帐模板
  *     requestBody:
  *         content:
@@ -1022,7 +1022,7 @@
  * @swagger
  * /v1/journal/entry(添加提现帐本记录):
  *   post:
- *     tags: ["ledger(记帐帐本)", "已实现"
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 添加提现记录
  *     requestBody:
  *       content:
