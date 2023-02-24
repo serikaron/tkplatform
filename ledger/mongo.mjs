@@ -122,10 +122,17 @@ export async function setupMongo(req) {
                     {$set: account}
                 )
         },
-        getSiteRecords: async (userId, siteId) => {
-            return await collection.siteRecords.find(
-                {userId: new ObjectId(userId), siteId: new ObjectId(siteId)}
+        getSiteRecords: async (userId, siteId, minDate, maxDate) => {
+            return await collection.siteRecords.find({
+                    userId: new ObjectId(userId),
+                    siteId: new ObjectId(siteId),
+                    createdAt: {$gte: minDate, $lt: maxDate},
+                }
             ).toArray()
+        },
+        addSiteRecord: async (record) => {
+            const r = await collection.siteRecords.insertOne(record)
+            return r.insertedId
         }
     }
 }

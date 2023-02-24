@@ -12,6 +12,7 @@ import {routeGetUserAccounts} from "./handlers/getUserAccounts.mjs";
 import {routePostUserAccount} from "./handlers/postUserAccount.mjs";
 import {routePutUserAccount} from "./handlers/putUserAccount.mjs";
 import {routeGetSiteRecords} from "./handlers/getSiteRecords.mjs";
+import {routePostSiteRecord} from "./handlers/postSiteRecord.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -30,6 +31,7 @@ export function setup(app, {setup, teardown}) {
     routePostUserAccount(router)
     routePutUserAccount(router)
     routeGetSiteRecords(router)
+    routePostSiteRecord(router)
 
     teardown(router)
 }
