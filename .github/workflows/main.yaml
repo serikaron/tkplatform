@@ -44,4 +44,4 @@ jobs:
 
       - name: show logs when failed
         if: failure()
-        run: docker compose logs api user site ledger
+        run: docker compose logs api user site ledger migration
