@@ -10,6 +10,7 @@ let secondSiteId = undefined
 // no concurrent
 test.each([
     {name: "Get system sites", method: "GET", path: "/v1/sites"},
+    {name: "Get system sites with params", method: "GET", path: "/v1/sites?keyword=&offset=0&limit=10"},
     {name: "Get user sites", method: "GET", path: "/v1/user/sites"},
     {
         name: "Add first site",

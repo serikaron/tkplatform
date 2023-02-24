@@ -30,3 +30,27 @@ export function today() {
     const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // set the time to 00:00:00
     return Math.floor(startOfToday.getTime() / 1000); // get the timestamp in milliseconds
 }
+
+export function dateRange(
+    minDate, maxDate,
+    {
+        defaultMinDate = now() - 86400,
+        defaultMaxDate = now()
+    } = {}
+) {
+    const parse = (i, d) => {
+        const n = Number(i)
+        return isNaN(n) ? d : n
+    }
+    const numMinDate = parse(minDate, defaultMinDate)
+    const numMaxDate = parse(maxDate, defaultMaxDate)
+    if (isNaN(numMinDate)) {
+        numMinDate = defaultMinDate
+    }
+    if (isNaN(numMaxDate)) {
+        numMaxDate = defaultMaxDate
+    }
+    if (numMinDate > numMaxDate) {
+
+    }
+}

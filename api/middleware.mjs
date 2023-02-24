@@ -7,7 +7,8 @@ import {TKResponse} from "../common/TKResponse.mjs";
 import {NeedAuth} from "../common/errors/00000-basic.mjs";
 
 export function checkSign(req, res, next) {
-    // console.log("checkSign")
+    // console.log(`checkSign, url:${req.originalUrl}`)
+    // console.log(`query: ${JSON.stringify(req.query)}`)
     const s = sign(req.originalUrl, req.body, req.header("timestamp"), process.env.SECRET_KEY)
     if (s.signature !== req.header("signature")) {
         console.log(s.source)

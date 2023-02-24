@@ -5,9 +5,9 @@ services:
     image: car.daoyi365.com:5000/tk-api
     restart: always
     entrypoint: node /app/api/app.mjs
-    depends_on:
-      - user
-      - token
+#    depends_on:
+#      - user
+#      - token
     ports:
       - "9000:8080"
     volumes:

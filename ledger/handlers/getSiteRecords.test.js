@@ -9,6 +9,9 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 import {jest} from "@jest/globals";
 
 test("get site record from db", async () => {
+})
+
+async function runTest(dateInput, dateExpect) {
     const getSiteRecords = jest.fn(async () => {
         return [{msg: "a fake site record"}]
     })
@@ -28,10 +31,10 @@ test("get site record from db", async () => {
     })
 
     const response = await supertest(app)
-        .get("/v1/site/fake-site-id/records")
+        .get(`/v1/site/fake-site-id/records/${dateInput.minDate}/${dateInput.maxDate}`)
         .set({id: "a fake user id"})
     simpleCheckTKResponse(response, TKResponse.Success({
         data: [{msg: "a fake site record"}]
     }))
-    expect(getSiteRecords).toHaveBeenCalledWith("a fake user id", "fake-site-id")
-})
+    expect(getSiteRecords).toHaveBeenCalledWith("a fake user id", "fake-site-id", dateExpect.minDate, dateExpect.maxDate)
+}
