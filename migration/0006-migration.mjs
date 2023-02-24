@@ -10,7 +10,7 @@ export async function migrate(mongoClient) {
 async function createIndexes(mongoClient) {
     await mongoClient.ledger.db
         .collection("siteRecords")
-        .createIndexes([{userId: 1, createdAt: -1}])
+        .createIndex({userId: 1, createdAt: -1})
 }
 
 async function modifyUserSitesIndexes(mongoClient) {
