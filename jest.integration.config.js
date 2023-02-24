@@ -1,4 +1,5 @@
 export default {
     transform: {},
-    roots: ["tests/integration"]
+    roots: ["tests/integration"],
+    detectOpenHandles: true
 }

@@ -4,7 +4,6 @@ import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
 import {now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
-import {integrationConnectMongo} from "./mongo.mjs";
 
 const baseURL = "http://localhost:9007"
 const userId = "60f6a4b4f4b2384f8c40b1ac"
@@ -258,44 +257,48 @@ describe("test journal entries db", () => {
 
 describe("test site record", () => {
     const box = new Box()
-    const siteId = `${new ObjectId()}`
-    const userId = `${new ObjectId()}`
+    box.data = {
+        siteId1: `${new ObjectId()}`,
+        userId1: `${new ObjectId()}`,
+        siteId2: `${new ObjectId()}`,
+        userId2: `${new ObjectId()}`,
+    }
 
-    beforeAll(async () => {
-        const ledger = await integrationConnectMongo("ledger", 10003)
-        const r = await ledger.db.collection("siteRecords")
-            .insertMany([{
-                userId: new ObjectId(userId),
-                siteId: new ObjectId(siteId),
-                createdAt: now() - 2 * 86400,
-                kept: false
-            }, {
-                userId: new ObjectId(userId),
-                siteId: new ObjectId(),
-                createdAt: now(),
-                kept: false
-            }, {
-                userId: new ObjectId(),
-                siteId: new ObjectId(siteId),
-                createdAt: now(),
-                kept: false
-            }])
-        box.data = {
-            ids: Object.values(r.insertedIds).map(x => `${x}`)
-        }
-    })
+    // beforeAll(async () => {
+    //     const ledger = await integrationConnectMongo("ledger", 10003)
+    //     const r = await ledger.db.collection("siteRecords")
+    //         .insertMany([{
+    //             userId: new ObjectId(userId),
+    //             siteId: new ObjectId(siteId),
+    //             createdAt: now() - 2 * 86400,
+    //             kept: false
+    //         }, {
+    //             userId: new ObjectId(userId),
+    //             siteId: new ObjectId(),
+    //             createdAt: now(),
+    //             kept: false
+    //         }, {
+    //             userId: new ObjectId(),
+    //             siteId: new ObjectId(siteId),
+    //             createdAt: now(),
+    //             kept: false
+    //         }])
+    //     box.data = {
+    //         ids: Object.values(r.insertedIds).map(x => `${x}`)
+    //     }
+    // })
 
     test("add site record", async () => {
         await runTest({
             method: "POST",
-            path: `/v1/site/${siteId}/record`,
+            path: `/v1/site/${box.data.siteId1}/record`,
             body: {principle: 100, commission: 200},
             baseURL,
-            userId,
+            userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
                 expect(response.data.recordId).not.toBeUndefined()
-                box.entryId = response.data.recordId
+                box.data.id1 = response.data.recordId
             }
         })
     })
@@ -303,17 +306,17 @@ describe("test site record", () => {
     test("get site record", async () => {
         await runTest({
             method: "GET",
-            path: `/v1/site/records/${now() - 86400}/${now()+100}`,
-            query: {siteId},
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {siteId: box.data.siteId1},
             baseURL,
-            userId,
+            userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
                 expect(Array.isArray(response.data)).toBe(true)
                 expect(response.data.length).toBe(1)
                 const record = response.data[0]
                 expect(record.createdAt).toBeLessThanOrEqual(now())
-                expect(record.id).toBe(box.entryId)
+                expect(record.id).toBe(box.data.id1)
                 expect(record.kept).toBe(false)
                 expect(record.principle).toBe(100)
                 expect(record.commission).toBe(200)
@@ -324,10 +327,10 @@ describe("test site record", () => {
     test("set site record", async () => {
         await runTest({
             method: "PUT",
-            path: `/v1/site/${siteId}/record/${box.entryId}`,
+            path: `/v1/site/${box.data.siteId1}/record/${box.data.id1}`,
             body: {kept: 1},
             baseURL,
-            userId,
+            userId: box.data.userId1,
             verify: response => {
                 expect(response.status).toBe(200)
             }
@@ -337,16 +340,16 @@ describe("test site record", () => {
     test("check record to be correctly updated", async () => {
         await runTest({
             method: "GET",
-            path: `/v1/site/records/${now() - 86400}/${now()+100}`,
-            query: {siteId},
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {siteId: box.data.siteId1},
             baseURL,
-            userId,
+            userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
                 expect(Array.isArray(response.data)).toBe(true)
                 expect(response.data.length).toBe(1)
                 const record = response.data[0]
-                expect(record.id).toBe(box.entryId)
+                expect(record.id).toBe(box.data.id1)
                 expect(record.kept).toBe(true)
                 expect(record.createdAt).toBeLessThanOrEqual(now())
                 expect(record.principle).toBe(100)
@@ -355,21 +358,48 @@ describe("test site record", () => {
         })
     })
 
-    test("get today records all site", async () => {
+    test("check search without siteId", async () => {
+        await runTest({
+            method: "POST",
+            path: `/v1/site/${box.data.siteId2}/record`,
+            body: {principle: 100, commission: 200},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.recordId).not.toBeUndefined()
+                box.data.id2 = response.data.recordId
+            }
+        })
         await runTest({
             method: "GET",
-            path: `/v1/site/records/${now() - 86400}/${now()+100}`,
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
             baseURL,
-            userId,
+            userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
                 expect(Array.isArray(response.data)).toBe(true)
                 expect(response.data.length).toBe(2)
                 // check id only
                 const ids = response.data.map(x => x.id)
-                expect(ids.includes(box.entryId)).toBe(true)
-                expect(ids.includes(box.data.ids[1])).toBe(true)
+                expect(ids.includes(box.data.id1)).toBe(true)
+                expect(ids.includes(box.data.id2)).toBe(true)
             }
         })
     })
+
+    // test("check search with timestamp", async () => {
+    //     await runTest({
+    //         method: "POST",
+    //         path: `/v1/site/${box.data.siteId1}/record`,
+    //         body: {principle: 100, commission: 200},
+    //         baseURL,
+    //         userId: box.data.userId2,
+    //         verify: response => {
+    //             simpleVerification(response)
+    //             expect(response.data.recordId).not.toBeUndefined()
+    //             box.data.id3 = response.data.recordId
+    //         }
+    //     })
+    // })
 })
