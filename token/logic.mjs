@@ -30,6 +30,7 @@ export async function generate(payload) {
 export async function verify(accessToken) {
     try {
         const payload = jwt.verify(accessToken, secretKey, {
+            ignoreExpiration: true,
             algorithm: "HS256"
         })
 
