@@ -6,7 +6,7 @@
  * @swagger
  * /v1/captcha/require:
  *   post:
- *     tags: ["captcha(图形码)"]
+ *     tags: ["captcha(图形码)", "已实现"]
  *     description: 获取图形码
  *     responses:
  *       200:

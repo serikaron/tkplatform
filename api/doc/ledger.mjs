@@ -4,7 +4,7 @@
  * @swagger
  * /v1/stores(系统商城):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 系统商城列表
  *     responses:
  *       200:
@@ -28,7 +28,7 @@
  * @swagger
  * /v1/ledger/accounts(系统商城买号):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 系统买号列表
  *     responses:
  *       200:
@@ -53,7 +53,7 @@
  * @swagger
  * /v1/user/ledger/accounts(查询用户买号):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 用户买号列表
  *     responses:
  *       200:
@@ -81,7 +81,7 @@
  * @swagger
  * /v1/user/ledger/account(添加用户买号):
  *   post:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 添加用户买号
  *     requestBody:
  *       content:
@@ -118,7 +118,7 @@
  * @swagger
  * /v1/user/ledger/account/:accountId(更新用户买号):
  *   put:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 添加用户买号
  *     requestBody:
  *       content:
@@ -147,7 +147,7 @@
  * @swagger
  * /v1/journal/accounts(系统收款号):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 系统收款号列表
  *     responses:
  *       200:
@@ -172,7 +172,7 @@
  * @swagger
  * /v1/user/journal/accounts(查询用户收款号):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 用户收款号列表
  *     responses:
  *       200:
@@ -200,7 +200,7 @@
  * @swagger
  * /v1/user/ledger/account(添加用户收款号):
  *   post:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 添加用户收款号
  *     requestBody:
  *       content:
@@ -237,7 +237,7 @@
  * @swagger
  * /v1/user/ledger/account/:accountId(更新用户收款号):
  *   put:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 添加用户收款号
  *     requestBody:
  *       content:
@@ -266,7 +266,7 @@
  * @swagger
  * /v1/ledger/sites(自定义站点):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     responses:
  *       200:
  *         description: 返回列表
@@ -290,7 +290,7 @@
  * @swagger
  * /v1/ledger/site(添加自定义站点):
  *   post:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     requestBody:
  *       content:
  *         application/json:
@@ -321,7 +321,7 @@
  * @swagger
  * /v1/ledger/entries/:minDate/:maxDate(帐本记录):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 帐本记录
  *     parameters:
  *     - in: path
@@ -521,7 +521,7 @@
  * @swagger
  * /v1/ledger/entry(添加记帐):
  *   post:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 记帐
  *     requestBody:
  *       content:
@@ -654,7 +654,7 @@
  * @swagger
  * /v1/ledger/entry/:entryId(更新帐本记录):
  *   put:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 更新帐本记录
  *     requestBody:
  *       content:
@@ -777,7 +777,7 @@
  * @swagger
  * /v1/ledger/templates(记帐模板):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 记帐模板
  *     responses:
  *       200:
@@ -826,7 +826,7 @@
  * @swagger
  * /v1/ledger/template/:templateId(更新记帐模板):
  *   put:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"
  *     description: 更新记帐模板
  *     requestBody:
  *         content:
@@ -910,7 +910,7 @@
  * @swagger
  * /v1/journal/entries/:minDate/:maxDate(查询提现帐本记录):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 查询提现帐本记录
  *     parameters:
  *     - in: path
@@ -1022,7 +1022,7 @@
  * @swagger
  * /v1/journal/entry(添加提现帐本记录):
  *   post:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"
  *     description: 添加提现记录
  *     requestBody:
  *       content:
@@ -1082,7 +1082,7 @@
  * @swagger
  * /v1/journal/entry/:entryId(更新提现帐本记录):
  *   put:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 更新提现帐本记录
  *     requestBody:
  *       content:

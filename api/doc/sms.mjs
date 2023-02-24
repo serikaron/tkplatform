@@ -6,7 +6,7 @@
  * @swagger
  * /v1/sms/send:
  *   post:
- *     tags: ["sms(短信服务)"]
+ *     tags: ["sms(短信服务)", "已实现"]
  *     description: 发送验证码到手机
  *     requestBody:
  *       content:

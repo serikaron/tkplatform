@@ -7,7 +7,7 @@
  * @swagger
  * /v1/user/register:
  *   post:
- *     tags: ["user(用户相关)"]
+ *     tags: ["user(用户相关)", "已实现"]
  *     description: 用户注册
  *     requestBody:
  *       content:
@@ -79,7 +79,7 @@
  * @swagger
  * /v1/user/login:
  *   post:
- *     tags: ["user(用户相关)"]
+ *     tags: ["user(用户相关)", "已实现"]
  *     description: 用户登录
  *     requestBody:
  *       content:
@@ -138,7 +138,7 @@
  * @swagger
  * /v1/user/password:
  *   post:
- *     tags: ["user(用户相关)"]
+ *     tags: ["user(用户相关)", "已实现"]
  *     description: 修改密码
  *     requestBody:
  *       content:
