@@ -6,7 +6,6 @@ import {now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
 
 const baseURL = "http://localhost:9007"
-const userId = "60f6a4b4f4b2384f8c40b1ac"
 
 class Box {
     constructor() {
@@ -67,10 +66,10 @@ class Box1 {
     }
 }
 
-const addEntry = async (path, entry, userId) => {
+const addEntry = async (key, entry, userId) => {
     await runTest({
         method: "POST",
-        path,
+        path: `/v1/${key}/entry`,
         body: entry,
         baseURL,
         userId,
@@ -82,10 +81,10 @@ const addEntry = async (path, entry, userId) => {
     })
 }
 
-async function checkEntries(path, userId, query, desired) {
+async function checkEntries(key, userId, query, desired) {
     await runTest({
         method: "GET",
-        path: `${path}/${today()}/${today() + 86400}`,
+        path: `/v1/${key}/entries/${today()}/${today() + 86400}`,
         query: query,
         baseURL,
         userId: userId,
@@ -97,10 +96,10 @@ async function checkEntries(path, userId, query, desired) {
     })
 }
 
-async function updateEntry(path, entry, userId, update) {
+async function updateEntry(key, entry, userId, update) {
     await runTest({
         method: "PUT",
-        path: `${path}/${entry.id}`,
+        path: `/v1/${key}/entry/${entry.id}`,
         body: update,
         baseURL,
         userId,
@@ -113,146 +112,72 @@ async function updateEntry(path, entry, userId, update) {
     })
 }
 
-describe.only("test ledger entries db", () => {
-    const path = "/v1/ledger/entry"
+describe.each([
+    // "ledger",
+    "journal"
+])("%s", (key) => {
+    describe("test ledger entries db", () => {
+        describe("modify entry", () => {
+            const box = new Box1()
+            box.data.userId = `${new ObjectId()}`
 
-    describe("modify entry", () => {
-        const box = new Box1()
-        box.data.userId = `${new ObjectId()}`
+            test("add entry", async () => {
+                box.data.entry1 = box.newEntry()
+                await addEntry(key, box.data.entry1, box.data.userId)
+            })
 
-        test("add entry", async () => {
+            test("check entry after add", async () => {
+                await checkEntries(key, box.data.userId, {}, [
+                    box.data.entry1
+                ]);
+            })
+
+            test("update specify field of entry", async () => {
+                await updateEntry(key, box.data.entry1, box.data.userId, {comment: "newComment"});
+            })
+
+            test("check entry after updating", async () => {
+                await checkEntries(key, box.data.userId, {}, [
+                    box.data.entry1
+                ]);
+            })
+        })
+
+        describe("query with date", () => {
+            const box = new Box1()
+            box.data.userId = `${new ObjectId()}`
+
+            test("add entry1", async () => {
+                box.data.entry1 = box.newEntry()
+                await addEntry(key, box.data.entry1, box.data.userId)
+            })
+
+            test("add entry1", async () => {
+                box.data.entry2 = box.newEntry()
+                box.data.entry2.createdAt = now() - 86400
+                await addEntry(key, box.data.entry2, box.data.userId)
+            })
+
+            test("check", async () => {
+                await checkEntries(key, box.data.userId, {}, [
+                    box.data.entry1
+                ]);
+            })
+        })
+
+        test("query with offset limit", async () => {
+            const box = new Box1()
+            box.data.userId = `${new ObjectId}`
+
             box.data.entry1 = box.newEntry()
-            await addEntry(path, box.data.entry1, box.data.userId)
-        })
+            await addEntry(key, box.data.entry1, box.data.userId)
 
-        test("check entry after add", async () => {
-            await checkEntries("/v1/ledger/entries", box.data.userId, {}, [
-                box.data.entry1
-            ]);
-        })
-
-        test("update specify field of entry", async () => {
-            await updateEntry(path, box.data.entry1, box.data.userId, {comment: "newComment"});
-        })
-
-        test("check entry after updating", async () => {
-            await checkEntries("/v1/ledger/entries", box.data.userId, {}, [
-                box.data.entry1
-            ]);
-        })
-    })
-
-    describe("query with date", () => {
-        const box = new Box1()
-        box.data.userId = `${new ObjectId()}`
-
-        test("add entry1", async () => {
-            box.data.entry1 = box.newEntry()
-            await addEntry(path, box.data.entry1, box.data.userId)
-        })
-
-        test("add entry1", async () => {
             box.data.entry2 = box.newEntry()
-            box.data.entry2.createdAt = now() - 86400
-            await addEntry(path, box.data.entry2, box.data.userId)
-        })
+            box.data.entry2.createdAt = now() - 10
+            await addEntry(key, box.data.entry2, box.data.userId)
 
-        test("check", async () => {
-            await checkEntries("/v1/ledger/entries", box.data.userId, {}, [
-                box.data.entry1
-            ]);
-        })
-    })
-
-    test("query with offset limit", async () => {
-        const box = new Box1()
-        box.data.userId = `${new ObjectId}`
-
-        box.data.entry1 = box.newEntry()
-        await addEntry(path, box.data.entry1, box.data.userId)
-
-        box.data.entry2 = box.newEntry()
-        box.data.entry2.createdAt = now() - 10
-        await addEntry(path, box.data.entry2, box.data.userId)
-
-        await checkEntries("/v1/ledger/entries", box.data.userId, {offset: 0, limit: 1}, [box.data.entry1])
-        await checkEntries("/v1/ledger/entries", box.data.userId, {offset: 1, limit: 1}, [box.data.entry2])
-    })
-})
-
-describe("test journal entries db", () => {
-    const box = new Box()
-
-    test("add entry", async () => {
-        await runTest({
-            method: "POST",
-            path: "/v1/journal/entry",
-            body: {msg: "a journal entry"},
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(response.data.entryId).not.toBe(undefined)
-                box.entryId = response.data.entryId
-            }
-        })
-    })
-
-    test("check after adding", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/journal/entries",
-            query: {minDate: today(), maxDate: today() + 86400},
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                const entries = response.data.filter(entry => entry.id === box.entryId)
-                expect(entries.length).toBe(1)
-                entries.forEach(entry => {
-                    expect(entry.id).toBe(box.entryId)
-                    expect(entry.userId).toBe(userId)
-                    expect(entry.msg).toBe("a journal entry")
-                    expect(entry.createdAt).not.toBeUndefined()
-                    box.createdAt = entry.createdAt
-                })
-            }
-        })
-    })
-
-    test("update entry", async () => {
-        await runTest({
-            method: "PUT",
-            path: `/v1/journal/entry/${box.entryId}`,
-            body: {msg: "a new entry body"},
-            baseURL,
-            userId,
-            verify: response => {
-                expect(response.status).toBe(200)
-            }
-        })
-    })
-
-    test("check after updating", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/journal/entries",
-            query: {minDate: today(), maxDate: today() + 86400},
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                const entries = response.data.filter(entry => entry.id === box.entryId)
-                expect(entries.length).toBe(1)
-                entries.forEach(entry => {
-                    expect(entry.id).toBe(box.entryId)
-                    expect(entry.userId).toBe(userId)
-                    expect(entry.msg).toBe("a new entry body")
-                    expect(entry.createdAt).toBe(box.createdAt)
-                })
-            }
+            await checkEntries(key, box.data.userId, {offset: 0, limit: 1}, [box.data.entry1])
+            await checkEntries(key, box.data.userId, {offset: 1, limit: 1}, [box.data.entry2])
         })
     })
 })

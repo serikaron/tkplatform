@@ -1,11 +1,7 @@
 'use strict'
 
 import express from "express";
-import {routePostLedgerEntry} from "./handlers/postLedgerEntry.mjs";
-import {routePutLedgerEntry} from "./handlers/putLedgerEntry.mjs";
 import {routeGetEntries} from "./handlers/getEntries.mjs";
-import {routePostJournalEntry} from "./handlers/postJournalEntry.mjs";
-import {routePutJournalEntry} from "./handlers/putJournalEntry.mjs";
 import {routeGetStores} from "./handlers/getStores.mjs";
 import {routeGetAccounts} from "./handlers/getAccounts.mjs";
 import {routeGetUserAccounts} from "./handlers/getUserAccounts.mjs";
@@ -14,6 +10,8 @@ import {routePutUserAccount} from "./handlers/putUserAccount.mjs";
 import {routeGetSiteRecords} from "./handlers/getSiteRecords.mjs";
 import {routePostSiteRecord} from "./handlers/postSiteRecord.mjs";
 import {routePutSiteRecord} from "./handlers/putSiteRecord.mjs";
+import {routePostEntry} from "./handlers/postEntry.mjs";
+import {routePutEntry} from "./handlers/putEntry.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -21,11 +19,9 @@ export function setup(app, {setup, teardown}) {
 
     setup(router)
 
-    routePostLedgerEntry(router)
-    routePutLedgerEntry(router)
+    routePostEntry(router)
+    routePutEntry(router)
     routeGetEntries(router)
-    routePostJournalEntry(router)
-    routePutJournalEntry(router)
     routeGetStores(router)
     routeGetAccounts(router)
     routeGetUserAccounts(router)

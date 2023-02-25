@@ -20,37 +20,29 @@ const makeArguments = (req, res, next) => {
     next()
 }
 
-const queryDb = async (dbFn, args) => {
-    console.log("queryDb")
-    const entries = await dbFn(args.userId, args.minDate, args.maxDate, args.offset, args.limit)
-    return entries.map(replaceId)
-        .map(x => {
-            delete x.userId
-            return x
-        })
+const queryDb = (dbName) => {
+    return async (req, res, next) => {
+        const args = req.context.mongo.arguments
+        const entries = await req.context.mongo.getEntries(dbName, args.userId, args.minDate, args.maxDate, args.offset, args.limit)
+        res.tkResponse(TKResponse.Success({
+            data: entries.map(replaceId)
+                .map(x => {
+                    delete x.userId
+                    return x
+                })
+        }))
+        next()
+    }
 }
 
-async function getLedger(req, res, next) {
-    res.tkResponse(TKResponse.Success({
-        data: await queryDb(req.context.mongo.getLedgerEntries, req.context.mongo.arguments)
-    }))
-    next()
-}
-
-async function getJournal(req, res, next) {
-    res.tkResponse(TKResponse.Success({
-        data: await queryDb(req.context.mongo.getJournalEntries, req.context.mongo.arguments)
-    }))
-    next()
+const route = (router, key, dbName) => {
+    router.get(`/${key}/entries/:minDate/:maxDate`, ...[
+        makeArguments,
+        queryDb(dbName)
+    ])
 }
 
 export function routeGetEntries(router) {
-    router.get('/ledger/entries/:minDate/:maxDate', ...[
-        makeArguments,
-        getLedger
-    ])
-    router.get('/journal/entries/:minDate/:maxDate', ...[
-        makeArguments,
-        getJournal
-    ])
+    route(router, "ledger", "ledgerEntries")
+    route(router, "journal", "withdrawJournalEntries")
 }

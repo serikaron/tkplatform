@@ -24,12 +24,12 @@ export async function setupMongo(req) {
     }
     req.context.mongo = {
         client: ledger.client, db: ledger.db, collection,
-        addLedgerEntry: async (entry) => {
-            const r = await collection.ledgerEntries.insertOne(entry)
+        addEntry: async (collectionName, entry) => {
+            const r = await ledger.db.collection(collectionName).insertOne(entry)
             return r.insertedId
         },
-        setLedgerEntry: async (entryId, userId, update) => {
-            await collection.ledgerEntries.updateOne(
+        setEntry: async (collectionName, entryId, userId, update) => {
+            await ledger.db.collection(collectionName).updateOne(
                 {
                     _id: new ObjectId(entryId),
                     userId: new ObjectId(userId)
@@ -37,8 +37,8 @@ export async function setupMongo(req) {
                 {$set: update}
             )
         },
-        getLedgerEntries: async (userId, minDate, maxDate, offset, limit) => {
-            let query = collection.ledgerEntries
+        getEntries: async (collectionName, userId, minDate, maxDate, offset, limit) => {
+            let query = ledger.db.collection(collectionName)
                 .find({
                     userId: new ObjectId(userId),
                     createdAt: {$gte: minDate, $lt: maxDate}
@@ -52,29 +52,6 @@ export async function setupMongo(req) {
             }
 
             return await query.sort({createdAt: -1}).toArray()
-        },
-        addJournalEntry: async (entry) => {
-            const r = await collection.withdrawJournalEntries.insertOne(entry)
-            return r.insertedId
-        },
-        updateJournalEntry: async (entryId, userId, update) => {
-            await collection.withdrawJournalEntries.updateOne(
-                {_id: new ObjectId(entryId), userId: new ObjectId(userId)},
-                {$set: update}
-            )
-        },
-        getJournalEntries: async (minDate, maxDate, offset, limit) => {
-            let query = collection.withdrawJournalEntries
-                .find({createdAt: {$gte: minDate, $lt: maxDate}})
-
-            if (offset !== null) {
-                query = query.skip(offset)
-            }
-            if (limit !== null) {
-                query = query.limit(limit)
-            }
-
-            return await query.toArray()
         },
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()

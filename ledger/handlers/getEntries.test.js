@@ -16,8 +16,7 @@ async function runTest(
         params,
         headers,
         tkResponse,
-        ledgerFn,
-        journalFn
+        getEntries,
     }
 ) {
     const app = createApp()
@@ -26,8 +25,7 @@ async function runTest(
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        getLedgerEntries: ledgerFn,
-                        getJournalEntries: journalFn
+                        getEntries,
                     }
                 }
                 next()
@@ -45,25 +43,20 @@ async function runTest(
 
 describe.each([
     {
-        path: "/v1/ledger/entries",
-        ledgerFn: jest.fn(),
+        key: "ledger",
+        dbName: "ledgerEntries"
     },
-    // {
-    //     path: "/v1/journal/entries",
-    //     journalFn: jest.fn(async () => {
-    //         return [{
-    //             msg: "a fake entry",
-    //             _id: "a fake entry id"
-    //         }]
-    //     })
-    // }
-])("$path", ({path, ledgerFn, journalFn}) => {
+    {
+        key: "journal",
+        dbName: "withdrawJournalEntries"
+    }
+])("$path", ({key, dbName}) => {
     describe.each([
         {
             minDate: "abc",
             maxDate: "abc",
             params: "?offset=abc&limit=abc",
-            dbArguments: {minDate: now()-86400, maxDate: now(), offset: null, limit: null}
+            dbArguments: {minDate: now() - 86400, maxDate: now(), offset: null, limit: null}
         },
         {
             minDate: "123",
@@ -97,34 +90,21 @@ describe.each([
             }]
 
             test("should be work as expect", async () => {
-                if (ledgerFn !== undefined) {
-                    ledgerFn.mockImplementation(async () => {
-                        return dbRes
-                    })
-                }
-                if (journalFn !== undefined) {
-                    journalFn.mockImplementation(async () => {
-                        return dbRes
-                    })
-                }
+                const getEntries = jest.fn(async () => {
+                    return dbRes
+                })
 
                 const userId = `${new ObjectId()}`
                 await runTest({
-                    path: `${path}/${minDate}/${maxDate}`,
+                    path: `/v1/${key}/entries/${minDate}/${maxDate}`,
                     params,
                     headers: {id: userId},
                     tkResponse: TKResponse.Success({
                         data: responseBody
                     }),
-                    ledgerFn,
-                    journalFn
+                    getEntries
                 })
-                if (ledgerFn !== undefined) {
-                    expect(ledgerFn).toHaveBeenCalledWith(userId, dbArguments.minDate, dbArguments.maxDate, dbArguments.offset, dbArguments.limit)
-                }
-                if (journalFn !== undefined) {
-                    expect(journalFn).toHaveBeenCalledWith(userId, dbArguments.minDate, dbArguments.maxDate, dbArguments.offset, dbArguments.limit)
-                }
+                expect(getEntries).toHaveBeenCalledWith(dbName, userId, dbArguments.minDate, dbArguments.maxDate, dbArguments.offset, dbArguments.limit)
             })
         })
     })
