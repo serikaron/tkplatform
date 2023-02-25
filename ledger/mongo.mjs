@@ -3,7 +3,6 @@
 import * as dotenv from 'dotenv'
 import {connectLedger} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
-import {now} from "../common/utils.mjs";
 
 dotenv.config()
 
@@ -38,20 +37,12 @@ export async function setupMongo(req) {
                 {$set: update}
             )
         },
-        keepALedger: async (entryId, userId) => {
-            await collection.ledgerEntries.updateOne(
-                {
-                    _id: new ObjectId(entryId),
-                    userId: new ObjectId(userId),
-                    keptAt: {$exists: false}
-                }, {
-                    $set: {keptAt: now()}
-                }
-            )
-        },
-        getLedgerEntries: async (minDate, maxDate, offset, limit) => {
+        getLedgerEntries: async (userId, minDate, maxDate, offset, limit) => {
             let query = collection.ledgerEntries
-                .find({createdAt: {$gte: minDate, $lt: maxDate}})
+                .find({
+                    userId: new ObjectId(userId),
+                    createdAt: {$gte: minDate, $lt: maxDate}
+                })
 
             if (offset !== null) {
                 query = query.skip(offset)
@@ -60,7 +51,7 @@ export async function setupMongo(req) {
                 query = query.limit(limit)
             }
 
-            return await query.toArray()
+            return await query.sort({createdAt: -1}).toArray()
         },
         addJournalEntry: async (entry) => {
             const r = await collection.withdrawJournalEntries.insertOne(entry)

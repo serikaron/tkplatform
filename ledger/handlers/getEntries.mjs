@@ -2,24 +2,17 @@
 
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {dateRange, replaceId} from "../../common/utils.mjs";
 
-const checkInput = (req, res, next) => {
-    if (req.query.minDate === undefined
-        || req.query.maxDate === undefined) {
-        throw new InvalidArgument()
-    }
-
-    const minDate = Number(req.query.minDate)
-    const maxDate = Number(req.query.maxDate)
-    if (isNaN(minDate) || isNaN(maxDate)) {
-        throw new InvalidArgument()
-    }
-
+const makeArguments = (req, res, next) => {
+    const range = dateRange(req.params.minDate, req.params.maxDate)
     const offset = Number(req.query.offset)
     const limit = Number(req.query.limit)
+
     req.context.mongo.arguments = {
-        minDate, maxDate,
+        userId: req.headers.id,
+        minDate: range.minDate,
+        maxDate: range.maxDate,
         offset: isNaN(offset) ? null : offset,
         limit: isNaN(limit) ? null : limit
     }
@@ -27,37 +20,37 @@ const checkInput = (req, res, next) => {
     next()
 }
 
+const queryDb = async (dbFn, args) => {
+    console.log("queryDb")
+    const entries = await dbFn(args.userId, args.minDate, args.maxDate, args.offset, args.limit)
+    return entries.map(replaceId)
+        .map(x => {
+            delete x.userId
+            return x
+        })
+}
+
 async function getLedger(req, res, next) {
-    const entries = await req.context.mongo.getLedgerEntries(req.context.mongo.arguments.minDate, req.context.mongo.arguments.maxDate, req.context.mongo.arguments.offset, req.context.mongo.arguments.limit);
-    entries.forEach(x => {
-        x.id = x._id
-        x._id = undefined
-    })
     res.tkResponse(TKResponse.Success({
-        data: entries
+        data: await queryDb(req.context.mongo.getLedgerEntries, req.context.mongo.arguments)
     }))
     next()
 }
 
 async function getJournal(req, res, next) {
-    const entries = await req.context.mongo.getJournalEntries(req.context.mongo.arguments.minDate, req.context.mongo.arguments.maxDate, req.context.mongo.arguments.offset, req.context.mongo.arguments.limit);
-    entries.forEach(x => {
-        x.id = x._id
-        x._id = undefined
-    })
     res.tkResponse(TKResponse.Success({
-        data: entries
+        data: await queryDb(req.context.mongo.getJournalEntries, req.context.mongo.arguments)
     }))
     next()
 }
 
 export function routeGetEntries(router) {
-    router.get('/ledger/entries', ...[
-        checkInput,
+    router.get('/ledger/entries/:minDate/:maxDate', ...[
+        makeArguments,
         getLedger
     ])
-    router.get('/journal/entries', ...[
-        checkInput,
+    router.get('/journal/entries/:minDate/:maxDate', ...[
+        makeArguments,
         getJournal
     ])
 }

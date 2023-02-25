@@ -49,132 +49,134 @@ class Box {
     }
 }
 
-describe("test ledger entries db", () => {
-    const box = new Box()
-    test("add entry", async () => {
-        await runTest({
-            method: "POST",
-            path: "/v1/ledger/entry",
-            body: {msg: "a test ledger entry"},
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(response.data.entryId).not.toBe(undefined)
-                box.entryId = response.data.entryId
-            }
+class Box1 {
+    constructor() {
+        this._data = {}
+    }
+
+    get data() {
+        return this._data
+    }
+
+    newEntry() {
+        return {
+            account: "entryAccount",
+            comment: "entryComment",
+            createdAt: now()
+        }
+    }
+}
+
+const addEntry = async (path, entry, userId) => {
+    await runTest({
+        method: "POST",
+        path,
+        body: entry,
+        baseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(response.data.entryId).not.toBeUndefined()
+            entry.id = response.data.entryId
+        }
+    })
+}
+
+async function checkEntries(path, userId, query, desired) {
+    await runTest({
+        method: "GET",
+        path: `${path}/${today()}/${today() + 86400}`,
+        query: query,
+        baseURL,
+        userId: userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(Array.isArray(response.data)).toBe(true)
+            expect(response.data).toStrictEqual(desired)
+        }
+    })
+}
+
+async function updateEntry(path, entry, userId, update) {
+    await runTest({
+        method: "PUT",
+        path: `${path}/${entry.id}`,
+        body: update,
+        baseURL,
+        userId,
+        verify: response => {
+            expect(response.status).toBe(200)
+            Object.keys(update).forEach(key => {
+                entry[key] = update[key]
+            })
+        }
+    })
+}
+
+describe.only("test ledger entries db", () => {
+    const path = "/v1/ledger/entry"
+
+    describe("modify entry", () => {
+        const box = new Box1()
+        box.data.userId = `${new ObjectId()}`
+
+        test("add entry", async () => {
+            box.data.entry1 = box.newEntry()
+            await addEntry(path, box.data.entry1, box.data.userId)
+        })
+
+        test("check entry after add", async () => {
+            await checkEntries("/v1/ledger/entries", box.data.userId, {}, [
+                box.data.entry1
+            ]);
+        })
+
+        test("update specify field of entry", async () => {
+            await updateEntry(path, box.data.entry1, box.data.userId, {comment: "newComment"});
+        })
+
+        test("check entry after updating", async () => {
+            await checkEntries("/v1/ledger/entries", box.data.userId, {}, [
+                box.data.entry1
+            ]);
         })
     })
 
-    test("check entry after add", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/ledger/entries",
-            query: {
-                minDate: today(),
-                maxDate: today() + 86400,
-            },
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                const entries = response.data
-                    .filter(entry => entry.id === box.entryId)
-                expect(entries.length).toBeGreaterThan(0)
-                entries
-                    .forEach(entry => {
-                        expect(entry.id).toBe(box.entryId)
-                        expect(entry.userId).toBe(userId)
-                        expect(entry.msg).toBe("a test ledger entry")
-                        expect(entry.createdAt).not.toBe(undefined)
-                        box.createdAt = entry.createdAt
-                    })
-            }
+    describe("query with date", () => {
+        const box = new Box1()
+        box.data.userId = `${new ObjectId()}`
+
+        test("add entry1", async () => {
+            box.data.entry1 = box.newEntry()
+            await addEntry(path, box.data.entry1, box.data.userId)
+        })
+
+        test("add entry1", async () => {
+            box.data.entry2 = box.newEntry()
+            box.data.entry2.createdAt = now() - 86400
+            await addEntry(path, box.data.entry2, box.data.userId)
+        })
+
+        test("check", async () => {
+            await checkEntries("/v1/ledger/entries", box.data.userId, {}, [
+                box.data.entry1
+            ]);
         })
     })
 
-    test("update entry", async () => {
-        await runTest({
-            method: "PUT",
-            path: `/v1/ledger/entry/${box.entryId}`,
-            body: {msg: "a new test body"},
-            baseURL,
-            userId,
-            verify: response => {
-                expect(response.status).toBe(200)
-            }
-        })
-    })
+    test("query with offset limit", async () => {
+        const box = new Box1()
+        box.data.userId = `${new ObjectId}`
 
-    test("check entry after updating", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/ledger/entries",
-            query: {
-                minDate: today(),
-                maxDate: today() + 86400,
-            },
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                const entries = response.data
-                    .filter(entry => entry.id === box.entryId)
-                expect(entries.length).toBe(1)
-                entries
-                    .forEach(entry => {
-                        expect(entry.id).toBe(box.entryId)
-                        expect(entry.userId).toBe(userId)
-                        expect(entry.msg).toBe("a new test body")
-                        expect(entry.createdAt).toBe(box.createdAt)
-                        expect(entry.keptAt).not.toBeUndefined()
-                        box.keptAt = entry.keptAt
-                    })
-            }
-        })
-    })
+        box.data.entry1 = box.newEntry()
+        await addEntry(path, box.data.entry1, box.data.userId)
 
-    test("update entry the second time", async () => {
-        await runTest({
-            method: "PUT",
-            path: `/v1/ledger/entry/${box.entryId}`,
-            body: {msg: "a new new test body"},
-            baseURL,
-            userId,
-            verify: response => {
-                expect(response.status).toBe(200)
-            }
-        })
-    })
+        box.data.entry2 = box.newEntry()
+        box.data.entry2.createdAt = now() - 10
+        await addEntry(path, box.data.entry2, box.data.userId)
 
-    test("check entry after updating the second time", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/ledger/entries",
-            query: {
-                minDate: today(),
-                maxDate: today() + 86400,
-            },
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                const entries = response.data
-                    .filter(entry => entry.id === box.entryId)
-                expect(entries.length).toBe(1)
-                entries
-                    .forEach(entry => {
-                        expect(entry.id).toBe(box.entryId)
-                        expect(entry.userId).toBe(userId)
-                        expect(entry.msg).toBe("a new new test body")
-                        expect(entry.createdAt).toBe(box.createdAt)
-                        expect(entry.keptAt).toBe(box.keptAt)
-                    })
-            }
-        })
+        await checkEntries("/v1/ledger/entries", box.data.userId, {offset: 0, limit: 1}, [box.data.entry1])
+        await checkEntries("/v1/ledger/entries", box.data.userId, {offset: 1, limit: 1}, [box.data.entry2])
     })
 })
 

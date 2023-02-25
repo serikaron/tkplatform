@@ -7,7 +7,6 @@ import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {jest} from "@jest/globals";
-import {now} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
 
 async function runTest(
@@ -17,7 +16,7 @@ async function runTest(
         tkResponse,
         dbFn
     }
-){
+) {
     const app = createApp()
     setup(app, {
         setup: testDIContainer.setup([
@@ -41,32 +40,55 @@ async function runTest(
     simpleCheckTKResponse(response, tkResponse)
 }
 
+const userId = new ObjectId()
 const RealDate = Date.now
+const fakeNow = () => {
+    return 0
+}
 
 beforeAll(() => {
-    global.Date.now = () => { return 0 }
+    global.Date.now = fakeNow
 })
 
 afterAll(() => {
     global.Date.now = RealDate
 })
 
-test("should add entry to db", async () => {
-    const addEntry = jest.fn(async () => {
-        return "a fake entry id"
-    })
-    await runTest({
-        body: {msg: "a fake entry body"},
-        headers: {id: "60f6a4b4f4b2384f8c40b1af"},
-        tkResponse: TKResponse.Success({
-            data: {entryId: "a fake entry id"}
-        }),
-        dbFn: addEntry
-    })
-    expect(addEntry).toHaveBeenCalledWith( {
-        userId: new ObjectId("60f6a4b4f4b2384f8c40b1af"),
-        msg: "a fake entry body",
-        kept: false,
-        createdAt: now()
+describe.each([
+    {
+        body: {
+            msg: "a fake entry",
+            createdAt: 12345
+        },
+        entryToSave: {
+            userId,
+            msg: "a fake entry",
+            createdAt: 12345
+        }
+    },
+    {
+        body: {
+            msg: "a fake entry",
+        },
+        entryToSave: {
+            userId,
+            msg: "a fake entry",
+            createdAt: fakeNow()
+        }
+    }
+])("($#)", ({body, entryToSave}) => {
+    test("should add correct entry to db", async () => {
+        const addEntry = jest.fn(async () => {
+            return "a fake entry id"
+        })
+        await runTest({
+            body,
+            headers: {id: `${userId}`},
+            tkResponse: TKResponse.Success({
+                data: {entryId: "a fake entry id"}
+            }),
+            dbFn: addEntry
+        })
+        expect(addEntry).toHaveBeenCalledWith(entryToSave)
     })
 })

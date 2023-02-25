@@ -8,14 +8,12 @@ const makeUpdate = (req) => {
     delete req.update.userId
     delete req.update.id
     delete req.update.createdAt
-    delete req.update.keptAt
 }
 
 const updateDb = async (req) => {
-    console.log(`update ledger entry: ${JSON.stringify(req.update, null, 4)}`)
+    // console.log(`update ledger entry: ${JSON.stringify(req.update, null, 4)}`)
     if (Object.keys(req.update).length !== 0) {
         await req.context.mongo.setLedgerEntry(req.params.entryId, req.headers.id, req.update)
-        await req.context.mongo.keepALedger(req.params.entryId, req.headers.id)
     }
 }
 
