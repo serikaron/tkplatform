@@ -12,6 +12,7 @@ import {routePostSiteRecord} from "./handlers/postSiteRecord.mjs";
 import {routePutSiteRecord} from "./handlers/putSiteRecord.mjs";
 import {routePostEntry} from "./handlers/postEntry.mjs";
 import {routePutEntry} from "./handlers/putEntry.mjs";
+import {routeGetEntry} from "./handlers/getEntry.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -22,6 +23,7 @@ export function setup(app, {setup, teardown}) {
     routePostEntry(router)
     routePutEntry(router)
     routeGetEntries(router)
+    routeGetEntry(router)
     routeGetStores(router)
     routeGetAccounts(router)
     routeGetUserAccounts(router)

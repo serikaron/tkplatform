@@ -59,10 +59,12 @@ const routeInfo = [
         needAuth: true,
         service: {baseURL: "http://ledger:8080"}
     },
-    {url: "/v1/ledger/entries", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/entries/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/entry/:entry", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/entry", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/entry/:entry", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
-    {url: "/v1/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/journal/entries/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/journal/entry/:entry", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entry/:entry", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 ]

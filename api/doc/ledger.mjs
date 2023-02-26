@@ -519,6 +519,132 @@
 
 /**
  * @swagger
+ * /v1/ledger/entry/:entryId(帐本记录):
+ *   get:
+ *     tags: ["ledger(记帐帐本)", "已实现"]
+ *     description: 帐本记录
+ *     responses:
+ *       200:
+ *         description: 返回列表
+ *         content:
+ *           application/json:
+ *             schema:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       template:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                       createdAt:
+ *                         type: Number
+ *                         example: 1676951437
+ *                       site:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                              type: string
+ *                              example: 站点1
+ *                           icon:
+ *                              type: string
+ *                              example: 连接1
+ *                       taskId:
+ *                         type: string
+ *                         example: 任务编号
+ *                       account:
+ *                         type: string
+ *                         example: 站点帐号
+ *                       store:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             example: 陶宝
+ *                           icon:
+ *                             type: string
+ *                             example: /static/stores/taobao.png
+ *                       ledgerAccount:
+ *                         type: object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             example: 陶宝
+ *                           icon:
+ *                             type: string
+ *                             example: /static/accounts/taobao.png
+ *                           account:
+ *                             type: string
+ *                             example: 用户输入的名字
+ *                       shop:
+ *                         type: string
+ *                         example: 店铺
+ *                       product:
+ *                         type: string
+ *                         example: 商品
+ *                       orderId:
+ *                         type: string
+ *                         example: 用户输入的订单编号
+ *                       commission:
+ *                         type: object
+ *                         properties:
+ *                           amount:
+ *                             type: Number
+ *                             example: 5.5
+ *                           refunded:
+ *                             type: Boolean
+ *                             example: false
+ *                       principle:
+ *                         type: object
+ *                         properties:
+ *                           amount:
+ *                             type: Number
+ *                             example: 85.0
+ *                           refunded:
+ *                             type: Boolean
+ *                             example: false
+ *                       journalAccount:
+ *                         type: Object
+ *                         properties:
+ *                           name:
+ *                             type: string
+ *                             example: 微信
+ *                           icon:
+ *                             type: string
+ *                             example: /static/accounts/wechat.png
+ *                           userAccount:
+ *                             type: string
+ *                             example: 用户输入的帐号
+ *                       refund:
+ *                         type: object
+ *                         properties:
+ *                           from:
+ *                             type: number
+ *                             example: 0-商家返，1-平台返
+ *                           type:
+ *                             type: number
+ *                             example: 0-立返，1-货返
+ *                       received:
+ *                         type: number
+ *                         example: 是否收货 0-否，1-是
+ *                       status:
+ *                         type: number
+ *                         example: 0-正常，1-异常
+ *                       screenshot:
+ *                         type: string
+ *                         example: 上传后的url
+ *                       comment:
+ *                         type: string
+ *                         example: 备注
+ */
+
+/**
+ * @swagger
  * /v1/ledger/entry(添加记帐):
  *   post:
  *     tags: ["ledger(记帐帐本)", "已实现"]
@@ -970,6 +1096,66 @@
  *             schema:
  *               type: array
  *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   createdAt:
+ *                     type: Number
+ *                     example: 1676951437
+ *                   site:
+ *                     type: object
+ *                     properties:
+ *                       name:
+ *                          type: string
+ *                          example: 站点1
+ *                       icon:
+ *                          type: string
+ *                          example: 连接1
+ *                   account:
+ *                     type: string
+ *                     example: 对应用户站点中的 credential.account
+ *                   amount:
+ *                     type: Number
+ *                     example: 100.0
+ *                   fee:
+ *                     type: Number
+ *                     example: 10.0
+ *                   journalAccount:
+ *                     type: Object
+ *                     properties:
+ *                       name:
+ *                         type: string
+ *                         example: 微信
+ *                       icon:
+ *                         type: string
+ *                         example: /static/accounts/wechat.png
+ *                       userAccount:
+ *                         type: string
+ *                         example: 用户输入的帐号
+ *                   order:
+ *                     type: string
+ *                     example: 单号
+ *                   credited:
+ *                     type: boolean
+ *                     example: true
+ *                   comment:
+ *                     type: string
+ *                     example: 备注
+ */
+
+/**
+ * @swagger
+ * /v1/journal/entry/:entryId(查询提现帐本记录):
+ *   get:
+ *     tags: ["ledger(记帐帐本)", "已实现"]
+ *     description: 查询提现帐本记录
+ *     responses:
+ *       200:
+ *         description: 返回列表
+ *         content:
+ *           application/json:
+ *             schema:
  *                 type: object
  *                 properties:
  *                   id:

@@ -272,7 +272,7 @@ test.concurrent.each([
             url: "/v1/user/ledger/account/fake-account-id",
         }
     },
-        {
+    {
         url: "/v1/journal/accounts",
         method: "GET",
         needAuth: true,
@@ -309,12 +309,21 @@ test.concurrent.each([
         }
     },
     {
-        url: "/v1/ledger/entries",
+        url: "/v1/ledger/entries/123/234?offset=1&limit=2",
         method: "GET",
         needAuth: true,
         service: {
             baseURL: "http://ledger:8080",
-            url: "/v1/ledger/entries",
+            url: "/v1/ledger/entries/123/234?offset=1&limit=2",
+        }
+    },
+    {
+        url: "/v1/ledger/entry/123",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entry/123",
         }
     },
     {
@@ -336,12 +345,21 @@ test.concurrent.each([
         }
     },
     {
-        url: "/v1/journal/entries",
+        url: "/v1/journal/entries/123/234?offset=1&limit=2",
         method: "GET",
         needAuth: true,
         service: {
             baseURL: "http://ledger:8080",
-            url: "/v1/journal/entries",
+            url: "/v1/journal/entries/123/234?offset=1&limit=2",
+        }
+    },
+    {
+        url: "/v1/journal/entry/fake-entry-id",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entry/fake-entry-id",
         }
     },
     {

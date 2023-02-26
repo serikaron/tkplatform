@@ -53,6 +53,13 @@ export async function setupMongo(req) {
 
             return await query.sort({createdAt: -1}).toArray()
         },
+        getEntry: async (collectionName, entryId, userId) => {
+            return await ledger.db.collection(collectionName)
+                .findOne({
+                    _id: new ObjectId(entryId),
+                    userId: new ObjectId(userId)
+                })
+        },
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()
         },

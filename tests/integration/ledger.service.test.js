@@ -96,6 +96,19 @@ async function checkEntries(key, userId, query, desired) {
     })
 }
 
+async function checkEntry(key, userId, entryId, desired) {
+    await runTest({
+        method: "GET",
+        path: `/v1/${key}/entry/${entryId}`,
+        baseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(response.data).toStrictEqual(desired)
+        }
+    })
+}
+
 async function updateEntry(key, entry, userId, update) {
     await runTest({
         method: "PUT",
@@ -113,10 +126,10 @@ async function updateEntry(key, entry, userId, update) {
 }
 
 describe.each([
-    // "ledger",
+    "ledger",
     "journal"
 ])("%s", (key) => {
-    describe("test ledger entries db", () => {
+    describe("test entries db", () => {
         describe("modify entry", () => {
             const box = new Box1()
             box.data.userId = `${new ObjectId()}`
@@ -178,6 +191,15 @@ describe.each([
 
             await checkEntries(key, box.data.userId, {offset: 0, limit: 1}, [box.data.entry1])
             await checkEntries(key, box.data.userId, {offset: 1, limit: 1}, [box.data.entry2])
+        })
+
+        test("query with entry id", async () => {
+            const box = new Box1()
+            box.data.userId = `${new ObjectId()}`
+            box.data.entry = box.newEntry()
+
+            await addEntry(key, box.data.entry, box.data.userId)
+            await checkEntry(key, box.data.userId, box.data.entry.id, box.data.entry)
         })
     })
 })
