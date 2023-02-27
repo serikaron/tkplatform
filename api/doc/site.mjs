@@ -487,8 +487,13 @@
  *                   password:
  *                     type: string
  *                   inviteCode:
- *                     type: string
- *                     example: 上传后的地址
+ *                     type: object
+ *                     properties:
+ *                       code:
+ *                         type: string
+ *                       image:
+ *                         type: string
+ *                         example: 上传后的地址
  *                   url:
  *                     type: object
  *                     properties:
