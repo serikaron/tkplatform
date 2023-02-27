@@ -6,6 +6,10 @@ import {routePostUserSite} from "./handlers/postUserSite.mjs";
 import {routeGetUserSites} from "./handlers/getUserSites.mjs";
 import {routePutUserSite} from "./handlers/putUserSite.mjs";
 import {routeGetUserSite} from "./handlers/getUserSite.mjs";
+import {routeGetSitesBalance} from "./handlers/getUserSitesBalance.mjs";
+import {routePutUserSiteBalance} from "./handlers/putUserSiteBalance.mjs";
+import {routePostUserSiteJournalEntry} from "./handlers/postUserSiteJournalEntry.mjs";
+import {routeGetUserSiteJournalEntries} from "./handlers/getUserSiteJournalEntries.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -18,6 +22,10 @@ export function setup(app, {setup, teardown}) {
     routeGetUserSites(router)
     routePutUserSite(router)
     routeGetUserSite(router)
+    routeGetSitesBalance(router)
+    routePutUserSiteBalance(router)
+    routePostUserSiteJournalEntry(router)
+    routeGetUserSiteJournalEntries(router)
 
     teardown(router)
 }
