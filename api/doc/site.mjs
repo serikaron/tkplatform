@@ -63,7 +63,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:siteId(查询用户站点):
+ * /v1/user/site/:userSiteId(查询用户站点):
  *   get:
  *     tags: ["site(站点)", "已实现"]
  *     description: 结构中除了 id, site 字段以外，其余为可选项有可能为空
@@ -378,7 +378,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:siteId(删除站点):
+ * /v1/user/site/:userSiteId(删除站点):
  *   delete:
  *     tags: ["site(站点)"]
  */

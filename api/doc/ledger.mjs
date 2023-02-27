@@ -966,7 +966,7 @@
  * @swagger
  * /v1/ledger/statistics/:minDate/:maxDate(帐本统计):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已完成"]
  *     description: 帐本统计
  *     responses:
  *       200:
@@ -1325,7 +1325,7 @@
  * @swagger
  * /v1/journal/statistics/:minDate/:maxDate(提现帐本统计):
  *   get:
- *     tags: ["ledger(记帐帐本)"]
+ *     tags: ["ledger(记帐帐本)", "已完成"]
  *     responses:
  *       200:
  *         content:

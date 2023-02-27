@@ -345,6 +345,15 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/ledger/statistics/123/234",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/statistics/123/234",
+        }
+    },
+    {
         url: "/v1/journal/entries/123/234?offset=1&limit=2",
         method: "GET",
         needAuth: true,
@@ -378,6 +387,15 @@ test.concurrent.each([
         service: {
             baseURL: "http://ledger:8080",
             url: "/v1/journal/entry/fake-entry-id",
+        }
+    },
+    {
+        url: "/v1/journal/statistics/123/234",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/statistics/123/234",
         }
     },
 ])("$url should dispatch correctly", async (argument) => {
