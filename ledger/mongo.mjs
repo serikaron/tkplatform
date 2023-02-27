@@ -38,11 +38,12 @@ export async function setupMongo(req) {
             )
         },
         getEntries: async (collectionName, userId, minDate, maxDate, offset, limit) => {
+            const filter = {
+                userId: new ObjectId(userId),
+                createdAt: {$gte: minDate, $lt: maxDate}
+            };
             let query = ledger.db.collection(collectionName)
-                .find({
-                    userId: new ObjectId(userId),
-                    createdAt: {$gte: minDate, $lt: maxDate}
-                })
+                .find(filter)
 
             if (offset !== null) {
                 query = query.skip(offset)
@@ -51,7 +52,11 @@ export async function setupMongo(req) {
                 query = query.limit(limit)
             }
 
-            return await query.sort({createdAt: -1}).toArray()
+            const items = await query.sort({createdAt: -1}).toArray()
+            const total = await ledger.db.collection(collectionName)
+                .countDocuments(filter)
+
+            return {total, items}
         },
         getEntry: async (collectionName, entryId, userId) => {
             return await ledger.db.collection(collectionName)

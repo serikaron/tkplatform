@@ -23,13 +23,13 @@ const makeArguments = (req, res, next) => {
 const queryDb = (dbName) => {
     return async (req, res, next) => {
         const args = req.context.mongo.arguments
-        const entries = await req.context.mongo.getEntries(dbName, args.userId, args.minDate, args.maxDate, args.offset, args.limit)
+        const dbRes = await req.context.mongo.getEntries(dbName, args.userId, args.minDate, args.maxDate, args.offset, args.limit)
+        dbRes.items.forEach(x => {
+            replaceId(x)
+            delete x.userId
+        })
         res.tkResponse(TKResponse.Success({
-            data: entries.map(replaceId)
-                .map(x => {
-                    delete x.userId
-                    return x
-                })
+            data: dbRes
         }))
         next()
     }

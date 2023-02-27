@@ -84,14 +84,17 @@ describe.each([
                 _id: "a fake entry id",
                 userId: "should not send"
             }]
-            const responseBody = [{
+            const responseList = [{
                 id: "a fake entry id",
                 msg: "a fake entry",
             }]
 
             test("should be work as expect", async () => {
                 const getEntries = jest.fn(async () => {
-                    return dbRes
+                    return {
+                        total: 1,
+                        items: dbRes
+                    }
                 })
 
                 const userId = `${new ObjectId()}`
@@ -100,7 +103,10 @@ describe.each([
                     params,
                     headers: {id: userId},
                     tkResponse: TKResponse.Success({
-                        data: responseBody
+                        data: {
+                            total: 1,
+                            items: responseList
+                        }
                     }),
                     getEntries
                 })

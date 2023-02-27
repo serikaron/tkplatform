@@ -90,7 +90,6 @@ async function checkEntries(key, userId, query, desired) {
         userId: userId,
         verify: response => {
             simpleVerification(response)
-            expect(Array.isArray(response.data)).toBe(true)
             expect(response.data).toStrictEqual(desired)
         }
     })
@@ -140,9 +139,11 @@ describe.each([
             })
 
             test("check entry after add", async () => {
-                await checkEntries(key, box.data.userId, {}, [
-                    box.data.entry1
-                ]);
+                await checkEntries(key, box.data.userId, {},
+                    {
+                        total: 1,
+                        items: [box.data.entry1]
+                    });
             })
 
             test("update specify field of entry", async () => {
@@ -150,9 +151,11 @@ describe.each([
             })
 
             test("check entry after updating", async () => {
-                await checkEntries(key, box.data.userId, {}, [
-                    box.data.entry1
-                ]);
+                await checkEntries(key, box.data.userId, {},
+                    {
+                        total: 1,
+                        items: [box.data.entry1]
+                    });
             })
         })
 
@@ -172,9 +175,11 @@ describe.each([
             })
 
             test("check", async () => {
-                await checkEntries(key, box.data.userId, {}, [
-                    box.data.entry1
-                ]);
+                await checkEntries(key, box.data.userId, {},
+                    {
+                        total: 1,
+                        items: [box.data.entry1]
+                    });
             })
         })
 
@@ -189,8 +194,16 @@ describe.each([
             box.data.entry2.createdAt = now() - 10
             await addEntry(key, box.data.entry2, box.data.userId)
 
-            await checkEntries(key, box.data.userId, {offset: 0, limit: 1}, [box.data.entry1])
-            await checkEntries(key, box.data.userId, {offset: 1, limit: 1}, [box.data.entry2])
+            await checkEntries(key, box.data.userId, {offset: 0, limit: 1},
+                {
+                    total: 2,
+                    items: [box.data.entry1]
+                })
+            await checkEntries(key, box.data.userId, {offset: 1, limit: 1},
+                {
+                    total: 2,
+                    items: [box.data.entry2]
+                })
         })
 
         test("query with entry id", async () => {
