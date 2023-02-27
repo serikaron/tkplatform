@@ -228,6 +228,42 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/user/sites/balance",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/sites/balance"
+        }
+    },
+    {
+        url: "/v1/user/site/fake-site-id/balance",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id/balance"
+        }
+    },
+    {
+        url: "/v1/user/site/fake-site-id/journal/entries",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id/journal/entries",
+        }
+    },
+    {
+        url: "/v1/user/site/fake-site-id/journal/entry",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id/journal/entry",
+        }
+    },
+    {
         url: "/v1/stores",
         method: "GET",
         needAuth: true,
