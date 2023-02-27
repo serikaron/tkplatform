@@ -9,6 +9,9 @@ export const routeGetSitesBalance = (router) => {
         l.forEach(x => {
             replaceId(x)
             delete x.userId
+            if (x.balance === undefined) {
+                x.balance = 0
+            }
         })
         res.tkResponse(TKResponse.Success({
             data: l

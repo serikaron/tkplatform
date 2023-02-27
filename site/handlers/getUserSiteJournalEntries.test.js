@@ -26,12 +26,13 @@ describe.each([
         const entryId = new ObjectId()
         const userId = new ObjectId()
         const userSiteId = new ObjectId()
+        const withdrewAt = now()
         const getUserSiteJournalEntries = jest.fn(async () => {
             return {
                 total: 10,
                 items: [{
                     _id: entryId,
-                    createdAt: now(),
+                    withdrewAt,
                     userId,
                     userSiteId,
                     msg: "a fake entry"
@@ -64,7 +65,8 @@ describe.each([
                 items: [{
                     id: `${entryId}`,
                     userSiteId: `${userSiteId}`,
-                    msg: "a fake entry"
+                    msg: "a fake entry",
+                    withdrewAt,
                 }]
             }
         }))

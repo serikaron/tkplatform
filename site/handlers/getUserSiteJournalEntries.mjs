@@ -16,7 +16,6 @@ export const routeGetUserSiteJournalEntries = router => {
         dbRes.items.forEach(x => {
             replaceId(x)
             delete x.userId
-            delete x.createdAt
         })
         res.tkResponse(TKResponse.Success({
             data: dbRes

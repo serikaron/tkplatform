@@ -3,6 +3,7 @@
 import * as dotenv from 'dotenv'
 import {connectSite} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
+import {now} from "../common/utils.mjs";
 
 dotenv.config()
 
@@ -14,7 +15,8 @@ export async function setupMongo(req) {
     const site = await connectSite()
     const collection = {
         sites: site.db.collection("sites"),
-        userSites: site.db.collection("userSites")
+        userSites: site.db.collection("userSites"),
+        withdrawJournalEntries: site.db.collection("withdrawJournalEntries")
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
@@ -46,6 +48,48 @@ export async function setupMongo(req) {
                 _id: new ObjectId(siteId),
                 userId: new ObjectId(userId)
             })
+        },
+        getUserSitesBalance: async (userId) => {
+            return await collection.userSites
+                .find({
+                    userId: new ObjectId(userId),
+                    verified: true
+                }, {
+                    projection: {site: 1, balance: 1}
+                })
+                .toArray()
+        },
+        setUserSiteBalance: async (userSiteId, userId, update) => {
+            await collection.userSites
+                .updateOne({
+                    _id: new ObjectId(userSiteId),
+                    userId: new ObjectId(userId),
+                },{
+                    $set: update
+                })
+        },
+        addUserSiteJournalEntry: async (userId, userSiteId, entry) => {
+            entry.userId = new ObjectId(userId)
+            entry.userSiteId = new ObjectId(userSiteId)
+            const r = await collection.withdrawJournalEntries
+                .insertOne(entry)
+            return r.insertedId
+        },
+        getUserSiteJournalEntries: async (userId, userSiteId, offset, limit) => {
+            const filter = {
+                userSiteId: new ObjectId(userSiteId),
+                withdrewAt: {$gte: now() - 86400 * 30},
+                userId: new ObjectId(userId),
+            };
+            const items = await collection.withdrawJournalEntries
+                .find(filter)
+                .sort({withdrewAt: -1})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+            const total = await collection.withdrawJournalEntries
+                .countDocuments(filter)
+            return {total, items}
         }
     }
 }
