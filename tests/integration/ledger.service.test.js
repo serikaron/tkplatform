@@ -9,47 +9,6 @@ const baseURL = "http://localhost:9007"
 
 class Box {
     constructor() {
-        this._entryId = undefined
-        this._keptAt = undefined
-        this._createdAt = undefined
-        this._data = undefined
-    }
-
-    get entryId() {
-        return this._entryId
-    }
-
-    set entryId(id) {
-        this._entryId = id
-    }
-
-    get keptAt() {
-        return this._keptAt
-    }
-
-    set keptAt(time) {
-        this._keptAt = time
-    }
-
-    get createdAt() {
-        return this._createdAt
-    }
-
-    set createdAt(time) {
-        this._createdAt = time
-    }
-
-    get data() {
-        return this._data
-    }
-
-    set data(d) {
-        this._data = d
-    }
-}
-
-class Box1 {
-    constructor() {
         this._data = {}
     }
 
@@ -130,7 +89,7 @@ describe.each([
 ])("%s", (key) => {
     describe("test entries db", () => {
         describe("modify entry", () => {
-            const box = new Box1()
+            const box = new Box()
             box.data.userId = `${new ObjectId()}`
 
             test("add entry", async () => {
@@ -160,7 +119,7 @@ describe.each([
         })
 
         describe("query with date", () => {
-            const box = new Box1()
+            const box = new Box()
             box.data.userId = `${new ObjectId()}`
 
             test("add entry1", async () => {
@@ -184,7 +143,7 @@ describe.each([
         })
 
         test("query with offset limit", async () => {
-            const box = new Box1()
+            const box = new Box()
             box.data.userId = `${new ObjectId}`
 
             box.data.entry1 = box.newEntry()
@@ -207,7 +166,7 @@ describe.each([
         })
 
         test("query with entry id", async () => {
-            const box = new Box1()
+            const box = new Box()
             box.data.userId = `${new ObjectId()}`
             box.data.entry = box.newEntry()
 
@@ -219,12 +178,10 @@ describe.each([
 
 describe("test site record", () => {
     const box = new Box()
-    box.data = {
-        siteId1: `${new ObjectId()}`,
-        userId1: `${new ObjectId()}`,
-        siteId2: `${new ObjectId()}`,
-        userId2: `${new ObjectId()}`,
-    }
+    box.data.siteId1 = `${new ObjectId()}`
+    box.data.userId1 = `${new ObjectId()}`
+    box.data.siteId2 = `${new ObjectId()}`
+    box.data.userId2 = `${new ObjectId()}`
 
     // beforeAll(async () => {
     //     const ledger = await integrationConnectMongo("ledger", 10003)
@@ -364,4 +321,65 @@ describe("test site record", () => {
     //         }
     //     })
     // })
+})
+
+describe("test ledger statistics", () => {
+    const userId = `${new ObjectId()}`
+    describe("prepare data", () => {
+        const entries = [
+            {
+                principle: {amount: 100, refunded: false},
+                commission: {amount: 1000, refunded: false},
+            },
+            {
+                principle: {amount: 200, refunded: true},
+                commission: {amount: 2000, refunded: false},
+            },
+            {
+                principle: {amount: 300, refunded: false},
+                commission: {amount: 3000, refunded: true},
+            },
+            {
+                principle: {amount: 400, refunded: true},
+                commission: {amount: 4000, refunded: true},
+            },
+            {status: 1},
+            {status: 1},
+        ]
+        it("post to server", async () => {
+            for (const entry of entries) {
+                entry.createdAt = now()
+                if (entry.principle === undefined) {
+                    entry.principle = {amount: 0, refunded: true}
+                }
+                if (entry.commission === undefined) {
+                    entry.commission = {amount: 0, refunded: true}
+                }
+                if (entry.status === undefined) {
+                    entry.status = 0
+                }
+                await addEntry("ledger", entry, userId)
+            }
+        })
+    })
+
+    describe("check statistics", () => {
+        it("from server", async () => {
+            await runTest({
+                method: "GET",
+                path: `/v1/ledger/statistics/${now() - 100}/${now() + 100}`,
+                baseURL,
+                userId,
+                verify: response => {
+                    simpleVerification(response)
+                    expect(response.data).toStrictEqual({
+                        exceptions: 2,
+                        notYetRefunded: 3400,
+                        principle: 1000,
+                        commission: 10000,
+                    })
+                }
+            })
+        })
+    })
 })

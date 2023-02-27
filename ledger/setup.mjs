@@ -13,6 +13,7 @@ import {routePutSiteRecord} from "./handlers/putSiteRecord.mjs";
 import {routePostEntry} from "./handlers/postEntry.mjs";
 import {routePutEntry} from "./handlers/putEntry.mjs";
 import {routeGetEntry} from "./handlers/getEntry.mjs";
+import {routeGetLedgerStatistics} from "./handlers/getLedgerStatistics.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -32,6 +33,7 @@ export function setup(app, {setup, teardown}) {
     routeGetSiteRecords(router)
     routePostSiteRecord(router)
     routePutSiteRecord(router)
+    routeGetLedgerStatistics(router)
 
     teardown(router)
 }

@@ -65,6 +65,54 @@ export async function setupMongo(req) {
                     userId: new ObjectId(userId)
                 })
         },
+        getLedgerStatistics: async (userId, minDate, maxDate) => {
+            const pipeline = [
+                {
+                    $match: {
+                        userId: new ObjectId(userId),
+                        createdAt: {$gte: minDate, $lt: maxDate},
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        principle: {$sum: "$principle.amount"},
+                        commission: {$sum: "$commission.amount"},
+                        notYetRefunded: {
+                            $sum: {
+                                $add: [
+                                    {
+                                        $cond: [
+                                            {$eq: ["$principle.refunded", false]},
+                                            "$principle.amount",
+                                            0
+                                        ]
+                                    },
+                                    {
+                                        $cond: [
+                                            {$eq: ["$commission.refunded", false]},
+                                            "$commission.amount",
+                                            0
+                                        ]
+                                    }
+                                ]
+                            }
+                        },
+                        exceptions: {
+                            $sum: {
+                                $cond: [
+                                    {$eq: ["$status", 1]}, 1, 0
+                                ]
+                            }
+                        }
+                    }
+                },
+            ];
+
+            return await collection.ledgerEntries
+                .aggregate(pipeline)
+                .toArray()
+        },
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()
         },
