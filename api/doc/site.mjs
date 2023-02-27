@@ -136,6 +136,8 @@
  *                             to:
  *                               type: string
  *                               example: "5:0"
+ *                             activated:
+ *                               type: boolean
  *
  */
 
@@ -216,6 +218,8 @@
  *                             to:
  *                               type: string
  *                               example: "5:0"
+ *                             activated:
+ *                               type: boolean
  *
  */
 
@@ -301,6 +305,8 @@
  *                             to:
  *                               type: string
  *                               example: "5:0"
+ *                             activated:
+ *                               type: boolean
  */
 
 /**
@@ -374,6 +380,8 @@
  *                             to:
  *                               type: string
  *                               example: "5:0"
+ *                             activated:
+ *                               type: boolean
  */
 
 /**

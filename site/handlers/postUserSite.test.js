@@ -111,10 +111,12 @@ test('test add site should work as expect', async () => {
                 {
                     "from": "",
                     "to": "",
+                    activated: false,
                 },
                 {
                     from: "",
-                    to: ""
+                    to: "",
+                    activated: false,
                 }
             ]
         }

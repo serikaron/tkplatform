@@ -7,6 +7,7 @@ import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals";
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {ObjectId} from "mongodb";
 
 async function runTest(
     {
@@ -36,25 +37,64 @@ async function runTest(
     simpleCheckTKResponse(response, tkResponse)
 }
 
+const genUserSite = () => {
+    return {
+        site: {
+            id: "site-id",
+            name: "a fake site name"
+        },
+        "credential": {
+            "account": "",
+            "password": ""
+        },
+        "verified": false,
+        "account": {
+            "list": []
+        },
+        "setting": {
+            "interval": {
+                "min": 200,
+                "max": 300,
+            },
+            "schedule": [
+                {
+                    "from": "",
+                    "to": "",
+                    activated: false,
+                },
+                {
+                    from: "",
+                    to: "",
+                    activated: false,
+                }
+            ]
+        }
+    }
+}
+
 test("should return sites from db", async () => {
+    const id = new ObjectId()
+    const dbUserSite = genUserSite()
+    const userId = new ObjectId()
+    dbUserSite._id = id
+    dbUserSite.userId = userId
+    dbUserSite.setting.schedule.forEach(x => {
+        delete x.activated
+    })
     const getUserSites = jest.fn(async () => {
-        return [
-            {_id: "a fake site id", msg: "fake user sites", userId: "a fake user id"},
-            {_id: "a fake site id too", msg: "fake user sites too", userId: "a fake user id"}
-        ]
+        return [dbUserSite]
 
     })
+    const tkUserSite = genUserSite()
+    tkUserSite.id = `${id}`
     await runTest({
-        header: {id: "fake user id"},
+        header: {id: `${userId}`},
         getUserSites,
         tkResponse: TKResponse.Success({
-            data: [
-                {id: "a fake site id", msg: "fake user sites"},
-                {id: "a fake site id too", msg: "fake user sites too"}
-            ]
+            data: [tkUserSite]
         })
     })
-    expect(getUserSites).toHaveBeenCalledWith("fake user id")
+    expect(getUserSites).toHaveBeenCalledWith(`${userId}`)
 })
 
 // TODO: check db return null

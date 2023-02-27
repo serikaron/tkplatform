@@ -44,10 +44,12 @@ const makeUserSite = async req => {
                 {
                     "from": "",
                     "to": "",
+                    activated: false,
                 },
                 {
                     from: "",
-                    to: ""
+                    to: "",
+                    activated: false,
                 }
             ]
         }

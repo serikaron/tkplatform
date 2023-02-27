@@ -10,6 +10,11 @@ export function routeGetUserSites(router) {
             data: dbRes === null ? [] :
                 dbRes.map(replaceId).map(x => {
                     delete x.userId
+                    x.setting.schedule.forEach(s => {
+                        if (s.activated === undefined) {
+                            s.activated = false
+                        }
+                    })
                     return x
                 })
         }))

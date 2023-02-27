@@ -29,11 +29,13 @@ class Box {
                 "schedule": [
                     {
                         "from": "",
-                        "to": ""
+                        "to": "",
+                        activated: false
                     },
                     {
                         "from": "",
-                        "to": ""
+                        "to": "",
+                        activated: false
                     },
                 ]
             }
