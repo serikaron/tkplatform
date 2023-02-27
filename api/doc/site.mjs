@@ -143,7 +143,7 @@
  * @swagger
  * /v1/user/sites(查询用户站点):
  *   get:
- *     tags: ["site(站点)"]
+ *     tags: ["site(站点)", "已实现"]
  *     description: 结构中除了 id, site 字段以外，其余为可选项有可能为空
  *     responses:
  *       200:
