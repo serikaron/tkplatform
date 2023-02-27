@@ -64,6 +64,17 @@ describe.each([
             body: {},
             update: {},
             count: 0
+        },
+        {
+            body: {
+                field: {
+                    nestedField: "a new entry body",
+                }
+            },
+            update: {
+                "field.nestedField": "a new entry body"
+            },
+            count: 1
         }
     ])("should update entry according to body", async ({body, update, count}) => {
         const setFn = jest.fn()

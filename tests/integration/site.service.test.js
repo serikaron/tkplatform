@@ -3,41 +3,16 @@
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
 import {ObjectId} from "mongodb";
+import {mergeObjects} from "../../common/utils.mjs";
 
 class Box {
     constructor() {
-        this._firstUserSite = undefined
-        this._secondUserSite = undefined
-        this._site = undefined
+        this._data = {}
     }
 
-    set firstUserSite(s) {
-        this._firstUserSite = s
-    }
-
-    get firstUserSite() {
-        return this._firstUserSite
-    }
-
-    set secondUserSite(s) {
-        this._secondUserSite = s
-    }
-
-    get secondUserSite() {
-        return this._secondUserSite
-    }
-
-    set site(s) {
-        this._site = s
-    }
-
-    get site() {
-        return this._site
-    }
-
-    get emptyUserSite() {
+    getEmptyUserSite() {
         return {
-            site: this.site,
+            site: this.data.site,
             "credential": {
                 "account": "",
                 "password": ""
@@ -64,13 +39,74 @@ class Box {
             }
         }
     }
+
+    get data() {
+        return this._data
+    }
 }
 
 const baseURL = "http://localhost:9006"
-const userId = `${new ObjectId()}`
 
-describe.only("test site service", () => {
+const checkUserSites = async (userId, desired) => {
+    await runTest({
+        method: "GET",
+        path: "/v1/user/sites",
+        baseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(Array.isArray(response.data)).toBe(true)
+            expect(response.data).toStrictEqual(desired)
+        }
+    })
+}
+
+const checkUserSite = async (userId, desired) => {
+    await runTest({
+        method: "GET",
+        path: `/v1/user/site/${desired.id}`,
+        baseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(response.data).toStrictEqual(desired)
+        }
+    })
+}
+
+const addUserSite = async (siteId, userId, userSite) => {
+    await runTest({
+        method: "POST",
+        path: "/v1/user/site",
+        body: {siteId},
+        baseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(response.data.id).not.toBeUndefined()
+            userSite.id = response.data.id
+            expect(response.data).toStrictEqual(userSite)
+        }
+    })
+}
+
+const setUserSite = async (userSite, userId, update) => {
+    await runTest({
+        method: "PUT",
+        path: `/v1/user/site/${userSite.id}`,
+        body: update,
+        baseURL,
+        userId,
+        verify: response => {
+            expect(response.status).toBe(200)
+            mergeObjects(userSite, update)
+        }
+    })
+}
+
+describe("test site service", () => {
     const box = new Box()
+    const userId = `${new ObjectId()}`
 
     test("Get system sites", async () => {
         await runTest({
@@ -82,67 +118,30 @@ describe.only("test site service", () => {
                 simpleVerification(response)
                 expect(Array.isArray(response.data)).toBe(true)
                 expect(response.data.length).toBeGreaterThan(0)
-                box.site = response.data[0]
-                console.log(box.site)
+                box.data.site = response.data[0]
             }
         })
     })
 
     test("Get user sites", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/user/sites",
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                expect(response.data.length).toBe(0)
-            }
-        })
+        await checkUserSites(userId, [])
     })
 
     test("Add first site", async () => {
-        await runTest({
-            method: "POST",
-            path: "/v1/user/site",
-            body: {siteId: box.site.id},
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(response.data.id).not.toBeUndefined()
-                box.firstUserSite = response.data
-                const actually = JSON.parse(JSON.stringify(response.data))
-                delete actually.id
-                expect(actually).toEqual(box.emptyUserSite)
-            }
-        })
+        box.data.firstUserSite = box.getEmptyUserSite()
+        await addUserSite(box.data.site.id, userId, box.data.firstUserSite);
     })
 
     test("Add second site", async () => {
-        await runTest({
-            method: "POST",
-            path: "/v1/user/site",
-            body: {siteId: box.site.id},
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(response.data.id).not.toBeUndefined()
-                box.secondUserSite = response.data
-                const actually = JSON.parse(JSON.stringify(response.data))
-                delete actually.id
-                expect(actually).toEqual(box.emptyUserSite)
-            }
-        })
+        box.data.secondUserSite = box.getEmptyUserSite()
+        await addUserSite(box.data.site.id, userId, box.data.secondUserSite);
     })
 
     test("Set second site", async () => {
-        const userSiteId = box.secondUserSite.id
-        box.secondUserSite = {
+        const userSiteId = box.data.secondUserSite.id
+        const update = {
             id: userSiteId,
-            site: box.site,
+            site: box.data.site,
             "credential": {
                 "account": "12345",
                 "password": "23456"
@@ -171,67 +170,25 @@ describe.only("test site service", () => {
             }
         }
 
-        await runTest({
-            method: "PUT",
-            path: `/v1/user/site/${userSiteId}`,
-            body: box.secondUserSite,
-            baseURL,
-            userId,
-            verify: response => {
-                expect(response.status).toBe(200)
-            }
-        })
+        await setUserSite(box.data.secondUserSite, userId, update)
     })
 
     test("Check user sites", async () => {
-        await runTest({
-            method: "GET",
-            path: "/v1/user/sites",
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                expect(response.data).toEqual([
-                    box.firstUserSite, box.secondUserSite
-                ])
-            }
-        })
+        await checkUserSites(userId, [box.data.firstUserSite, box.data.secondUserSite])
     })
 
     test("Update only one field", async () => {
-        await runTest({
-            method: "GET",
-            path: `/v1/user/site/${box.firstUserSite.id}`,
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(response.data).toEqual(box.firstUserSite)
-                expect(response.data.verified).toBe(false)
+        await setUserSite(box.data.firstUserSite, userId, {verified: true})
+        await checkUserSites(userId, [box.data.firstUserSite, box.data.secondUserSite])
+    })
+
+    test("Update nested field", async () => {
+        const update = {
+            site: {
+                alias: "alias-name"
             }
-        })
-        await runTest({
-            method: "PUT",
-            path: `/v1/user/site/${box.firstUserSite.id}`,
-            body: {verified: true},
-            baseURL,
-            userId,
-            verify: response => {
-                expect(response.status).toBe(200)
-                box.firstUserSite.verified = true
-            }
-        })
-        await runTest({
-            method: "GET",
-            path: `/v1/user/site/${box.firstUserSite.id}`,
-            baseURL,
-            userId,
-            verify: response => {
-                simpleVerification(response)
-                expect(response.data).toEqual(box.firstUserSite)
-                expect(response.data.verified).toBe(true)
-            }
-        })
+        }
+        await setUserSite(box.data.firstUserSite, userId, update)
+        await checkUserSite(userId, box.data.firstUserSite)
     })
 })

@@ -43,6 +43,7 @@ test('set one site according to site id', async () => {
     await runTest({
         body: {
             id: "possible bad id",
+            name: "a-name",
             site: {name: "site-name", icon: "site-icon"}
         },
         headers: {
@@ -53,8 +54,9 @@ test('set one site according to site id', async () => {
         tkResponse: TKResponse.Success()
     })
     expect(setUserSiteOne).toHaveBeenCalledWith("fake user id", "fake-site-id", {
-        id: "fake-site-id",
-        site: {name: "site-name", icon: "site-icon"},
+        "name": "a-name",
+        "site.name": "site-name",
+        "site.icon": "site-icon",
     })
 });
 

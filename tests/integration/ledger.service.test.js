@@ -2,7 +2,7 @@
 
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
-import {now, today} from "../../common/utils.mjs";
+import {mergeObjects, now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
 
 const baseURL = "http://localhost:9007"
@@ -76,9 +76,7 @@ async function updateEntry(key, entry, userId, update) {
         userId,
         verify: response => {
             expect(response.status).toBe(200)
-            Object.keys(update).forEach(key => {
-                entry[key] = update[key]
-            })
+            mergeObjects(entry, update)
         }
     })
 }
@@ -171,6 +169,28 @@ describe.each([
             box.data.entry = box.newEntry()
 
             await addEntry(key, box.data.entry, box.data.userId)
+            await checkEntry(key, box.data.userId, box.data.entry.id, box.data.entry)
+        })
+
+        test("update nested field", async () => {
+            const box = new Box()
+            box.data.userId = `${new ObjectId()}`
+            box.data.entry = box.newEntry()
+            box.data.entry.field = {
+                nestedField1: "nestedField1",
+                nestedField2: "nestedField2"
+            }
+
+            await addEntry(key, box.data.entry, box.data.userId)
+
+            const update = {
+                field: {
+                    nestedField1: "newNestedField1",
+                    nestedField3: "newNestedField3"
+                }
+            }
+            await updateEntry(key, box.data.entry, box.data.userId, update)
+
             await checkEntry(key, box.data.userId, box.data.entry.id, box.data.entry)
         })
     })

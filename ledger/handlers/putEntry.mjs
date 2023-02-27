@@ -2,6 +2,7 @@
 
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
+import {flattenObject} from "../../common/utils.mjs";
 
 const makeUpdate = (req) => {
     req.update = req.body
@@ -14,7 +15,9 @@ const updateDb = (collectionName) => {
     return async (req) => {
         // console.log(`update ledger entry: ${JSON.stringify(req.update, null, 4)}`)
         if (Object.keys(req.update).length !== 0) {
-            await req.context.mongo.setEntry(collectionName, req.params.entryId, req.headers.id, req.update)
+            const flatten = flattenObject(req.update)
+            console.log(`updateEntry: ${JSON.stringify(flatten)}`)
+            await req.context.mongo.setEntry(collectionName, req.params.entryId, req.headers.id, flatten)
         }
     }
 }
