@@ -14,6 +14,7 @@ import {routePostEntry} from "./handlers/postEntry.mjs";
 import {routePutEntry} from "./handlers/putEntry.mjs";
 import {routeGetEntry} from "./handlers/getEntry.mjs";
 import {routeGetLedgerStatistics} from "./handlers/getLedgerStatistics.mjs";
+import {routeGetJournalStatistics} from "./handlers/getJournalStatistics.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -34,6 +35,7 @@ export function setup(app, {setup, teardown}) {
     routePostSiteRecord(router)
     routePutSiteRecord(router)
     routeGetLedgerStatistics(router)
+    routeGetJournalStatistics(router)
 
     teardown(router)
 }

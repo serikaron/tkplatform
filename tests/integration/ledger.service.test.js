@@ -327,6 +327,14 @@ describe("test ledger statistics", () => {
     const userId = `${new ObjectId()}`
     describe("prepare data", () => {
         const entries = [
+            // not count
+            {
+                principle: {amount: 10000, refunded: false},
+                commission: {amount: 10000, refunded: false},
+                status: 1,
+                createdAt: now() - 86400
+            },
+            // count
             {
                 principle: {amount: 100, refunded: false},
                 commission: {amount: 1000, refunded: false},
@@ -348,7 +356,9 @@ describe("test ledger statistics", () => {
         ]
         it("post to server", async () => {
             for (const entry of entries) {
-                entry.createdAt = now()
+                if (entry.createdAt === undefined) {
+                    entry.createdAt = now()
+                }
                 if (entry.principle === undefined) {
                     entry.principle = {amount: 0, refunded: true}
                 }
@@ -380,6 +390,48 @@ describe("test ledger statistics", () => {
                     })
                 }
             })
+        })
+    })
+})
+
+describe("test journal statistics", () => {
+    const userId = `${new ObjectId()}`
+
+    it.each([
+        // not count
+        {amount: 1000, credited: true, createdAt: now()-86400},
+        // count
+        {amount: 100, credited: false},
+        {amount: 200, credited: true}
+    ])("($#) prepare journal entry", async (entry) => {
+        if (entry.credited === undefined) {
+            entry.credited = now()
+        }
+        await addEntry("journal", entry, userId)
+    })
+
+    it.each([
+        {principle: {amount: 100, refunded: true}},
+        {principle: {amount: 200, refunded: false}},
+    ])("($#) prepare ledger entry", async (entry) => {
+        entry.createdAt = now()
+        await addEntry("ledger", entry, userId)
+    })
+
+    it("check statistics", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/journal/statistics/${now() - 100}/${now() + 100}`,
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data).toStrictEqual({
+                    notYetCredited: 100,
+                    credited: 200,
+                    principle: 300
+                })
+            }
         })
     })
 })

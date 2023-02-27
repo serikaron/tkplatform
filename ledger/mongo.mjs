@@ -113,6 +113,60 @@ export async function setupMongo(req) {
                 .aggregate(pipeline)
                 .toArray()
         },
+        sumLedgerPrinciple: async (userId, minDate, maxDate) => {
+            return await collection.ledgerEntries
+                .aggregate([
+                    {
+                        $match: {
+                            userId: new ObjectId(userId),
+                            createdAt: {$gte: minDate, $lt: maxDate}
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            principle: {$sum: "$principle.amount"}
+                        }
+                    }
+                ])
+                .toArray()
+        },
+        getJournalStatistics: async (userId, minDate, maxDate) => {
+            const pipeline = [
+                {
+                    $match: {
+                        userId: new ObjectId(userId),
+                        createdAt: {$gte: minDate, $lt: maxDate}
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        notYetCredited: {
+                            $sum: {
+                                $cond: [
+                                    {$eq: ["$credited", false]},
+                                    "$amount",
+                                    0
+                                ]
+                            }
+                        },
+                        credited: {
+                            $sum: {
+                                $cond: [
+                                    {$eq: ["$credited", true]},
+                                    "$amount",
+                                    0
+                                ]
+                            }
+                        },
+                    }
+                }
+            ]
+            return await collection.withdrawJournalEntries
+                .aggregate(pipeline)
+                .toArray()
+        },
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()
         },
