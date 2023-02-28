@@ -5,7 +5,7 @@ import {runTest} from "./api.mjs";
 import {simpleVerification} from "./verification.mjs";
 
 test.each([
-    {path: "/v1/stores"},
+    {path: "/v1/ledger/stores"},
     {path: "/v1/ledger/accounts"}
 ])("$path should live", async ({path}) => {
     await runTest(
