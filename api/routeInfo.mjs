@@ -9,6 +9,8 @@ const routeInfo = [
     {url: '/v1/user/password', method: "POST", needAuth: false},
 
     {url: "/v1/user/member", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/overview", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/overview", method: "PUT", needAuth: true, service: {baseURL: "http://user:8080"}},
 
     // site
     {

@@ -262,9 +262,9 @@
 
 /**
  * @swagger
- * /v1/user/overview(帐号总览):
+ * /v1/user/overview(查询帐号总览):
  *   get:
- *     tags: ["user(用户相关)","个人中心"]
+ *     tags: ["user(用户相关)","个人中心","已实现"]
  *     parameters:
  *     - in: path
  *       name: id
@@ -291,14 +291,91 @@
  *                       type: number
  *                 rechargeCount:
  *                   type: number
- *                 memberExpiration:
- *                   type: number
+ *                 member:
+ *                   type: object
+ *                   properties:
+ *                     expiration:
+ *                       type: number
  *                 siteCount:
  *                   type: number
- *                 phone:
+ *                 contact:
+ *                   type: object
+ *                   properties:
+ *                     qq:
+ *                       type: object
+ *                       properties:
+ *                         account:
+ *                           type: string
+ *                         open:
+ *                           type: boolean
+ *                     wechat:
+ *                       type: object
+ *                       properties:
+ *                         account:
+ *                           type: string
+ *                         open:
+ *                           type: boolean
+ *                     phone:
+ *                       type: object
+ *                       properties:
+ *                         open:
+ *                           type: boolean
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/overview(更新帐号总览):
+ *   put:
+ *     tags: ["user(用户相关)","个人中心","已实现"]
+ *     requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 name:
  *                   type: string
- *                 qq:
- *                   type: string
+ *                 registeredAt:
+ *                   type: number
+ *                 activeDays:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: number
+ *                     30:
+ *                       type: number
+ *                 rechargeCount:
+ *                   type: number
+ *                 member:
+ *                   type: object
+ *                   properties:
+ *                     expiration:
+ *                       type: number
+ *                 siteCount:
+ *                   type: number
+ *                 contact:
+ *                   type: object
+ *                   properties:
+ *                     qq:
+ *                       type: object
+ *                       properties:
+ *                         account:
+ *                           type: string
+ *                         open:
+ *                           type: boolean
+ *                     wechat:
+ *                       type: object
+ *                       properties:
+ *                         account:
+ *                           type: string
+ *                         open:
+ *                           type: boolean
+ *                     phone:
+ *                       type: object
+ *                       properties:
+ *                         open:
+ *                           type: boolean
  *
  */
 
