@@ -90,6 +90,10 @@ export async function setupMongo(req) {
             const total = await collection.withdrawJournalEntries
                 .countDocuments(filter)
             return {total, items}
+        },
+        countUserSites: async (userId) => {
+            return await collection.userSites
+                .countDocuments({userId: new ObjectId(userId)})
         }
     }
 }

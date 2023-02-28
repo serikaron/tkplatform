@@ -10,6 +10,7 @@ import {routeGetSitesBalance} from "./handlers/getUserSitesBalance.mjs";
 import {routePutUserSiteBalance} from "./handlers/putUserSiteBalance.mjs";
 import {routePostUserSiteJournalEntry} from "./handlers/postUserSiteJournalEntry.mjs";
 import {routeGetUserSiteJournalEntries} from "./handlers/getUserSiteJournalEntries.mjs";
+import {routeCountUserSites} from "./handlers/countUserSites.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -26,6 +27,7 @@ export function setup(app, {setup, teardown}) {
     routePutUserSiteBalance(router)
     routePostUserSiteJournalEntry(router)
     routeGetUserSiteJournalEntries(router)
+    routeCountUserSites(router)
 
     teardown(router)
 }

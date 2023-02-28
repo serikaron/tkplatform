@@ -355,4 +355,32 @@ describe("test site service", () => {
             })
         })
     })
+
+    describe("test count user sites", () => {
+        const box = new Box()
+        const userId = `${new ObjectId()}`
+
+        it("prepare 2 sites", async () => {
+            await getSites(userId, box)
+
+            box.data.userSite1 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite1)
+            box.data.userSite2 = box.getEmptyUserSite()
+            box.data.userSite2.site = box.data.sites[1]
+            await addUserSite(box.data.sites[1].id, userId, box.data.userSite2)
+        })
+
+        it("count", async () => {
+            await runTest({
+                method: "GET",
+                path: "/v1/user/sites/count",
+                baseURL,
+                userId,
+                verify: response => {
+                    simpleVerification(response)
+                    expect(response.data.count).toBe(2)
+                }
+            })
+        })
+    })
 })
