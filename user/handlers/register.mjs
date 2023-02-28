@@ -3,6 +3,7 @@
 import {makeMiddleware} from "../../common/flow.mjs";
 import {RegisterFailed, UserExists, UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs"
 import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {now} from "../../common/utils.mjs";
 
 // import argon2i from "argon2";
 
@@ -63,15 +64,26 @@ async function verifySms(req) {
 
 async function registerHandler(req) {
     const register = async ({registerUser, inviter, config = {daysForRegister: 7, daysForInvite: 3}}) => {
-        function todayTimestamp() {
-            return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
-        }
-
         // registerUser.password = await argon2i.hash(registerUser.password)
         registerUser.password = await req.context.password.encode(registerUser.password)
         registerUser.member = {
-            expiration: todayTimestamp() + config.daysForRegister * 86400
+            expiration: now() + config.daysForRegister * 86400
         }
+        registerUser.registeredAt = now()
+        registerUser.contact = {
+            qq: {
+                account: req.body.qq === undefined ? "" : req.body.qq,
+                open: false
+            },
+            wechat: {
+                account: req.body.wechat === undefined ? "" : req.body.wechat,
+                open: false
+            },
+            phone: {
+                open: false
+            }
+        }
+        registerUser.name = req.body.name === undefined ? "" : req.body.name
 
         if (inviter === undefined) {
             return {
@@ -85,7 +97,7 @@ async function registerHandler(req) {
         } else {
             inviter.downLines.push(registerUser.phone)
         }
-        const baseline = Math.max(inviter.member.expiration, todayTimestamp())
+        const baseline = Math.max(inviter.member.expiration, now())
         inviter.member.expiration = baseline + config.daysForInvite * 86400
         return {
             registerUser, inviter

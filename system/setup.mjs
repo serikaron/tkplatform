@@ -9,9 +9,9 @@ export function setup(app, {setup, teardown}) {
     setup(router)
 
     router.get("/setting/:key", async (req, res, next) => {
-        const value = await req.context.mongo.get(req.params.key)
+        const dbRes = await req.context.mongo.get(req.params.key)
         res.response({
-            data: value === null ? {} : value
+            data: dbRes === null ? {} : dbRes.value
         })
         next()
     })

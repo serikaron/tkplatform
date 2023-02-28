@@ -4,6 +4,7 @@ import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
+import {now} from "../../common/utils.mjs";
 
 dotenv.config()
 
@@ -56,7 +57,8 @@ describe("test user service", () => {
             userId: box.userId,
             verify: response => {
                 simpleVerification(response)
-                expect(response.data.expiration).not.toBeUndefined()
+                expect(response.data.expiration).toBeDefined()
+                expect(response.data.expiration).toEqual(now()+86400*7)
             }
         })
     })

@@ -9,9 +9,19 @@ import {jest} from "@jest/globals"
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
-function todayTimestamp() {
-    return Math.floor(new Date(new Date().toISOString().slice(0, 10).replaceAll("-", "/")).getTime() / 1000)
+const RealDate = Date.now
+const mockNow = () => {
+    return 0
 }
+
+beforeAll(() => {
+    // global.Date.now = () => { return 1677571421 }
+    global.Date.now = mockNow
+})
+
+afterAll(() => {
+    global.Date.now = RealDate
+})
 
 async function runTest(
     {
@@ -89,7 +99,13 @@ describe("test register", () => {
             {phone: "13333333333", password: "123456", inviter: {}},
             {phone: "13333333333", password: "123456"},
             {},
-            {"inviter":{"phone":"14711111111"},"password":"111111","phone":"18938901487","qq":"2KIP","smsCode":"3059"},
+            {
+                "inviter": {"phone": "14711111111"},
+                "password": "111111",
+                "phone": "18938901487",
+                "qq": "2KIP",
+                "smsCode": "3059"
+            },
         ]
         it("should return InvalidArgument", async () => {
             await Promise.all(bodies.map(body => {
@@ -166,27 +182,27 @@ describe("test register", () => {
             expect(encodePassword).toHaveBeenCalledWith("123456")
         })
         test.concurrent.each([
-            {daysForRegister: 7, daysForInvite: 3, expectUserExpiration: todayTimestamp() + 7 * 86400},
+            {daysForRegister: 7, daysForInvite: 3, expectUserExpiration: mockNow() + 7 * 86400},
             {
                 daysForRegister: 7,
                 daysForInvite: 3,
-                expectUserExpiration: todayTimestamp() + 7 * 86400,
-                inviterExpiration: todayTimestamp(),
-                expectInviterExpiration: todayTimestamp() + 3 * 86400
+                expectUserExpiration: mockNow() + 7 * 86400,
+                inviterExpiration: mockNow(),
+                expectInviterExpiration: mockNow() + 3 * 86400
             },
             {
                 daysForRegister: 6,
                 daysForInvite: 2,
-                expectUserExpiration: todayTimestamp() + 6 * 86400,
-                inviterExpiration: todayTimestamp() - 86400,
-                expectInviterExpiration: todayTimestamp() + 2 * 86400
+                expectUserExpiration: mockNow() + 6 * 86400,
+                inviterExpiration: mockNow() - 86400,
+                expectInviterExpiration: mockNow() + 2 * 86400
             },
             {
                 daysForRegister: 5,
                 daysForInvite: 1,
-                expectUserExpiration: todayTimestamp() + 5 * 86400,
-                inviterExpiration: todayTimestamp() + 3 * 86400,
-                expectInviterExpiration: todayTimestamp() + 4 * 86400
+                expectUserExpiration: mockNow() + 5 * 86400,
+                inviterExpiration: mockNow() + 3 * 86400,
+                expectInviterExpiration: mockNow() + 4 * 86400
             },
         ])("($#) should extend member expiration correctly", async (
             {
@@ -273,7 +289,7 @@ describe("test register", () => {
                         dbUsers: c.inviterPhone === undefined ? {} : {
                             [c.inviterPhone]: {
                                 id: c.inviterPhone,
-                                member: {expiration: todayTimestamp()},
+                                member: {expiration: mockNow()},
                                 downLines: c.existsDownLines
                             }
                         },
@@ -295,6 +311,53 @@ describe("test register", () => {
                         msg: "注册成功"
                     })
                 })
+            })
+        })
+
+        it.only("full user information check", async () => {
+            let registerUser = undefined
+            await runTest({
+                body: {
+                    phone: "13333333333",
+                    password: "123456",
+                    smsCode: "1234",
+                    qq: "1234567890",
+                },
+                insertAndUpdate: () => {
+                },
+                tokenFn: () => {
+                    return new TKResponse(200, {code: 0})
+                },
+                verify: async (req) => {
+                    registerUser = req.updateDB.registerUser
+                    expect(req.updateDB.registerUser.phone).toBe("13333333333")
+                    expect(req.updateDB.registerUser.password).toBe("encodedPassword")
+                },
+                status: 201,
+                code: 0,
+                msg: "注册成功"
+            })
+            expect(registerUser).toStrictEqual({
+                phone: "13333333333",
+                password: "encodedPassword",
+                member: {
+                    expiration: mockNow() + 7 * 86400
+                },
+                registeredAt: mockNow(),
+                contact: {
+                    qq: {
+                        account: "1234567890",
+                        open: false
+                    },
+                    wechat: {
+                        account: "",
+                        open: false
+                    },
+                    phone: {
+                        open: false
+                    }
+                },
+                name: "",
             })
         })
     })
@@ -324,7 +387,7 @@ describe("test register", () => {
                     dbUsers: s.inviter === undefined ? {} : {
                         [s.inviter.id]: {
                             id: s.inviter.id,
-                            member: {expiration: todayTimestamp()},
+                            member: {expiration: mockNow()},
                         }
                     },
                     insertAndUpdate,
@@ -390,7 +453,7 @@ describe("test register", () => {
             dbUsers: scenarios.body.inviter === undefined ? {} : {
                 [scenarios.body.inviter.id]: {
                     _id: scenarios.body.inviter.id,
-                    member: {expiration: todayTimestamp()}
+                    member: {expiration: mockNow()}
                 }
             },
             insertAndUpdate: async () => {
