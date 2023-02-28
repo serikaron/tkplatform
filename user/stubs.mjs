@@ -44,6 +44,26 @@ export function setupStub(req) {
                     })
                 }
             }
+        },
+        site: {
+            countUserSites: async (userId) => {
+                return await axiosCall({
+                    url: '/v1/user/sites/count',
+                    baseURL: "http://site:8080",
+                    method: "GET",
+                    headers: {id: userId}
+                })
+            }
+        },
+        payment: {
+            countRecharge: async (userId) => {
+                return await axiosCall({
+                    url: "/v1/recharge/count",
+                    baseURL: "http://payment:8080",
+                    method: "GET",
+                    headers: {id: userId}
+                })
+            }
         }
     }
 }

@@ -79,6 +79,24 @@ export async function setupMongo(req) {
             await collection.users
                 .updateOne({_id: id}, {$set: {phone, password}})
         },
+        getOverview: async (userId) => {
+            return await collection.users
+                .findOne({
+                    _id: new ObjectId(userId)
+                }, {
+                    projection: {
+                        _id: 0, name: 1, contact: 1, member: 1, registeredAt: 1
+                    }
+                })
+        },
+        updateOverview: async (userId, update) => {
+            await collection.users
+                .updateOne({
+                    _id: new ObjectId(userId)
+                }, {
+                    $set: update
+                })
+        }
     }
 }
 
