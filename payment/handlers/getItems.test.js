@@ -10,14 +10,14 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 
 describe.each([
     {
-        path: "/v1/member/items",
+        path: "/v1/store/member/items",
         items: [{msg: "a fake member item"}],
         memberFn: jest.fn(async () => {
             return [{msg: "a fake member item"}]
         })
     },
     {
-        path: "/v1/rice/items",
+        path: "/v1/store/rice/items",
         items: [{msg: "a fake rice item"}],
         riceFn: jest.fn(async () => {
             return [{msg: "a fake rice item"}]

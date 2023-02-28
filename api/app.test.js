@@ -264,7 +264,7 @@ test.concurrent.each([
         }
     },
     {
-        url: "/v1/stores",
+        url: "/v1/ledger/stores",
         method: "GET",
         needAuth: true,
         service: {

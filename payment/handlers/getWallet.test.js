@@ -8,34 +8,57 @@ import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
-test("get wallet from db", async () => {
-    const getWallet = jest.fn(async () => {
-        return {
-            rice: 1000
+describe.each([
+    {
+        dbWallet: {},
+        tkWallet: {
+            rice: 0,
+            cash: 0
         }
-    })
-    const app = createApp()
-    setup(app, {
-        setup: testDIContainer.setup([
-            (req, res, next) => {
-                req.context = {
-                    mongo: {
-                        getWallet,
+    },
+    {
+        dbWallet: null,
+        tkWallet: {
+            rice: 0,
+            cash: 0
+        }
+    },
+    {
+        dbWallet: {
+            rice: 1000,
+            cash: 1000
+        },
+        tkWallet: {
+            rice: 1000,
+            cash: 1000
+        }
+    },
+])("($#) wallet scenario", ({dbWallet, tkWallet}) => {
+    test("get wallet from db", async () => {
+        const getWallet = jest.fn(async () => {
+            return dbWallet
+        })
+        const app = createApp()
+        setup(app, {
+            setup: testDIContainer.setup([
+                (req, res, next) => {
+                    req.context = {
+                        mongo: {
+                            getWallet,
+                        }
                     }
+                    next()
                 }
-                next()
-            }
-        ]),
-        teardown: testDIContainer.teardown([])
-    })
+            ]),
+            teardown: testDIContainer.teardown([])
+        })
 
-    const response = await supertest(app)
-        .get("/v1/wallet")
-        .set({id: "a fake user id"})
-    simpleCheckTKResponse(response, TKResponse.Success({
-        data: {
-            rice: 1000
-        }
-    }))
-    expect(getWallet).toHaveBeenCalledWith("a fake user id")
+        const response = await supertest(app)
+            .get("/v1/wallet")
+            .set({id: "a fake user id"})
+        simpleCheckTKResponse(response, TKResponse.Success({
+            data: tkWallet
+        }))
+        expect(getWallet).toHaveBeenCalledWith("a fake user id")
+    })
 })
