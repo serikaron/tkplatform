@@ -2,7 +2,7 @@
 
 /**
  * @swagger
- * /v1/stores(系统商城):
+ * /v1/ledger/stores(系统商城-记帐帐本):
  *   get:
  *     tags: ["ledger(记帐帐本)", "已实现"]
  *     description: 系统商城列表
