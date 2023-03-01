@@ -14,5 +14,9 @@ export class TKError extends Error {
     get code() {
         return this._code
     }
+
+    toString() {
+        return `{status:${this._status}, code:${this._code}, msg:${this.message}}`
+    }
 }
 

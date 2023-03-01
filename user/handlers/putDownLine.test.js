@@ -1,0 +1,42 @@
+'use restrict'
+
+import {jest} from "@jest/globals";
+import createApp from "../../common/app.mjs";
+import {setup} from "../server.mjs";
+import testDIContainer from "../../tests/unittest/dicontainer.mjs";
+import supertest from "supertest";
+import {ObjectId} from "mongodb";
+import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
+import {TKResponse} from "../../common/TKResponse.mjs";
+
+test("just update alias", async () => {
+    const updateDownLine = jest.fn()
+
+    const app = createApp()
+    setup(app, {
+        setup: testDIContainer.setup([
+            (req, res, next) => {
+                req.context = {
+                    mongo: {
+                        updateDownLine
+                    }
+                }
+                next()
+            }
+        ]),
+        teardown: testDIContainer.teardown([])
+    })
+
+    const userId = new ObjectId()
+    const downLineUser = new ObjectId()
+    const response = await supertest(app)
+        .put(`/v1/user/downLine/${downLineUser}`)
+        .send({
+            alias: "abc",
+            illegalField: "should not update"
+        })
+        .set({id: `${userId}`})
+
+    simpleCheckTKResponse(response, TKResponse.Success())
+    expect(updateDownLine).toHaveBeenCalledWith(`${userId}`, `${downLineUser}`, {alias: "abc"})
+})

@@ -8,6 +8,8 @@ import {route as routeResetAccount} from "./handlers/resetAccount.mjs"
 import {routeGetUserMember} from "./handlers/getUserMember.mjs";
 import {routeGetUserOverview} from "./handlers/getUserOverview.mjs";
 import {routePutUserOverview} from "./handlers/putUserOverview.mjs";
+import {routeGetDownLines} from "./handlers/getDownLines.mjs";
+import {routePutUserDownLine} from "./handlers/putDownLine.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -24,6 +26,8 @@ export function setup(app, {
     routeGetUserMember(router)
     routeGetUserOverview(router)
     routePutUserOverview(router)
+    routeGetDownLines(router)
+    routePutUserDownLine(router)
 
     teardown(router)
 }

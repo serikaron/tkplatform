@@ -36,13 +36,14 @@ function genPhone() {
     return `${randomPrefix}${randomSuffix}`
 }
 
-const register = async (phone, box) => {
+const register = async (phone, box, inviter) => {
     await runTest({
         baseURL,
         method: "POST",
         path: "/v1/user/register",
         body: {
             phone,
+            inviter,
             password: "123456",
             smsCode: "2065",
             qq: "1234567890"
@@ -82,7 +83,7 @@ describe("test user service", () => {
         })
     })
 
-    describe.only("test user overview", () => {
+    describe("test user overview", () => {
         const box = new Box()
         const phone = genPhone()
         it("prepare user", async () => {
@@ -153,6 +154,84 @@ describe("test user service", () => {
                     })
                 }
             })
+        })
+    })
+
+    describe("test downLines", () => {
+        const box = new Box()
+        const check = async () => {
+            await runTest({
+                method: "GET",
+                path: "/v1/user/downLines",
+                baseURL,
+                userId: box.data.inviter.id,
+                verify: response => {
+                    simpleVerification(response)
+                    expect(response.data.total).toBe(box.data.downLines.length)
+                    response.data.items.forEach(x => {
+                        expect(x.registeredAt).toBeGreaterThan(now() - 10)
+                        expect(x.registeredAt).toBeLessThanOrEqual(now())
+                        delete x.registeredAt
+                        expect(x.member.expiration).toBeGreaterThan(now() + 7 * 86400 - 10)
+                        expect(x.member.expiration).toBeLessThanOrEqual(now() + 7 * 86400)
+                        delete x.member.expiration
+                    })
+                    expect(response.data.items).toStrictEqual(
+                        box.data.downLines.map(x => {
+                            return {
+                                id: x.id,
+                                phone: x.phone,
+                                lastLoginAt: 0,
+                                // registeredAt: now(),
+                                member: {
+                                    // expiration: now() + 7 * 86400
+                                },
+                                name: "",
+                                alias: x.alias === undefined ? "" : x.alias
+                            }
+                        })
+                    )
+                }
+            })
+        }
+
+        it("register inviter", async () => {
+            await register(genPhone(), box)
+            box.data.inviter = {id: box.userId}
+        })
+
+        it("add two down lines", async () => {
+            box.data.downLines = []
+            for (let i = 0; i < 2; ++i) {
+                const phone = genPhone()
+                await register(phone, box, {id: box.data.inviter.id})
+                box.data.downLines.push({
+                    id: box.userId,
+                    phone
+                })
+            }
+        })
+
+        it("check", async () => {
+            await check()
+        })
+
+        it("set alias", async () => {
+            await runTest({
+                method: "PUT",
+                path: `/v1/user/downLine/${box.data.downLines[0].id}`,
+                body: {alias: "alias"},
+                baseURL,
+                userId: box.data.inviter.id,
+                verify: response => {
+                    expect(response.status).toBe(200)
+                    box.data.downLines[0].alias = "alias"
+                }
+            })
+        })
+
+        it("check after update", async () => {
+            await check()
         })
     })
 })

@@ -61,7 +61,14 @@ export function replaceId(obj) {
 }
 
 export function copy(obj) {
-    return JSON.parse(JSON.stringify(obj))
+    // return JSON.parse(JSON.stringify(obj))
+    if (Array.isArray(obj)) {
+        return obj.slice()
+    }
+    if (typeof obj === "object") {
+        return Object.assign({}, obj)
+    }
+    return obj
 }
 
 export function flattenObject(obj, prefix = "") {

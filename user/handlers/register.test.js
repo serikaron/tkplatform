@@ -4,10 +4,12 @@ import {setup as setupServer} from '../server.mjs'
 import createApp from "../../common/app.mjs";
 import supertest from 'supertest'
 import {makeMiddleware} from "../../common/flow.mjs";
-import {parallelRun, serialTest, simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
+import {simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals"
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {ObjectId} from "mongodb";
+import {copy} from "../../common/utils.mjs";
 
 const RealDate = Date.now
 const mockNow = () => {
@@ -26,8 +28,8 @@ afterAll(() => {
 async function runTest(
     {
         body = {phone: "13333333333", password: "123456", smsCode: "1234"},
-        dbUsers = {},
-        verify = () => {
+        getUserByPhone = async () => {
+            return null
         },
         systemFn = async () => {
             return TKResponse.Success({
@@ -37,13 +39,33 @@ async function runTest(
                 }
             })
         },
-        insertAndUpdate = undefined,
-        tokenFn = undefined,
+        tokenFn = async () => {
+            return TKResponse.Success({
+                data: {
+                    accessToken: "accessToken",
+                    refreshToken: "refreshToken"
+                }
+            })
+        },
         smsFn = async () => {
             return TKResponse.Success()
         },
         encodeFn = async () => {
             return "encodedPassword"
+        },
+        register = async () => {
+            return new ObjectId()
+        },
+        updateInviter = async () => {
+            return true
+        },
+        getInviter = async (id) => {
+            return {
+                _id: new ObjectId(id),
+                member: {
+                    expiration: mockNow()
+                }
+            }
         },
         status, code, msg,
         data = {},
@@ -55,13 +77,10 @@ async function runTest(
             (req) => {
                 req.context = {
                     mongo: {
-                        getUserByPhone: async (find) => {
-                            return find.phone in dbUsers ? dbUsers[find.phone] : null
-                        },
-                        getUserById: async (id) => {
-                            return id in dbUsers ? dbUsers[id] : null
-                        },
-                        insertAndUpdate,
+                        getUserByPhone,
+                        register,
+                        updateInviter,
+                        getInviter,
                     },
                     stubs: {
                         token: {
@@ -82,7 +101,7 @@ async function runTest(
                 }
             },
         ])),
-        teardown: testDIContainer.teardown(makeMiddleware([verify]))
+        teardown: testDIContainer.teardown(makeMiddleware([]))
     })
 
     const response = await supertest(app)
@@ -92,56 +111,60 @@ async function runTest(
 }
 
 describe("test register", () => {
-    describe("invalid body", () => {
-        const bodies = [
-            {phone: "13333333333", inviter: {id: "13444444444"}},
-            {password: "123456", inviter: {id: "13444444444"}},
-            {phone: "13333333333", password: "123456", inviter: {}},
-            {phone: "13333333333", password: "123456"},
-            {},
-            {
-                "inviter": {"phone": "14711111111"},
-                "password": "111111",
-                "phone": "18938901487",
-                "qq": "2KIP",
-                "smsCode": "3059"
-            },
-        ]
-        it("should return InvalidArgument", async () => {
-            await Promise.all(bodies.map(body => {
-                return runTest({
-                    body,
-                    status: 400,
-                    code: -1,
-                    msg: "参数错误"
-                })
-            }))
-        })
-    })
-    describe("phone already been registered", () => {
-        const dbUsers = {
-            "13333333333": {}
-        }
-        it("should return UserExists", async () => {
+    describe.each([
+        {phone: "13333333333", inviter: {id: "13444444444"}},
+        {password: "123456", inviter: {id: "13444444444"}},
+        {phone: "13333333333", password: "123456", inviter: {}},
+        {phone: "13333333333", password: "123456"},
+        {},
+        {
+            "inviter": {"phone": "14711111111"},
+            "password": "111111",
+            "phone": "18938901487",
+            "qq": "2KIP",
+            "smsCode": "3059"
+        },
+    ])("($#) invalid body", (body) => {
+        it.concurrent("should return InvalidArgument", async () => {
             await runTest({
-                body: {phone: "13333333333", password: "123456", smsCode: "1234"},
-                dbUsers,
-                status: 409,
-                code: -10001,
-                msg: "手机已注册"
+                body,
+                status: 400,
+                code: -1,
+                msg: "参数错误"
             })
         })
     })
+
+    test("phone already been registered should return UserExists", async () => {
+        const getUserByPhone = jest.fn(async () => {
+            return {
+                phone: "13333333333"
+            }
+        })
+        await runTest({
+            body: {phone: "13333333333", password: "123456", smsCode: "1234"},
+            getUserByPhone,
+            status: 409,
+            code: -10001,
+            msg: "手机已注册"
+        })
+        expect(getUserByPhone).toHaveBeenCalledWith({phone: "13333333333"}, {_id: 1})
+    })
+
     describe("inviter can not be found", () => {
         it("should return UserNotExists", async () => {
             await runTest({
                 body: {phone: "13333333333", password: "123456", smsCode: "1234", inviter: {id: "abcde"}},
+                getInviter: async () => {
+                    return null
+                },
                 status: 404,
                 code: -10002,
                 msg: "邀请人不存在"
             })
         })
     })
+
     test("invalid sms code should return error", async () => {
         const smsFn = jest.fn(async () => {
             return new TKResponse(400, {code: -1})
@@ -155,167 +178,93 @@ describe("test register", () => {
         })
         expect(smsFn).toHaveBeenCalledWith("13333333333", "1234")
     })
-    describe("processing register logic", () => {
-        it("should return encrypted password", async () => {
-            const encodePassword = jest.fn(async () => {
-                return "encodedPassword"
-            })
+
+    describe("when get token failed", () => {
+        it("should also return a partial success", async () => {
             await runTest({
-                body: {phone: "13333333333", password: "123456", smsCode: "1234"},
-                insertAndUpdate: () => {
-                },
                 tokenFn: () => {
-                    return new TKResponse(200, {code: 0})
-                },
-                verify: async (req) => {
-                    expect(req.updateDB.registerUser.phone).toBe("13333333333")
-                    expect(req.updateDB.registerUser.password).toBe("encodedPassword")
-                    // expect(req.updateDB.registerUser.password === "123456").not.toBe(true)
-                    // const passwordMatched = await argon2i.verify(req.updateDB.registerUser.password, "123456")
-                    // expect(passwordMatched).toBe(true)
-                },
-                encodeFn: encodePassword,
-                status: 201,
-                code: 0,
-                msg: "注册成功"
-            })
-            expect(encodePassword).toHaveBeenCalledWith("123456")
-        })
-        test.concurrent.each([
-            {daysForRegister: 7, daysForInvite: 3, expectUserExpiration: mockNow() + 7 * 86400},
-            {
-                daysForRegister: 7,
-                daysForInvite: 3,
-                expectUserExpiration: mockNow() + 7 * 86400,
-                inviterExpiration: mockNow(),
-                expectInviterExpiration: mockNow() + 3 * 86400
-            },
-            {
-                daysForRegister: 6,
-                daysForInvite: 2,
-                expectUserExpiration: mockNow() + 6 * 86400,
-                inviterExpiration: mockNow() - 86400,
-                expectInviterExpiration: mockNow() + 2 * 86400
-            },
-            {
-                daysForRegister: 5,
-                daysForInvite: 1,
-                expectUserExpiration: mockNow() + 5 * 86400,
-                inviterExpiration: mockNow() + 3 * 86400,
-                expectInviterExpiration: mockNow() + 4 * 86400
-            },
-        ])("($#) should extend member expiration correctly", async (
-            {
-                daysForInvite,
-                daysForRegister,
-                expectInviterExpiration,
-                expectUserExpiration,
-                inviterExpiration
-            }
-        ) => {
-            const systemFn = jest.fn(async () => {
-                return TKResponse.Success({data: {daysForRegister, daysForInvite}})
-            })
-            await runTest({
-                body: {
-                    phone: "13333333333",
-                    password: "123456",
-                    inviter: inviterExpiration === undefined ? undefined : {
-                        id: "13444444444",
-                    },
-                    smsCode: "1234"
-                },
-                dbUsers: inviterExpiration === undefined ? {} : {
-                    "13444444444": {
-                        id: "13444444444",
-                        member: {
-                            expiration: inviterExpiration
-                        }
-                    }
-                },
-                insertAndUpdate: () => {
-                },
-                tokenFn: () => {
-                    return new TKResponse(200, {code: 0})
-                },
-                verify: (req) => {
-                    expect(req.updateDB.registerUser.member.expiration).toBe(expectUserExpiration)
-                    if (expectInviterExpiration === undefined) {
-                        expect(req.updateDB.inviter).toBe(undefined)
-                    } else {
-                        expect(req.updateDB.inviter.member.expiration).toBe(expectInviterExpiration)
-                    }
-                },
-                systemFn,
-                status: 201,
-                code: 0,
-                msg: "注册成功"
-            })
-            expect(systemFn).toHaveBeenCalledWith("registerPrice")
-        })
-        describe("has inviter or not", () => {
-            const configurations = [
-                {userPhone: "13333333333", expectUpLine: undefined},
-                {
-                    userPhone: "13333333333",
-                    inviterPhone: "13444444444",
-                    existsDownLines: [],
-                    expectUpLine: "13444444444",
-                    expectDownLines: ["13333333333"]
-                },
-                {
-                    userPhone: "13333333333",
-                    inviterPhone: "13444444444",
-                    expectUpLine: "13444444444",
-                    expectDownLines: ["13333333333"]
-                },
-                {
-                    userPhone: "13333333333",
-                    inviterPhone: "13444444444",
-                    existsDownLines: ["13222222222"],
-                    expectUpLine: "13444444444",
-                    expectDownLines: ["13222222222", "13333333333"]
-                }
-            ]
-            it("should set relationship correctly", async () => {
-                await parallelRun(configurations, async (c) => {
-                    await runTest({
-                        body: {
-                            phone: c.userPhone, password: "123456", smsCode: "1234",
-                            inviter: c.inviterPhone === undefined ? undefined : {
-                                id: c.inviterPhone,
-                            }
-                        },
-                        dbUsers: c.inviterPhone === undefined ? {} : {
-                            [c.inviterPhone]: {
-                                id: c.inviterPhone,
-                                member: {expiration: mockNow()},
-                                downLines: c.existsDownLines
-                            }
-                        },
-                        insertAndUpdate: () => {
-                        },
-                        tokenFn: () => {
-                            return new TKResponse(200, {code: 0})
-                        },
-                        verify: (req) => {
-                            expect(req.updateDB.registerUser.upLine).toBe(c.expectUpLine)
-                            if (c.inviterPhone === undefined) {
-                                expect(req.updateDB.inviter).toBe(undefined)
-                            } else {
-                                expect(req.updateDB.inviter.downLines).toStrictEqual(c.expectDownLines)
-                            }
-                        },
-                        status: 201,
-                        code: 0,
-                        msg: "注册成功"
+                    return new TKResponse(500, {
+                        code: -20001,
+                        msg: "error"
                     })
+                },
+                status: 201,
+                code: -20001,
+                msg: "注册成功，请重新登录"
+            })
+        })
+    })
+
+    test('all well done should return with token', async () => {
+        const tokenFn = jest.fn(async () => {
+            return new TKResponse(200, {
+                code: 0, msg: "success", data: {
+                    accessToken: "accessToken",
+                    refreshToken: "refreshToken"
+                }
+            })
+        })
+        const registerId = new ObjectId()
+        await runTest({
+            body: {phone: "13333333333", password: "12345", smsCode: "1234", inviter: {id: `${new ObjectId()}`}},
+            tokenFn,
+            register: async () => {
+                return registerId
+            },
+            status: 201,
+            code: 0,
+            msg: "注册成功",
+            data: {
+                accessToken: "accessToken",
+                refreshToken: "refreshToken"
+            }
+        })
+        expect(tokenFn).toHaveBeenCalledWith({
+            id: `${registerId}`,
+            phone: "13333333333"
+        })
+    })
+
+    describe("update db", () => {
+        describe.each([
+            {
+                register: async () => {
+                    return null
+                },
+                updateInviter: async () => {
+                    return true
+                }
+            },
+            {
+                register: async () => {
+                    return new ObjectId()
+                },
+                updateInviter: async () => {
+                    return false
+                }
+            }
+        ])("($#) when failed", ({register, updateInviter}) => {
+            it("should return RegisterError", async () => {
+                await runTest({
+                    body: {
+                        phone: "13333333333",
+                        password: "123456",
+                        smsCode: "1234",
+                        inviter: {id: `${new ObjectId()}`}
+                    },
+                    register,
+                    updateInviter,
+                    status: 500,
+                    code: -10005,
+                    msg: "注册失败"
                 })
             })
         })
 
-        it.only("full user information check", async () => {
-            let registerUser = undefined
+        it("full user information check", async () => {
+            const register = jest.fn(async () => {
+                return new ObjectId()
+            })
             await runTest({
                 body: {
                     phone: "13333333333",
@@ -323,21 +272,15 @@ describe("test register", () => {
                     smsCode: "1234",
                     qq: "1234567890",
                 },
-                insertAndUpdate: () => {
-                },
+                register,
                 tokenFn: () => {
                     return new TKResponse(200, {code: 0})
-                },
-                verify: async (req) => {
-                    registerUser = req.updateDB.registerUser
-                    expect(req.updateDB.registerUser.phone).toBe("13333333333")
-                    expect(req.updateDB.registerUser.password).toBe("encodedPassword")
                 },
                 status: 201,
                 code: 0,
                 msg: "注册成功"
             })
-            expect(registerUser).toStrictEqual({
+            expect(register).toHaveBeenCalledWith({
                 phone: "13333333333",
                 password: "encodedPassword",
                 member: {
@@ -360,118 +303,124 @@ describe("test register", () => {
                 name: "",
             })
         })
-    })
-    test("update db failed should return RegisterError", async () => {
-        await runTest({
-            body: {phone: "13333333333", password: "123456", smsCode: "1234"},
-            insertAndUpdate: async () => {
-                return null
-            },
-            status: 500,
-            code: -10005,
-            msg: "注册失败"
-        })
-    })
-    describe("with various scenarios", () => {
-        const scenarios = [
-            {phone: "13333333333", password: "123456", smsCode: "1234"},
-            {phone: "13333333333", password: "123456", smsCode: "1234", inviter: {id: "13444444444"}}
-        ]
-        it("should update db correctly", async () => {
-            const insertAndUpdate = jest.fn(() => {
-                return "13333333333_user_id"
-            })
-            await serialTest(scenarios, async (s) => {
-                await runTest({
-                    body: s,
-                    dbUsers: s.inviter === undefined ? {} : {
-                        [s.inviter.id]: {
-                            id: s.inviter.id,
-                            member: {expiration: mockNow()},
-                        }
+
+        describe("test relationship", () => {
+            const registerId = new ObjectId()
+            const inviterId = new ObjectId()
+            const existDownLineId = new ObjectId()
+            describe.each([
+                {},
+                {
+                    inviter: {id: `${inviterId}`},
+                    existsDownLines: [],
+                    expectUpLine: inviterId,
+                    expectDownLines: [{id: registerId}]
+                },
+                {
+                    inviter: {id: `${inviterId}`},
+                    expectUpLine: inviterId,
+                    expectDownLines: [{id: registerId}]
+                },
+                {
+                    inviter: {id: `${inviterId}`},
+                    existsDownLines: [{id: existDownLineId}],
+                    expectUpLine: inviterId,
+                    expectDownLines: [{id: existDownLineId}, {id: registerId}]
+                }
+            ])("($#) with inviter or not", (relationship) => {
+                describe.each([
+                    // {daysForRegister: 7, daysForInvite: 3, expectUserExpiration: mockNow() + 7 * 86400},
+                    {
+                        daysForRegister: 7,
+                        daysForInvite: 3,
+                        expectUserExpiration: mockNow() + 7 * 86400,
+                        inviterExpiration: mockNow(),
+                        expectInviterExpiration: mockNow() + 3 * 86400
                     },
-                    insertAndUpdate,
-                    tokenFn: async () => {
-                        return new TKResponse(200, {code: 0})
+                    {
+                        daysForRegister: 6,
+                        daysForInvite: 2,
+                        expectUserExpiration: mockNow() + 6 * 86400,
+                        inviterExpiration: mockNow() - 86400,
+                        expectInviterExpiration: mockNow() + 2 * 86400
                     },
-                    verify: (req) => {
-                        if (s.inviter === undefined) {
-                            expect(req.context.mongo.insertAndUpdate).toHaveBeenCalledWith({user: req.updateDB.registerUser})
-                        } else {
-                            expect(req.context.mongo.insertAndUpdate).toHaveBeenCalledWith({
-                                user: req.updateDB.registerUser,
-                                inviter: {
-                                    filter: {_id: s.inviter.id},
-                                    update: {
-                                        $set: {
-                                            member: req.updateDB.inviter.member,
-                                            downLines: req.updateDB.inviter.downLines
-                                        }
-                                    }
+                    {
+                        daysForRegister: 5,
+                        daysForInvite: 1,
+                        expectUserExpiration: mockNow() + 5 * 86400,
+                        inviterExpiration: mockNow() + 3 * 86400,
+                        expectInviterExpiration: mockNow() + 4 * 86400
+                    },
+                ])("($#) with prize setting", (prize) => {
+                    it("all should be correct", async () => {
+                        const getInviter = jest.fn(async (id) => {
+                            console.log(`exists: ${JSON.stringify(relationship.existsDownLines)}`)
+                            return {
+                                _id: new ObjectId(id),
+                                downLines: copy(relationship.existsDownLines),
+                                member: {
+                                    expiration: prize.inviterExpiration
+                                }
+                            }
+                        })
+                        const register = jest.fn(async () => {
+                            return registerId
+                        })
+                        const updateInviter = jest.fn(async () => {
+                            return true
+                        })
+                        const systemFn = jest.fn(async () => {
+                            return TKResponse.Success({
+                                data: {
+                                    daysForRegister: prize.daysForRegister,
+                                    daysForInvite: prize.daysForInvite
                                 }
                             })
+                        })
+                        await runTest({
+                            body: copy({
+                                phone: "13333333333", password: "123456", smsCode: "1234",
+                                inviter: relationship.inviter,
+                            }),
+                            getInviter,
+                            updateInviter,
+                            register,
+                            systemFn,
+                            tokenFn: () => {
+                                return new TKResponse(200, {code: 0})
+                            },
+                            status: 201,
+                            code: 0,
+                            msg: "注册成功"
+                        })
+                        expect(register).toHaveBeenCalledWith({
+                            phone: "13333333333",
+                            password: "encodedPassword",
+                            member: {
+                                expiration: prize.expectUserExpiration
+                            },
+                            registeredAt: mockNow(),
+                            contact: {
+                                qq: {account: "", open: false},
+                                wechat: {account: "", open: false},
+                                phone: {open: false}
+                            },
+                            name: "",
+                            upLine: relationship.expectUpLine
+                        })
+                        if (relationship.inviter !== undefined) {
+                            expect(getInviter).toHaveBeenCalledWith(`${inviterId}`)
+                            console.log(`expect ${JSON.stringify(relationship.expectDownLines)}`)
+                            expect(updateInviter).toHaveBeenCalledWith(inviterId, {
+                                downLines: relationship.expectDownLines,
+                                "member.expiration": prize.expectInviterExpiration
+                            })
                         }
-                    },
-                    status: 201,
-                    code: 0,
-                    msg: "注册成功"
+                    })
                 })
             })
         })
-    })
-    describe("when get token failed", () => {
-        it("should also return a partial success", async () => {
-            await runTest({
-                insertAndUpdate: () => {
-                },
-                tokenFn: () => {
-                    return new TKResponse(500, {
-                        code: -20001,
-                        msg: "error"
-                    })
-                },
-                status: 201,
-                code: -20001,
-                msg: "注册成功，请重新登录"
-            })
-        })
-    })
-    test.concurrent.each([
-        {body: {phone: "13333333333", password: "12345", smsCode: "1234"}},
-        {body: {phone: "13333333333", password: "12345", smsCode: "1234", inviter: {id: "13444444444"}}},
-    ])('(well done scenarios ($#) should return with token', async (scenarios) => {
-        const tokenFn = jest.fn(() => {
-            return new TKResponse(200, {
-                code: 0, msg: "success", data: {
-                    accessToken: "accessToken",
-                    refreshToken: "refreshToken"
-                }
-            })
-        })
-        await runTest({
-            body: scenarios.body,
-            dbUsers: scenarios.body.inviter === undefined ? {} : {
-                [scenarios.body.inviter.id]: {
-                    _id: scenarios.body.inviter.id,
-                    member: {expiration: mockNow()}
-                }
-            },
-            insertAndUpdate: async () => {
-                return "13333333333_user_id"
-            },
-            tokenFn,
-            status: 201,
-            code: 0,
-            msg: "注册成功",
-            data: {
-                accessToken: "accessToken",
-                refreshToken: "refreshToken"
-            }
-        })
-        expect(tokenFn).toHaveBeenCalledWith({
-            id: "13333333333_user_id",
-            phone: "13333333333"
-        })
+
     })
 })
 

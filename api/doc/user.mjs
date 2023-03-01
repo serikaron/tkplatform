@@ -398,6 +398,7 @@
  *       schema:
  *         type: number
  *     responses:
+ *       200:
  *         content:
  *           application/json:
  *             schema:

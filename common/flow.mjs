@@ -53,6 +53,7 @@ export function errorHandler(error, req, res, next) {
         console.log(`path:${req.path}, body:${JSON.stringify(req.body)}`)
     }
     if (error instanceof TKError) {
+        // console.log(`TKError: ${error.toString()}`)
         res.response({
             status: error.status,
             code: error.code,

@@ -26,6 +26,47 @@ export async function setupMongo(req) {
             return await collection.users
                 .findOne({_id: new ObjectId(id)})
         },
+        getInviter: async (userId) => {
+            return await collection.users
+                .findOne({
+                    _id: new ObjectId(userId)
+                }, {
+                    projection: {downLines: 1, member: 1}
+                })
+        },
+        register: async (user) => {
+            // console.log(`register: ${JSON.stringify(user)}`)
+            const handlerError = (error) => {
+                if (error instanceof MongoServerError && error.code === 11000) {
+                    throw new UserExists()
+                } else {
+                    throw error;
+                }
+            }
+            try {
+                const result = await collection.users
+                    .insertOne(user)
+                return result.insertedId
+            } catch (error) {
+                handlerError(error)
+                return null
+            }
+        },
+        updateInviter: async (userId, update) => {
+            // console.log(`updateInviter: ${userId}, ${JSON.stringify(update)}`)
+            try {
+                await collection.users
+                    .updateOne({
+                        _id: new ObjectId(userId),
+                    }, {
+                        $set: update
+                    })
+                return true
+            } catch (e) {
+                console.log(e)
+                return false
+            }
+        },
         insertAndUpdate: async function ({user, inviter}) {
             const handlerError = (error) => {
                 if (error instanceof MongoServerError && error.code === 11000) {
@@ -95,6 +136,33 @@ export async function setupMongo(req) {
                     _id: new ObjectId(userId)
                 }, {
                     $set: update
+                })
+        },
+        getDownLines: async (userId) => {
+            const r = await collection.users
+                .findOne({
+                    _id: new ObjectId(userId)
+                }, {
+                    projection: {_id: 0, downLines: 1}
+                })
+            return r.downLines
+        },
+        getDownLineInfo: async (userId) => {
+            return await collection.users
+                .findOne({
+                    _id: new ObjectId(userId)
+                }, {
+                    projection: {_id: 0, phone: 1, registeredAt: 1, name: 1, member: 1}
+                })
+        },
+        updateDownLine: async (userId, downLineUserId, update) => {
+            await collection.users
+                .updateOne({
+                    _id: new ObjectId(userId)
+                }, {
+                    $set: {"downLines.$[downLine].alias": update.alias}
+                }, {
+                    arrayFilters:[{"downLine.id": new ObjectId(downLineUserId)}]
                 })
         }
     }

@@ -38,7 +38,7 @@ async function getInviter(req) {
     if (req.body.inviter === undefined) {
         return
     }
-    const inviter = await req.context.mongo.getUserById(req.body.inviter.id)
+    const inviter = await req.context.mongo.getInviter(req.body.inviter.id)
     if (inviter === null) {
         throw new UserNotExists({msg: "邀请人不存在"})
     }
@@ -62,84 +62,76 @@ async function verifySms(req) {
     }
 }
 
-async function registerHandler(req) {
-    const register = async ({registerUser, inviter, config = {daysForRegister: 7, daysForInvite: 3}}) => {
-        // registerUser.password = await argon2i.hash(registerUser.password)
-        registerUser.password = await req.context.password.encode(registerUser.password)
-        registerUser.member = {
-            expiration: now() + config.daysForRegister * 86400
-        }
-        registerUser.registeredAt = now()
-        registerUser.contact = {
-            qq: {
-                account: req.body.qq === undefined ? "" : req.body.qq,
-                open: false
-            },
-            wechat: {
-                account: req.body.wechat === undefined ? "" : req.body.wechat,
-                open: false
-            },
-            phone: {
-                open: false
-            }
-        }
-        registerUser.name = req.body.name === undefined ? "" : req.body.name
-
-        if (inviter === undefined) {
-            return {
-                registerUser
-            }
-        }
-
-        registerUser.upLine = inviter.id
-        if (inviter.downLines === undefined) {
-            inviter.downLines = [registerUser.phone]
-        } else {
-            inviter.downLines.push(registerUser.phone)
-        }
-        const baseline = Math.max(inviter.member.expiration, now())
-        inviter.member.expiration = baseline + config.daysForInvite * 86400
-        return {
-            registerUser, inviter
-        }
+async function register(req) {
+    req.updateDB = {
+        registerUser: {}
     }
 
-    const result = await register({
-        registerUser: {
-            phone: req.body.phone, password: req.body.password
-        },
-        inviter: req.inviter,
-        config: req.config,
-    })
+    const registerUser = {}
+    const config = req.config
 
-    req.updateDB = {
-        registerUser: result.registerUser,
-        inviter: result.inviter
+    registerUser.phone = req.body.phone
+    registerUser.password = await req.context.password.encode(req.body.password)
+    registerUser.member = {
+        expiration: now() + config.daysForRegister * 86400
+    }
+    registerUser.registeredAt = now()
+    registerUser.contact = {
+        qq: {
+            account: req.body.qq === undefined ? "" : req.body.qq,
+            open: false
+        },
+        wechat: {
+            account: req.body.wechat === undefined ? "" : req.body.wechat,
+            open: false
+        },
+        phone: {
+            open: false
+        }
+    }
+    registerUser.name = req.body.name === undefined ? "" : req.body.name
+
+    if (req.inviter !== undefined) {
+        registerUser.upLine = req.inviter._id
+    }
+
+    req.registerId = await req.context.mongo.register(registerUser)
+    if (req.registerId === null) {
+        throw new RegisterFailed()
     }
 }
 
-async function updateDB(req) {
-    const insertedId = await req.context.mongo.insertAndUpdate({
-        user: req.updateDB.registerUser,
-        inviter: req.updateDB.inviter === undefined ? undefined : {
-            filter: {_id: req.body.inviter.id},
-            update: {
-                $set: {
-                    member: req.updateDB.inviter.member,
-                    downLines: req.updateDB.inviter.downLines
-                }
-            }
-        }
-    })
-    if (insertedId === null) {
-        throw new RegisterFailed()
+async function updateInviter(req) {
+    if (req.inviter === undefined) {
+        return
+    }
+
+    const inviter = req.inviter
+    const config = req.config
+
+    const downLine = {
+        id: req.registerId
+    }
+    if (inviter.downLines === undefined) {
+        inviter.downLines = [downLine]
     } else {
-        req.insertedId = insertedId
+        inviter.downLines.push(downLine)
+    }
+    const baseline = Math.max(inviter.member.expiration, now())
+    inviter.member.expiration = baseline + config.daysForInvite * 86400
+
+    const success = await req.context.mongo.updateInviter(inviter._id, {
+        downLines: inviter.downLines,
+        "member.expiration": inviter.member.expiration
+    })
+
+    if (!success) {
+        throw new RegisterFailed()
     }
 }
 
 async function genToken(req, res) {
-    const response = await req.context.stubs.token.gen({id: req.insertedId, phone: req.body.phone})
+    const response = await req.context.stubs.token.gen({id: `${req.registerId}`, phone: req.body.phone})
     if (response.isError()) {
         res.response({
             status: 201,
@@ -163,8 +155,8 @@ export function route(router) {
         getInviter,
         getConfig,
         verifySms,
-        registerHandler,
-        updateDB,
+        register,
+        updateInviter,
         genToken
     ]))
 }
