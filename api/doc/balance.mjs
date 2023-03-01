@@ -2,9 +2,9 @@
 
 /**
  * @swagger
- * /v1/user/sites/balance(站点余额):
+ * /v1/user/sites/balance(站点余额✅):
  *   get:
- *     tags: [balance(站点余额), "已实现"]
+ *     tags: [balance(站点余额)]
  *     responses:
  *       200:
  *         content:
@@ -37,9 +37,9 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/balance(更新站点余额):
+ * /v1/user/site/:userSiteId/balance(更新站点余额✅):
  *   put:
- *     tags: [balance(站点余额), "已实现"]
+ *     tags: [balance(站点余额)]
  *     requestBody:
  *       content:
  *         application/json:
@@ -52,9 +52,9 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/journal/entry(添加提现记录):
+ * /v1/user/site/:userSiteId/journal/entry(添加提现记录✅):
  *   post:
- *     tags: [balance(站点余额), "已实现"]
+ *     tags: [balance(站点余额)]
  *     requestBody:
  *       content:
  *         application/json:
@@ -74,9 +74,9 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/journal/entries(查询提现记录):
+ * /v1/user/site/:userSiteId/journal/entries(查询提现记录✅):
  *   get:
- *     tags: [balance(站点余额), "已实现"]
+ *     tags: [balance(站点余额)]
  *     responses:
  *       200:
  *         content:

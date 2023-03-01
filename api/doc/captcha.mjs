@@ -4,9 +4,9 @@
 
 /**
  * @swagger
- * /v1/captcha/require:
+ * /v1/captcha/require(请求图形码✅):
  *   post:
- *     tags: ["captcha(图形码)", "已实现"]
+ *     tags: ["captcha(图形码)"]
  *     description: 获取图形码
  *     responses:
  *       200:

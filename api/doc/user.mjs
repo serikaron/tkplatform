@@ -5,9 +5,9 @@
 
 /**
  * @swagger
- * /v1/user/register:
+ * /v1/user/register(注册✅):
  *   post:
- *     tags: ["user(用户相关)", "已实现"]
+ *     tags: ["user(用户相关)"]
  *     description: 用户注册
  *     requestBody:
  *       content:
@@ -27,9 +27,8 @@
  *               inviter:
  *                 type: object
  *                 properties:
- *                   phone:
+ *                   id:
  *                     type: string
- *                     example: "13444444444"
  *               smsCode:
  *                 type: string
  *                 example: "1234"
@@ -77,9 +76,9 @@
 
 /**
  * @swagger
- * /v1/user/login:
+ * /v1/user/login(登录✅):
  *   post:
- *     tags: ["user(用户相关)", "已实现"]
+ *     tags: ["user(用户相关)"]
  *     description: 用户登录
  *     requestBody:
  *       content:
@@ -136,9 +135,9 @@
 
 /**
  * @swagger
- * /v1/user/password:
+ * /v1/user/password(修改密码✅):
  *   post:
- *     tags: ["user(用户相关)", "已实现"]
+ *     tags: ["user(用户相关)"]
  *     description: 修改密码
  *     requestBody:
  *       content:
@@ -262,7 +261,7 @@
 
 /**
  * @swagger
- * /v1/user/overview(查询帐号总览):
+ * /v1/user/overview(查询帐号总览✅):
  *   get:
  *     tags: ["user(用户相关)","个人中心","已实现"]
  *     parameters:
@@ -325,7 +324,7 @@
 
 /**
  * @swagger
- * /v1/user/overview(更新帐号总览):
+ * /v1/user/overview(更新帐号总览✅):
  *   put:
  *     tags: ["user(用户相关)","个人中心","已实现"]
  *     requestBody:
@@ -381,7 +380,7 @@
 
 /**
  * @swagger
- * /v1/user/downLines(下线管理):
+ * /v1/user/downLines(下线管理✅):
  *   get:
  *     tags: ["user(用户相关)","个人中心"]
  *     parameters:
@@ -416,18 +415,35 @@
  *                         type: string
  *                       phone:
  *                         type: string
- *                       lastLogin:
+ *                       lastLoginAt:
  *                         type: number
  *                       registeredAt:
  *                         type: number
- *                       memberExpiration:
- *                         type: number
+ *                       member:
+ *                         type: object
+ *                         properties:
+ *                           expiration:
+ *                             type: number
  *                       name:
  *                         type: string
  *                       alias:
  *                         type: string
  *
- *
+ */
+
+/**
+ * @swagger
+ * /v1/user/downLine/:downLineUserId(更新下线✅):
+ *   put:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               alias:
+ *                 type: string
  */
 
 /**

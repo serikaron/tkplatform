@@ -2,9 +2,9 @@
 
 /**
  * @swagger
- * /v1/sites(查询站点):
+ * /v1/sites(查询站点✅):
  *   get:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description: 查询站点
  *     parameters:
  *     - in: path
@@ -63,9 +63,9 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId(查询用户站点):
+ * /v1/user/site/:userSiteId(查询用户站点✅):
  *   get:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description: 结构中除了 id, site 字段以外，其余为可选项有可能为空
  *     responses:
  *       200:
@@ -143,9 +143,9 @@
 
 /**
  * @swagger
- * /v1/user/sites(查询用户站点):
+ * /v1/user/sites(查询用户站点✅):
  *   get:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description: 结构中除了 id, site 字段以外，其余为可选项有可能为空
  *     responses:
  *       200:
@@ -225,9 +225,9 @@
 
 /**
  * @swagger
- * /v1/user/site(添加用户站点):
+ * /v1/user/site(添加用户站点✅):
  *   post:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description: 参考查询接口的返回结构
  *     requestBody:
  *       content:
@@ -311,9 +311,9 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId(更新用户站点):
+ * /v1/user/site/:userSiteId(更新用户站点✅):
  *   put:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description:
  *     requestBody:
  *       content:
@@ -393,7 +393,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:siteId/recommend/times(时段推荐):
+ * /v1/user/site/:userSiteId/recommend/times(时段推荐):
  *   get:
  *     tags: ["site(站点)"]
  *     description: 时段推荐
@@ -414,7 +414,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:siteId/setting/sync(同步设置):
+ * /v1/user/site/:userSiteId/setting/sync(同步设置):
  *   put:
  *     tags: ["site(站点)"]
  *     description: 同步设置
@@ -442,7 +442,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:siteId/report(情况上报):
+ * /v1/user/site/:useSiteId/report(情况上报):
  *   post:
  *     tags: ["site(站点)"]
  *     description: 同步设置
@@ -574,12 +574,12 @@
 
 /**
  * @swagger
- * /v1/site/records/:minDate/:maxDate(成功记录):
+ * /v1/site/records/:minDate/:maxDate(成功记录✅):
  *   get:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     parameters:
  *     - in: path
- *       name: siteId
+ *       name: userSiteId
  *       schema:
  *         type: string
  *     responses:
@@ -616,9 +616,9 @@
 
 /**
  * @swagger
- * /v1/site/:siteId/record(成功记录):
+ * /v1/site/:userSiteId/record(成功记录✅):
  *   post:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description: 成功记录
  *     requestBody:
  *         content:
@@ -646,9 +646,9 @@
 
 /**
  * @swagger
- * /v1/site/:siteId/record/:recordId(成功记录):
+ * /v1/site/:userSiteId/record/:recordId(成功记录✅):
  *   put:
- *     tags: ["site(站点)", "已实现"]
+ *     tags: ["site(站点)"]
  *     description: 成功记录
  *     requestBody:
  *         content:
