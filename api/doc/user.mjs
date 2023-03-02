@@ -241,7 +241,7 @@
 
 /**
  * @swagger
- * /v1/user/member(会员信息):
+ * /v1/user/member(会员信息✅):
  *   get:
  *     tags: ["user(用户相关)"]
  *     description: 会员信息
