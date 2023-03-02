@@ -22,6 +22,10 @@ export async function setupMongo(req) {
             return await collection.users
                 .findOne(find, projection)
         },
+        getUserById: async (id) => {
+            return await collection.users
+                .findOne({_id: new ObjectId(id)})
+        },
         getInviter: async (userId) => {
             return await collection.users
                 .findOne({
