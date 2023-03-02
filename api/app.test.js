@@ -470,6 +470,33 @@ test.concurrent.each([
             url: "/v1/journal/statistics/123/234",
         }
     },
+    {
+        url: "/v1/site/fake-site-id/record",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/fake-site-id/record",
+        }
+    },
+    {
+        url: "/v1/site/records/123/234",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/records/123/234",
+        }
+    },
+    {
+        url: "/v1/site/fake-site-id/record/fake-record-id",
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/fake-site-id/record/fake-record-id",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
