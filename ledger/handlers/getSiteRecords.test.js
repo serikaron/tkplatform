@@ -14,7 +14,9 @@ import dotenv from "dotenv";
 dotenv.config()
 
 describe.each([
+    // filter with site
     {siteId: `${new ObjectId()}`},
+    // all
     {}
 ])("with siteId: $siteId", ({siteId}) => {
     test("get site record from db", async () => {
@@ -26,13 +28,17 @@ describe.each([
                 msg: "a fake site record"
             }]
         })
+        const countSiteRecords = jest.fn(async () => {
+            return 100
+        })
         const app = createApp()
         setup(app, {
             setup: testDIContainer.setup([
                 (req, res, next) => {
                     req.context = {
                         mongo: {
-                            getSiteRecords
+                            getSiteRecords,
+                            countSiteRecords
                         }
                     }
                     next()
@@ -46,11 +52,16 @@ describe.each([
             .query({siteId})
             .set({id: "a fake user id"})
         simpleCheckTKResponse(response, TKResponse.Success({
-            data: [{
-                id: "a fake record id",
-                msg: "a fake site record"
-            }]
+            data: {
+                total: 100,
+                rate: 1000,
+                list: [{
+                    id: "a fake record id",
+                    msg: "a fake site record"
+                }]
+            }
         }))
         expect(getSiteRecords).toHaveBeenCalledWith("a fake user id", siteId, minDate, maxDate)
+        expect(countSiteRecords).toHaveBeenCalledWith("a fake user id", siteId, minDate, maxDate)
     })
 })

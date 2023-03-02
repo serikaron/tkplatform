@@ -217,6 +217,18 @@ export async function setupMongo(req) {
                 .sort({creaatedAt: -1})
                 .toArray()
         },
+        countSiteRecords: async (userId, siteId, minDate, maxDate) => {
+            const filter = siteId === undefined ? {
+                userId: new ObjectId(userId),
+                createdAt: {$gte: minDate, $lt: maxDate},
+            } : {
+                userId: new ObjectId(userId),
+                createdAt: {$gte: minDate, $lt: maxDate},
+                siteId: new ObjectId(siteId),
+            }
+            return await collection.siteRecords
+                .countDocuments(filter)
+        },
         addSiteRecord: async (record) => {
             const r = await collection.siteRecords.insertOne(record)
             return r.insertedId
