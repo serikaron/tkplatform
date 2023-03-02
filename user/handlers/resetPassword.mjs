@@ -16,7 +16,7 @@ function checkInput(req) {
 }
 
 async function checkUser(req) {
-    const user = await req.context.mongo.getUserByPhone({phone: req.body.phone}, {_id: 1})
+    const user = await req.context.mongo.getPassword()
     if (user === null) {
         throw new UserNotExists()
     }
