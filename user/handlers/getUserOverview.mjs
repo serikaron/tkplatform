@@ -20,6 +20,7 @@ const getUsingId = (req) => {
 }
 
 const getOverview = async (req) => {
+    console.log(`usingId: ${req.usingId}`)
     const overview = await req.context.mongo.getOverview(req.usingId)
     if (overview === null) {
         throw new NotFound()

@@ -84,6 +84,33 @@ describe("test user service", () => {
     })
 
     describe("test user overview", () => {
+        const update = async (userId, body) => {
+            await runTest({
+                method: "PUT",
+                path: "/v1/user/overview",
+                body,
+                baseURL,
+                userId,
+                verify: response => {
+                    expect(response.status).toBe(200)
+                }
+            })
+        }
+
+        const check = async (userId, desired, toCheckId) => {
+            const query = toCheckId === undefined ? "" : `?id=${toCheckId}`
+            await runTest({
+                method: "GET",
+                path: `/v1/user/overview${query}`,
+                baseURL,
+                userId,
+                verify: response => {
+                    simpleVerification(response)
+                    expect(response.data).toStrictEqual(desired)
+                }
+            })
+        }
+
         const box = new Box()
         const phone = genPhone()
         it("prepare user", async () => {
@@ -91,68 +118,89 @@ describe("test user service", () => {
         })
 
         it("update", async () => {
-            await runTest({
-                method: "PUT",
-                path: "/v1/user/overview",
-                body: {
-                    name: "edited name",
-                    contact: {
-                        qq: {
-                            account: "11111111",
-                            open: true,
-                        },
-                        wechat: {
-                            account: "2222222",
-                            open: true,
-                        },
-                        phone: {
-                            open: true,
-                        }
+            await update(box.userId, {
+                name: "edited name",
+                contact: {
+                    qq: {
+                        account: "11111111",
+                        open: true,
+                    },
+                    wechat: {
+                        account: "2222222",
+                        open: true,
+                    },
+                    phone: {
+                        open: true,
                     }
-                },
-                baseURL,
-                userId: box.userId,
-                verify: response => {
-                    expect(response.status).toBe(200)
                 }
             })
         })
 
         it("check", async () => {
-            await runTest({
-                method: "GET",
-                path: "/v1/user/overview",
-                baseURL,
-                userId: box.userId,
-                verify: response => {
-                    simpleVerification(response)
-                    expect(response.data).toStrictEqual({
-                        name: "edited name",
-                        registeredAt: now(),
-                        activeDays: {
-                            "30": 0,
-                            total: 0,
-                        },
-                        rechargeCount: 0,
-                        member: {
-                            expiration: now() + 7 * 86400
-                        },
-                        siteCount: 0,
-                        contact: {
-                            qq: {
-                                account: "11111111",
-                                open: true,
-                            },
-                            wechat: {
-                                account: "2222222",
-                                open: true,
-                            },
-                            phone: {
-                                open: true
-                            }
-                        }
-                    })
+            await check(box.userId, {
+                name: "edited name",
+                registeredAt: now(),
+                activeDays: {
+                    "30": 0,
+                    total: 0,
+                },
+                rechargeCount: 0,
+                member: {
+                    expiration: now() + 7 * 86400
+                },
+                siteCount: 0,
+                contact: {
+                    qq: {
+                        account: "11111111",
+                        open: true,
+                    },
+                    wechat: {
+                        account: "2222222",
+                        open: true,
+                    },
+                    phone: {
+                        open: true
+                    }
                 }
+            })
+        })
+
+        describe("query others overview", () => {
+            it("prepare another user", async () => {
+                box.data.activeUserId = box.userId
+                await register(genPhone(), box)
+                box.data.passiveUserId = box.userId
+            })
+            it("update passive user", async () => {
+                await update(box.data.passiveUserId, {name: "passive user"})
+            })
+            it("check passive user", async () => {
+                await check(box.data.activeUserId, {
+                    name: "passive user",
+                    registeredAt: now(),
+                    activeDays: {
+                        "30": 0,
+                        total: 0,
+                    },
+                    rechargeCount: 0,
+                    member: {
+                        expiration: now() + 7 * 86400
+                    },
+                    siteCount: 0,
+                    contact: {
+                        qq: {
+                            account: "1234567890",
+                            open: false,
+                        },
+                        wechat: {
+                            account: "",
+                            open: false,
+                        },
+                        phone: {
+                            open: false
+                        }
+                    }
+                }, box.data.passiveUserId)
             })
         })
     })
