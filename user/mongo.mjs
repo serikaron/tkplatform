@@ -22,10 +22,6 @@ export async function setupMongo(req) {
             return await collection.users
                 .findOne(find, projection)
         },
-        getUserById: async (id) => {
-            return await collection.users
-                .findOne({_id: new ObjectId(id)})
-        },
         getInviter: async (userId) => {
             return await collection.users
                 .findOne({
@@ -65,51 +61,6 @@ export async function setupMongo(req) {
             } catch (e) {
                 console.log(e)
                 return false
-            }
-        },
-        insertAndUpdate: async function ({user, inviter}) {
-            const handlerError = (error) => {
-                if (error instanceof MongoServerError && error.code === 11000) {
-                    throw new UserExists()
-                } else {
-                    throw error;
-                }
-            }
-
-            const withoutInviter = async () => {
-                try {
-                    const result = await collection.users
-                        .insertOne(user)
-                    return result.insertedId
-                } catch (error) {
-                    handlerError(error)
-                    return null
-                }
-            }
-
-            const withInviter = async () => {
-                const session = user.client.startSession()
-                session.startTransaction()
-                try {
-                    const result = await collection.users
-                        .insertOne(user)
-                    await collection.users
-                        .updateOne(inviter.filter, inviter.update)
-                    await session.commitTransaction()
-                    return result.insertedId
-                } catch (error) {
-                    await session.abortTransaction()
-                    handlerError(error)
-                    return null
-                } finally {
-                    await session.endSession()
-                }
-            }
-
-            if (inviter === undefined) {
-                return await withoutInviter()
-            } else {
-                return await withInviter()
             }
         },
         updatePassword: async (_id, password) => {

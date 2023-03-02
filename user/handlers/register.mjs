@@ -62,6 +62,7 @@ async function verifySms(req) {
     }
 }
 
+// db 操作， 可以和updateInviter, 优化在transaction里执行
 async function register(req) {
     req.updateDB = {
         registerUser: {}

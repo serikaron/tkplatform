@@ -196,7 +196,7 @@ describe.each([
     })
 })
 
-describe.only("test site record", () => {
+describe("test site record", () => {
     const box = new Box()
     box.data.siteId1 = `${new ObjectId()}`
     box.data.userId1 = `${new ObjectId()}`

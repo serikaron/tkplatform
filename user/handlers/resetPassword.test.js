@@ -63,7 +63,6 @@ async function runTest(
                 req.context = {
                     mongo: {
                         getPassword: getFn,
-                        getUserByPhone: getFn,
                         updatePassword: setFn
                     },
                     stubs: {
