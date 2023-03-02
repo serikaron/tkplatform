@@ -196,36 +196,12 @@ describe.each([
     })
 })
 
-describe("test site record", () => {
+describe.only("test site record", () => {
     const box = new Box()
     box.data.siteId1 = `${new ObjectId()}`
     box.data.userId1 = `${new ObjectId()}`
     box.data.siteId2 = `${new ObjectId()}`
     box.data.userId2 = `${new ObjectId()}`
-
-    // beforeAll(async () => {
-    //     const ledger = await integrationConnectMongo("ledger", 10003)
-    //     const r = await ledger.db.collection("siteRecords")
-    //         .insertMany([{
-    //             userId: new ObjectId(userId),
-    //             siteId: new ObjectId(siteId),
-    //             createdAt: now() - 2 * 86400,
-    //             kept: false
-    //         }, {
-    //             userId: new ObjectId(userId),
-    //             siteId: new ObjectId(),
-    //             createdAt: now(),
-    //             kept: false
-    //         }, {
-    //             userId: new ObjectId(),
-    //             siteId: new ObjectId(siteId),
-    //             createdAt: now(),
-    //             kept: false
-    //         }])
-    //     box.data = {
-    //         ids: Object.values(r.insertedIds).map(x => `${x}`)
-    //     }
-    // })
 
     test("add site record", async () => {
         await runTest({
@@ -251,9 +227,9 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                expect(response.data.length).toBe(1)
-                const record = response.data[0]
+                expect(response.data.total).toBe(1)
+                expect(response.data.rate).toBe(1000)
+                const record = response.data.list[0]
                 expect(record.createdAt).toBeLessThanOrEqual(now())
                 expect(record.id).toBe(box.data.id1)
                 expect(record.kept).toBe(false)
@@ -285,9 +261,9 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                expect(response.data.length).toBe(1)
-                const record = response.data[0]
+                expect(response.data.total).toBe(1)
+                expect(response.data.rate).toBe(1000)
+                const record = response.data.list[0]
                 expect(record.id).toBe(box.data.id1)
                 expect(record.kept).toBe(true)
                 expect(record.createdAt).toBeLessThanOrEqual(now())
@@ -317,10 +293,10 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
-                expect(Array.isArray(response.data)).toBe(true)
-                expect(response.data.length).toBe(2)
+                expect(response.data.total).toBe(2)
+                expect(response.data.rate).toBe(1000)
                 // check id only
-                const ids = response.data.map(x => x.id)
+                const ids = response.data.list.map(x => x.id)
                 expect(ids.includes(box.data.id1)).toBe(true)
                 expect(ids.includes(box.data.id2)).toBe(true)
             }
