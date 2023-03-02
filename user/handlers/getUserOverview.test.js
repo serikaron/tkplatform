@@ -11,7 +11,6 @@ import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals";
 
-const userId = new ObjectId()
 const expiration = now()
 const registeredAt = now()
 
@@ -87,54 +86,67 @@ describe.each([
                 rechargeCount: 10
             }
         ])("($#) recharge count from payment", ({paymentResponse, rechargeCount}) => {
-            test("combine all information", async () => {
-                const getOverview = jest.fn(async () => {
-                    return dbUser
-                })
-                const countUserSites = jest.fn(async () => {
-                    return siteResponse
-                })
-                const countRecharge = jest.fn(async () => {
-                    return paymentResponse
-                })
-                const app = createApp()
-                setup(app, {
-                    setup: testDIContainer.setup([
-                        (req, res, next) => {
-                            req.context = {
-                                mongo: {
-                                    getOverview
-                                },
-                                stubs: {
-                                    site: {
-                                        countUserSites
+            const userId = new ObjectId()
+            const downLineId = new ObjectId()
+            describe.each([
+                {
+                    toGetId: downLineId,
+                    usingId: downLineId,
+                },
+                {
+                    usingId: userId,
+                },
+            ])("($#) query with id", ({toGetId, usingId}) => {
+                test("combine all information", async () => {
+                    const getOverview = jest.fn(async () => {
+                        return dbUser
+                    })
+                    const countUserSites = jest.fn(async () => {
+                        return siteResponse
+                    })
+                    const countRecharge = jest.fn(async () => {
+                        return paymentResponse
+                    })
+                    const app = createApp()
+                    setup(app, {
+                        setup: testDIContainer.setup([
+                            (req, res, next) => {
+                                req.context = {
+                                    mongo: {
+                                        getOverview
                                     },
-                                    payment: {
-                                        countRecharge
+                                    stubs: {
+                                        site: {
+                                            countUserSites
+                                        },
+                                        payment: {
+                                            countRecharge
+                                        }
                                     }
                                 }
+                                next()
                             }
-                            next()
-                        }
-                    ]),
-                    teardown: testDIContainer.teardown([])
+                        ]),
+                        teardown: testDIContainer.teardown([])
+                    })
+
+                    const query = toGetId === undefined ? "" : `?id=${toGetId}`
+                    const response = await supertest(app)
+                        .get(`/v1/user/overview${query}`)
+                        .set({id: `${userId}`})
+
+                    if (responseUser === null) {
+                        simpleCheckTKResponse(response, TKResponse.fromError(new NotFound()))
+                        return
+                    }
+
+                    responseUser.rechargeCount = rechargeCount
+                    responseUser.siteCount = siteCount
+                    simpleCheckTKResponse(response, TKResponse.Success({data: responseUser}))
+                    expect(countUserSites).toHaveBeenCalledWith(`${usingId}`)
+                    expect(countRecharge).toHaveBeenCalledWith(`${usingId}`)
+                    expect(getOverview).toHaveBeenCalledWith(`${usingId}`)
                 })
-
-                const response = await supertest(app)
-                    .get('/v1/user/overview')
-                    .set({id: `${userId}`})
-
-                if (responseUser === null) {
-                    simpleCheckTKResponse(response, TKResponse.fromError(new NotFound()))
-                    return
-                }
-
-                responseUser.rechargeCount = rechargeCount
-                responseUser.siteCount = siteCount
-                simpleCheckTKResponse(response, TKResponse.Success({data: responseUser}))
-                expect(countUserSites).toHaveBeenCalledWith(`${userId}`)
-                expect(countRecharge).toHaveBeenCalledWith(`${userId}`)
-                expect(getOverview).toHaveBeenCalledWith(`${userId}`)
             })
         })
     })
