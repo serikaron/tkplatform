@@ -138,7 +138,7 @@
  * /v1/user/password(修改密码✅):
  *   post:
  *     tags: ["user(用户相关)"]
- *     description: 修改密码
+ *     description: 修改密码在登录界面和用户中心都有入口，本接口两种情况都适用
  *     requestBody:
  *       content:
  *         application/json:
@@ -147,7 +147,10 @@
  *             properties:
  *               phone:
  *                 type: string
- *                 example: "13333333333"
+ *                 example: 未登录时使用
+ *               oldPassword:
+ *                 type: string
+ *                 example: 已登录时使用
  *               newPassword:
  *                 type: string
  *                 example: "123456"

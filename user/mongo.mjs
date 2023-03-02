@@ -112,9 +112,9 @@ export async function setupMongo(req) {
                 return await withInviter()
             }
         },
-        updatePassword: async (phone, password) => {
+        updatePassword: async (_id, password) => {
             await collection.users
-                .updateOne({phone}, {$set: {password}})
+                .updateOne({_id}, {$set: {password}})
         },
         updateAccount: async (id, phone, password) => {
             await collection.users
@@ -163,6 +163,19 @@ export async function setupMongo(req) {
                     $set: {"downLines.$[downLine].alias": update.alias}
                 }, {
                     arrayFilters:[{"downLine.id": new ObjectId(downLineUserId)}]
+                })
+        },
+        getPassword: async ({userId, phone}) => {
+            const filter = {}
+            if (userId !== undefined) {
+                filter._id = new ObjectId(userId)
+            }
+            if (phone !== undefined) {
+                filter.phone = phone
+            }
+            return await collection.users
+                .findOne(filter, {
+                    projection: {phone: 1, password: 1}
                 })
         }
     }

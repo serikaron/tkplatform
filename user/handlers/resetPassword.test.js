@@ -4,61 +4,54 @@ import createApp from "../../common/app.mjs";
 import {setup} from "../server.mjs";
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import supertest from "supertest";
-import {simpleCheckResponse, simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
+import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from '@jest/globals'
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {genPhone} from "../../tests/common/utils.mjs";
 import {ObjectId} from "mongodb";
-import argon2i from "argon2";
-import {UserNotExists} from "../../common/errors/10000-user.mjs";
+import {PasswordNotMatch, UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs";
 
-const userId = new ObjectId()
-const phone = genPhone()
-const oldPassword = '$argon2id$v=19$m=65536,t=3,p=4$4yOMJ8LoIFOwQBF9nWdhaw$na32PVqwpmlDN59601iA5y6GGdH7iX406oQPIqF3CoI\n'
+const presetUserId = new ObjectId()
+const presetPhone = genPhone()
 
 const headersWithId = (userId) => {
     return userId === undefined ? {} : {id: `${userId}`}
 }
-const bodyWithPhone = (phone) => {
+const bodyWithPhone = (phone, oldPassword) => {
     return {
-        smsCode: "1234", newPassword: "123456",
+        smsCode: "1234", oldPassword: oldPassword, newPassword: "123456",
         phone: phone
     }
-}
-
-const defaultGetFn = async () => {
-    return {
-        phone: phone,
-        password: oldPassword
-    }
-}
-
-const defaultSmsFn = async () => {
-    return TKResponse.Success()
-}
-
-const defaultResponseData = {
-    accessToken: "accessToken",
-    refreshToken: "refreshToken"
 }
 
 async function runTest(
     {
         headers = {},
         body,
-        getFn = defaultGetFn,
-        smsFn = defaultSmsFn,
+        getFn = async () => {
+            return {
+                phone: presetPhone,
+                password: "encodedOldPassword"
+            }
+        },
+        smsFn = async () => {
+            return TKResponse.Success()
+        },
         setFn = async () => {
         },
-        encodeFn = async (newPassword) => {
-            return await argon2i.hash(newPassword)
+        encodeFn = async () => {
         },
-        verifyFn = async (serverPassword, clientPassword) => {
-            return await argon2i.verify(serverPassword, clientPassword)
+        verifyFn = async () => {
+            return true
         },
         tokenFn = async () => {
-            return TKResponse.Success({data: defaultResponseData})
+            return TKResponse.Success({
+                data: {
+                    accessToken: "accessToken",
+                    refreshToken: "refreshToken"
+                }
+            })
         },
         tkResponse,
     }
@@ -99,69 +92,112 @@ async function runTest(
     simpleCheckTKResponse(response, tkResponse)
 }
 
-describe.each([
-    {smsCode: "1234", phone: "13333333333"},
-    {newPassword: "123456", phone: "13333333333"},
-    {smsCode: "1234", newPassword: "123456"},
-    {phone: "1222", smsCode: "1234", newPassword: "123456"}
-])("($#) invalid body", (body) => {
-    it.concurrent("should return InvalidArgument", async () => {
-        await runTest({
-            body,
-            tkResponse: TKResponse.fromError(new InvalidArgument())
+describe.each([true, false])("login %s", (hasBeenLogin) => {
+    const userId = hasBeenLogin ? new ObjectId() : undefined
+    const oldPassword = hasBeenLogin ? "12345" : undefined
+    const phone = hasBeenLogin ? undefined : genPhone()
+    const headers = headersWithId(userId)
+    const body = bodyWithPhone(phone, oldPassword)
+
+    describe("invalid bodies", () => {
+        const invalidBodies = hasBeenLogin ? [
+            {smsCode: "1234", oldPassword: "12345"},
+            {newPassword: "123456", oldPassword: "12345"},
+            {smsCode: "1234", newPassword: "123456"},
+        ] : [
+            {smsCode: "1234", phone: "13333333333"},
+            {newPassword: "123456", phone: "13333333333"},
+            {smsCode: "1234", newPassword: "123456"},
+            {phone: "1222", smsCode: "1234", newPassword: "123456"}
+        ]
+        it.concurrent.each(invalidBodies)("($#) should return InvalidArgument", async (invalidBody) => {
+            await runTest({
+                headers,// disable userId input to check all body situations
+                body: invalidBody,
+                tkResponse: TKResponse.fromError(new InvalidArgument())
+            })
         })
     })
-})
 
-
-test("sms code check failed should return InvalidArgument", async () => {
-    const smsFn = jest.fn(async () => {
-        return TKResponse.fromError(new InvalidArgument())
-    })
-    await runTest({
-        smsFn,
-        status: 400, code: -10006, msg: "验证码错误"
-    })
-    expect(smsFn).toHaveBeenCalledWith("13333333333", "1234")
-})
-
-test("password should be encoded and save to db", async () => {
-    const updatePassword = jest.fn()
-    const encodeFn = jest.fn(async () => {
-        return "encodedPassword"
-    })
-    await runTest({
-        setFn: updatePassword,
-        encodeFn,
-        status: 200, code: 0, msg: "更新成功"
-    })
-    expect(updatePassword).toHaveBeenCalledWith("13333333333", "encodedPassword")
-    expect(encodeFn).toHaveBeenCalledWith("123456")
-})
-
-describe.each([
-    {
-        userId: new ObjectId()
-    },
-    {
-        phone: genPhone()
-    }
-])("($#) from different entry", () => {
-    it("user not found from db", async () => {
+    it("user not found from db should return failed", async () => {
         const getPassword = jest.fn(async () => {
             return null
         })
         await runTest({
-            headers: headersWithId(userId),
-            body: bodyWithPhone(phone),
+            headers,
+            body,
             getFn: getPassword,
             tkResponse: TKResponse.fromError(new UserNotExists())
         })
-        if (userId !== undefined) {
-            expect(getPassword).toHaveBeenCalledWith({userId: `${userId}`})
-        } else {
-            expect(getPassword).toHaveBeenCalledWith({phone: phone})
-        }
     })
-    const checkPassword = jest.fn
+
+    it("password not match should return failed", async () => {
+        const checkPassword = async () => {
+            return false
+        }
+        await runTest({
+            headers,
+            body,
+            verifyFn: checkPassword,
+            // should only check using userId
+            tkResponse: hasBeenLogin ?
+                TKResponse.fromError(new PasswordNotMatch()) :
+                TKResponse.Success()
+        })
+    })
+
+    test("sms code check failed should return InvalidArgument", async () => {
+        const smsFn = jest.fn(async () => {
+            return TKResponse.fromError(new InvalidArgument())
+        })
+        await runTest({
+            headers,
+            body,
+            smsFn,
+            tkResponse: TKResponse.fromError(new VerifySmsCodeFailed())
+            // status: 400, code: -10006, msg: "验证码错误"
+        })
+    })
+
+    test("all goes well should return good", async () => {
+        const dbRes = {
+            _id: hasBeenLogin ? userId : presetUserId,
+            phone: hasBeenLogin ? presetPhone : phone,
+            password: "oldEncodedPassword"
+        }
+        const getPassword = jest.fn(async () => {
+            return dbRes
+        })
+        const checkPassword = jest.fn(async () => {
+            return true
+        })
+        const smsFn = jest.fn(async () => {
+            return TKResponse.Success()
+        })
+        const encodePassword = jest.fn(async () => {
+            return "encodedNewPassword"
+        })
+        const dbFn = jest.fn()
+
+        await runTest({
+            headers,
+            body,
+            getFn: getPassword,
+            smsFn: smsFn,
+            setFn: dbFn,
+            encodeFn: encodePassword,
+            verifyFn: checkPassword,
+            tkResponse: TKResponse.Success()
+        })
+
+        if (userId !== undefined) {
+            expect(getPassword).toHaveBeenCalledWith({userId: headers.id})
+            expect(checkPassword).toHaveBeenCalledWith(dbRes.password, body.oldPassword)
+        } else {
+            expect(getPassword).toHaveBeenCalledWith({phone: body.phone})
+        }
+        expect(smsFn).toHaveBeenCalledWith(dbRes.phone, body.smsCode)
+        expect(encodePassword).toHaveBeenCalledWith(body.newPassword)
+        expect(dbFn).toHaveBeenCalledWith(dbRes._id, "encodedNewPassword")
+    })
 })

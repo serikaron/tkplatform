@@ -54,6 +54,19 @@ const register = async (phone, box, inviter) => {
     })
 }
 
+const login = async (phone, password, expectOK) => {
+    await runTest({
+        method: "POST",
+        path: "/v1/user/login",
+        body: {phone, password},
+        baseURL,
+        verify: response => {
+            const expectStatus = expectOK ? 200 : 403
+            expect(response.status).toBe(expectStatus)
+        }
+    })
+}
+
 describe("test user service", () => {
     describe("test get member", () => {
         const box = new Box()
@@ -274,6 +287,46 @@ describe("test user service", () => {
 
         it("check after update", async () => {
             await check()
+        })
+    })
+
+    describe("test reset password", () => {
+        const reset = async (config) => {
+            await runTest({
+                method: "POST",
+                path: "/v1/user/password",
+                body: {
+                    smsCode: "2065",
+                    newPassword: config.newPassword,
+                    oldPassword: config.oldPassword,
+                    phone: config.phone
+                },
+                baseURL,
+                userId: config.userId,
+                verify: response => {
+                    expect(response.status).toBe(200)
+                }
+            })
+        }
+
+        it("should be ok", async () => {
+            const box = new Box()
+            const phone = genPhone()
+            await register(phone, box)
+            await login(phone, "123456", true)
+            await reset({
+                newPassword: "2222",
+                oldPassword: "123456",
+                userId: box.userId
+            })
+            await login(phone, "2222", true)
+            await login(phone, "123456", false)
+            await reset({
+                newPassword: "3333",
+                phone: phone
+            })
+            await login(phone, "3333", true)
+            await login(phone, "2222", false)
         })
     })
 })
