@@ -198,7 +198,7 @@
 
 /**
  * @swagger
- * /v1/user/ledger/account(添加用户收款号✅):
+ * /v1/user/journal/account(添加用户收款号✅):
  *   post:
  *     tags: ["ledger(记帐帐本)"]
  *     description: 添加用户收款号
@@ -235,7 +235,7 @@
 
 /**
  * @swagger
- * /v1/user/ledger/account/:accountId(更新用户收款号✅):
+ * /v1/user/journal/account/:accountId(更新用户收款号✅):
  *   put:
  *     tags: ["ledger(记帐帐本)"]
  *     description: 添加用户收款号
@@ -301,7 +301,7 @@
  *                     type: string
  *                   account:
  *                     type: string
- *     response:
+ *     responses:
  *       200:
  *         content:
  *           application/json:
