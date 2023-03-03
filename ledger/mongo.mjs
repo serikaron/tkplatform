@@ -21,6 +21,7 @@ export async function setupMongo(req) {
         userLedgerAccounts: ledger.db.collection("userLedgerAccounts"),
         userJournalAccounts: ledger.db.collection("userJournalAccounts"),
         siteRecords: ledger.db.collection("siteRecords"),
+        ledgerSites: ledger.db.collection("ledgerSites"),
     }
     req.context.mongo = {
         client: ledger.client, db: ledger.db, collection,
@@ -242,6 +243,19 @@ export async function setupMongo(req) {
                 }, {
                     $set: {kept: true}
                 })
+        },
+        addLedgerSite: async (site) => {
+            const r = await collection.ledgerSites
+                .insertOne(site)
+            return r.insertedId
+        },
+        getLedgerSites: async (userId) => {
+            return await collection.ledgerSites
+                .find(
+                    {userId: new ObjectId(userId)},
+                    {projection: {_id: 1, name: 1, account: 1}}
+                )
+                .toArray()
         }
     }
 }

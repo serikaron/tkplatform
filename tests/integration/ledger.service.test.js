@@ -431,3 +431,43 @@ describe("test journal statistics", () => {
         })
     })
 })
+
+describe("test ledger site", () => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+
+    it("should be ok", async () => {
+        await runTest({
+            method: "POST",
+            path: '/v1/ledger/site',
+            body: {
+                name: "我的",
+                account: "帐号"
+            },
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.ledgerSiteId).toBeDefined()
+                box.data.ledgerSiteId = response.data.ledgerSiteId
+            }
+        })
+
+        await runTest({
+            method: "GET",
+            path: '/v1/ledger/sites',
+            baseURL,
+            userId,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data).toStrictEqual([
+                    {
+                        id: `${box.data.ledgerSiteId}`,
+                        name: "我的",
+                        account: "帐号"
+                    }
+                ])
+            }
+        })
+    })
+})
