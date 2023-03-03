@@ -1,68 +1,91 @@
 'use strict'
 
 import {isBadFieldString, isBadFieldObject, isBadPhone} from "../../common/utils.mjs";
-import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {InvalidArgument, Unauthorized} from "../../common/errors/00000-basic.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
-import {ResetAccountFailed, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs";
+import {ResetAccountFailed, UserNotExists, VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs";
 import {tokenPayload} from "../stubs.mjs";
+import {TKResponse} from "../../common/TKResponse.mjs";
+
+const hasBeenLogin = (req) => {
+    return req.headers.id !== undefined
+}
 
 function checkInput(req) {
-    if (isBadFieldObject(req.body.old)
-        || isBadFieldString(req.body.old.phone)
-        || isBadFieldString(req.body.old.password)
+    if (
+        isBadFieldObject(req.body.old)
         || isBadFieldObject(req.body.new)
         || isBadFieldString(req.body.new.phone)
-        || isBadFieldString(req.body.new.password)
         || isBadPhone(req.body.new.phone)
+        || isBadFieldString(req.body.new.smsCode)
     ) {
         throw new InvalidArgument()
+    }
+
+    if (hasBeenLogin(req)) {
+        if (isBadFieldString(req.body.old.smsCode)) {
+            throw new InvalidArgument()
+        }
+    } else {
+        if (isBadFieldString(req.body.old.phone)
+            || isBadFieldString(req.body.old.password)
+            || isBadPhone(req.body.old.phone)) {
+            throw new InvalidArgument()
+        }
     }
 }
 
 async function checkUser(req) {
-    const user = await req.context.mongo.getUserById(req.headers.id)
+    const user = await req.context.mongo.getPassword({userId: req.headers.id, phone: req.body.old.phone})
 
-    const invalidPassword = async () => {
-        return !(await req.context.password.verify(user.password, req.body.old.password))
+    if (user === null) {
+        throw new UserNotExists()
     }
 
-    if (
-        user === null
-        || user.phone !== req.headers.phone
-        || await invalidPassword()
-    ) {
-        throw new ResetAccountFailed()
+    if (!hasBeenLogin(req)) {
+        const match = await req.context.password.verify(user.password, req.body.old.password)
+        if (!match) {
+            throw new ResetAccountFailed()
+        }
     }
+
+    req.user = user
 }
 
 async function checkCode(req) {
-    const response = await req.context.stubs.sms.verify(req.body.new.phone, req.body.smsCode)
+    const response = await req.context.stubs.sms.verify(req.body.new.phone, req.body.new.smsCode)
     if (response.isError()) {
         throw new VerifySmsCodeFailed()
+    }
+
+    if (req.headers.id !== undefined) {
+        const response = await req.context.stubs.sms.verify(req.user.phone, req.body.old.smsCode)
+        if (response.isError()) {
+            throw new VerifySmsCodeFailed()
+        }
     }
 }
 
 async function updateDb(req) {
-    const encodedPassword = await req.context.password.encode(req.body.new.password)
-    await req.context.mongo.updateAccount(req.headers.id, req.body.new.phone, encodedPassword)
+    await req.context.mongo.updateAccount(req.user._id, req.body.new.phone)
 }
 
-async function genToken(req, res) {
-    const response = await req.context.stubs.token.gen(tokenPayload(req.headers.id, req.body.new.phone))
-    if (response.isError()) {
-        res.response({
-            status: 200,
-            code: 0,
-            msg: "更新成功，请重新登录",
-        })
+async function genToken(req) {
+    if (hasBeenLogin(req)) {
+        const response = await req.context.stubs.token.gen(tokenPayload(`${req.user._id}`, req.body.new.phone))
+        if (response.isError()) {
+            throw new Unauthorized()
+        }
+        req.responseData = response.data
     } else {
-        res.response({
-            status: 200,
-            code: 0,
-            msg: "更新成功",
-            data: response.data
-        })
+        req.responseData = {}
     }
+}
+
+async function onSuccess(req, res) {
+    res.tkResponse(TKResponse.Success({
+        data: req.responseData
+    }))
 }
 
 export function route(router) {
@@ -71,6 +94,7 @@ export function route(router) {
         checkUser,
         checkCode,
         updateDb,
-        genToken
+        genToken,
+        onSuccess,
     ]))
 }

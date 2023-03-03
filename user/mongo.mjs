@@ -71,9 +71,9 @@ export async function setupMongo(req) {
             await collection.users
                 .updateOne({_id}, {$set: {password}})
         },
-        updateAccount: async (id, phone, password) => {
+        updateAccount: async (_id, phone) => {
             await collection.users
-                .updateOne({_id: id}, {$set: {phone, password}})
+                .updateOne({_id}, {$set: {phone}})
         },
         getOverview: async (userId) => {
             return await collection.users

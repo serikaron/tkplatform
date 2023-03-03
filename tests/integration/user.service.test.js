@@ -329,4 +329,42 @@ describe("test user service", () => {
             await login(phone, "2222", false)
         })
     })
+
+    describe("test reset account", () => {
+        const reset = async (body, userId) => {
+            await runTest({
+                method: "POST",
+                path: '/v1/user/account',
+                body,
+                baseURL,
+                userId,
+                verify: response => {
+                    expect(response.status).toBe(200)
+                }
+            })
+        }
+
+        it("should be ok", async () => {
+            const box = new Box()
+            box.data.phone1 = genPhone()
+            await register(box.data.phone1, box)
+            await login(box.data.phone1, "123456", true)
+
+            box.data.phone2 = genPhone()
+            await reset({
+                old: {smsCode: "2065"},
+                new: {phone: box.data.phone2, smsCode: "2065"}
+            }, box.userId)
+            await login(box.data.phone1, "123456", false)
+            await login(box.data.phone2, "123456", true)
+
+            box.data.phone3 = genPhone()
+            await reset({
+                old: {phone: box.data.phone2, password: "123456"},
+                new: {phone: box.data.phone3, smsCode: "2065"}
+            }, undefined)
+            await login(box.data.phone2, "123456", false)
+            await login(box.data.phone3, "123456", true)
+        })
+    })
 })
