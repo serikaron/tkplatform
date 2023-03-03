@@ -137,7 +137,7 @@
  * @swagger
  * /v1/user/password(修改密码✅):
  *   post:
- *     tags: ["user(用户相关)"]
+ *     tags: ["user(用户相关)", "个人中心"]
  *     description: 修改密码在登录界面和用户中心都有入口，本接口两种情况都适用
  *     requestBody:
  *       content:
@@ -185,10 +185,10 @@
 
 /**
  * @swagger
- * /v1/user/account:
+ * /v1/user/account(修改帐号✅):
  *   post:
- *     tags: ["user(用户相关)"]
- *     description: 修改帐号
+ *     tags: ["user(用户相关)", "个人中心"]
+ *     description: 修改帐号在登录界面和用户中心都有入口，本接口两种情况都适用
  *     requestBody:
  *       content:
  *         application/json:
@@ -200,22 +200,20 @@
  *                 properties:
  *                   phone:
  *                     type: string
- *                     example: "13333333333"
+ *                     example: 未登录时需要
  *                   password:
  *                     type: string
- *                     example: "123456"
+ *                     example: 未登录时需要
+ *                   smsCode:
+ *                     type: string
+ *                     example: 登录之后需要
  *               new:
  *                 type: object
  *                 properties:
  *                   phone:
  *                     type: string
- *                     example: "14444444444"
- *                   password:
+ *                   smsCode:
  *                     type: string
- *                     example: "123456"
- *               smsCode:
- *                 type: string
- *                 example: "1234"
  *
  *     responses:
  *       200:
