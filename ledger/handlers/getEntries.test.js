@@ -8,7 +8,6 @@ import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {jest} from "@jest/globals";
 import {ObjectId} from "mongodb";
-import {now} from "../../common/utils.mjs";
 
 async function runTest(
     {
@@ -41,6 +40,20 @@ async function runTest(
     simpleCheckTKResponse(response, tkResponse)
 }
 
+const RealDate = Date.now
+const mockNow = () => {
+    return 0
+}
+
+beforeAll(() => {
+    // global.Date.now = () => { return 1677571421 }
+    global.Date.now = mockNow
+})
+
+afterAll(() => {
+    global.Date.now = RealDate
+})
+
 describe.each([
     {
         key: "ledger",
@@ -56,7 +69,7 @@ describe.each([
             minDate: "abc",
             maxDate: "abc",
             params: "?offset=abc&limit=abc",
-            dbArguments: {minDate: now() - 86400, maxDate: now(), offset: null, limit: null}
+            dbArguments: {minDate: mockNow() - 86400, maxDate: mockNow(), offset: null, limit: null}
         },
         {
             minDate: "123",
