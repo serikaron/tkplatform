@@ -295,8 +295,12 @@
  *       content:
  *         application/json:
  *           schema:
- *             type: string
- *             example: 参考查询接口
+ *                 type: object
+ *                 properties:
+ *                   name:
+ *                     type: string
+ *                   account:
+ *                     type: string
  *     response:
  *       200:
  *         content:
