@@ -4,11 +4,14 @@ import createApp from "../../common/app.mjs";
 import {setup} from "../server.mjs";
 import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import supertest from "supertest";
-import {simpleCheckResponse} from "../../tests/unittest/test-runner.mjs";
+import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {jest} from "@jest/globals"
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {CodeError} from "../../common/errors/30000-sms-captcha.mjs";
-import {InternalError} from "../../common/errors/00000-basic.mjs";
+import {InternalError, InvalidArgument, Unauthorized} from "../../common/errors/00000-basic.mjs";
+import {VerifySmsCodeFailed} from "../../common/errors/10000-user.mjs";
+import {genPhone} from "../../tests/common/utils.mjs";
+import {ObjectId} from "mongodb";
 
 const defaultBody = {
     old: {
@@ -71,7 +74,7 @@ async function runTest(
         setFn = async () => {
         },
         tokenFn = defaultTokenFn,
-        status, code, msg, data = {}
+        tkResponse,
     }) {
     const app = createApp()
     setup(app, {
@@ -105,127 +108,87 @@ async function runTest(
         .post("/v1/user/account")
         .set(headers)
         .send(body)
-    simpleCheckResponse(response, status, code, msg, data)
+    simpleCheckTKResponse(response, tkResponse)
 }
 
-test.concurrent.each([
-    {
-        new: {phone: "14444444444", password: "2345"},
-    },
-    {
-        old: {phone: "13333333333"},
-        new: {phone: "14444444444", password: "2345"},
-    },
-    {
-        old: {password: "1234"},
-        new: {phone: "14444444444", password: "2345"},
-    },
-    {
-        old: {phone: "13333333333", password: "1234"},
-    },
-    {
-        old: {phone: "13333333333", password: "1234"},
-        new: {password: "2345"},
-    },
-    {
-        old: {phone: "13333333333", password: "1234"},
-        new: {phone: "14444444444"},
-    },
-    {
-        old: {phone: "13333333333", password: "1234"},
-        new: {phone: "1111", password: "2345"},
-    },
-])("invalid body ($#) should return InvalidPassword", async (body) => {
-    await runTest({
-        body,
-        status: 400, code: -1, msg: "参数错误"
+describe("reset when after login", () => {
+    describe.each([
+        {
+            name: "missing old sms",
+            new: {phone: "14444444444", smsCode: "2345"},
+        },
+        {
+            name: "missing new phone",
+            old: {smsCode: "1234"},
+            new: {smsCode: "2345"},
+        },
+        {
+            name: "missing new sms",
+            old: {smsCode: "1234"},
+            new: {phone: "14444444444"},
+        },
+        {
+            name: "invalid new phone",
+            old: {smsCode: "1234"},
+            new: {phone: "1111", smsCode: "2345"},
+        },
+    ])("body $name", (body) => {
+        it("should return InvalidArgument", async () => {
+            delete body.name
+            await runTest({
+                body,
+                tkResponse: TKResponse.fromError(new InvalidArgument())
+            })
+        })
     })
-})
 
-test.concurrent.each([
-    {
-        name: "if phone not match (header vs db)",
-        headers: {id: "userId", phone: "13444444444"},
-        dbUser: null,
-        verifyResult: true,
-        body: defaultBody,
-    },
-    {
-        name: "if user not found in db",
-        dbUser: null,
-        headers: defaultHeaders,
-        verifyResult: true,
-        body: defaultBody,
-    },
-    {
-        name: "an invalid old password",
-        headers: defaultHeaders,
-        dbUser: defaultDbUser,
-        verifyResult: false,
-        body: defaultBody,
-    },
-])("$name should return bad request", async ({headers, dbUser, verifyResult, body}) => {
-    const getUserById = jest.fn(async () => {
-        return dbUser
+    test("should check sms code", async () => {
+        const smsFn = jest.fn(async () => {
+            return TKResponse.fromError(new CodeError())
+        })
+        await runTest({
+            smsFn,
+            tkResponse: TKResponse.fromError(new VerifySmsCodeFailed())
+        })
     })
-    const verify = jest.fn(async () => {
-        return verifyResult
-    })
-    await runTest({
-        headers,
-        getFn: getUserById,
-        verifyFn: verify,
-        status: 400, code: -10007, msg: "更新失败"
-    })
-    expect(getUserById).toHaveBeenCalledWith(headers.id)
-    if (dbUser !== null) {
-        expect(verify).toHaveBeenCalledWith(dbUser.password, body.old.password)
-    }
-})
 
-test("should check sms code", async () => {
-    const smsFn = jest.fn(async () => {
-        return TKResponse.fromError(new CodeError())
+    test("should update db correctly", async () => {
+        const updateAccount = jest.fn()
+        const encode = jest.fn(async () => {
+            return "encodedNewPassword"
+        })
+        await runTest({
+            setFn: updateAccount,
+            encodeFn: encode,
+            status: 200, code: 0, msg: "更新成功", data: defaultResponseData
+        })
+        expect(updateAccount).toHaveBeenCalledWith(defaultHeaders.id, defaultBody.new.phone, "encodedNewPassword")
+        expect(encode).toHaveBeenCalledWith(defaultBody.new.password)
     })
-    await runTest({
-        smsFn,
-        status: 400, code: -10006, msg: "验证码错误"
-    })
-    expect(smsFn).toHaveBeenCalledWith(defaultBody.new.phone, defaultBody.smsCode)
-})
 
-test("should update db correctly", async () => {
-    const updateAccount = jest.fn()
-    const encode = jest.fn(async () => {
-        return "encodedNewPassword"
-    })
-    await runTest({
-        setFn: updateAccount,
-        encodeFn: encode,
-        status: 200, code: 0, msg: "更新成功", data: defaultResponseData
-    })
-    expect(updateAccount).toHaveBeenCalledWith(defaultHeaders.id, defaultBody.new.phone, "encodedNewPassword")
-    expect(encode).toHaveBeenCalledWith(defaultBody.new.password)
-})
+    test("token failed should return 401", async () => {
+        const tokenFn = async () => {
+            return TKResponse.fromError(new InternalError())
+        }
 
-test.concurrent.each([
-    {
-        tokenResponse: TKResponse.fromError(new InternalError()),
-        status: 200, code: 0, msg: "更新成功，请重新登录", data: {}
-    },
-    {
-        tokenResponse: TKResponse.Success({data: defaultResponseData}),
-        status: 200, code: 0, msg: "更新成功", data: defaultResponseData
-    }
-])("($#) refresh token", async ({tokenResponse, status, code, msg, data}) => {
-    const tokenFn = jest.fn(async () => {
-        return tokenResponse
+        await runTest({
+            tokenFn,
+            tkResponse: TKResponse.fromError(new Unauthorized())
+        })
     })
-    await runTest({
-        tokenFn, status, code, msg, data
-    })
-    expect(tokenFn).toHaveBeenCalledWith({
-        id: defaultHeaders.id,
-        phone: defaultBody.new.phone
+
+    test("all well should return good", async () => {
+        const userId = new ObjectId()
+        const phone = genPhone()
+        const getPassword = jest.fn(async () => {
+            return {
+                phone,
+                password: "old password"
+            }
+        })
+        const smsFn = jest.fn(async () => {
+            return TKResponse.Success()
+        })
+        expect(getPassword).toHaveBeenCalledWith()
     })
 })

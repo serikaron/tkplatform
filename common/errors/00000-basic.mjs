@@ -53,3 +53,13 @@ export class NotFound extends TKError {
         });
     }
 }
+
+export class Unauthorized extends TKError {
+    constructor({msg = ""} = {}) {
+        super({
+            status: 401,
+            code: codeBase - 6,
+            msg
+        });
+    }
+}
