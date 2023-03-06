@@ -36,6 +36,9 @@ async function callAgent(app, url, method, needAuth, body) {
         case "PUT":
             agent = agent.put(url).send(body)
             break
+        case "DELETE":
+            agent = agent.del(url)
+            break
     }
 
     agent.set(makeHeaders(url, body, needAuth))
@@ -87,7 +90,7 @@ async function runTest(
         teardown: testDIContainer.teardown([])
     })
 
-    const body = method === "GET" ? undefined : {
+    const body = method === "GET" || method === "DELETE" ? undefined : {
         msg: "this is a fake body"
     }
     const response = await callAgent(app, url, method, needAuth, body)
@@ -261,6 +264,15 @@ test.concurrent.each([
         service: {
             baseURL: "http://site:8080",
             url: "/v1/user/sites"
+        }
+    },
+    {
+        url: "/v1/user/site/fake-site-id",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id",
         }
     },
     {
@@ -535,4 +547,16 @@ test.concurrent.each([
     },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
+})
+
+test.skip("only one for debug", async () => {
+    await runTest({
+        url: "/v1/user/site/fake-site-id",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/user/site/fake-site-id",
+        }
+    })
 })

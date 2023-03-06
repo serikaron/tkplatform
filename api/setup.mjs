@@ -52,6 +52,9 @@ function useDispatcher(router) {
         } else if (info.method.toUpperCase() === "PUT") {
             console.log(`${info.url} PUT`)
             router.put(info.url, dispatch)
+        } else if (info.method.toUpperCase() === "DELETE") {
+            console.log(`${info.url} DELETE`)
+            router.delete(info.url, dispatch)
         } else {
             console.log(`${info.url} GET`)
             router.get(info.url, dispatch)

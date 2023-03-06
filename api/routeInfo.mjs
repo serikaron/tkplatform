@@ -25,6 +25,7 @@ const routeInfo = [
     {url: '/v1/user/site/:siteId', method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: '/v1/user/sites', method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:siteId", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/user/site/:siteId", method: "DELETE", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/sites", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/sites/balance", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
