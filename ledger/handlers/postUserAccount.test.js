@@ -7,6 +7,7 @@ import {jest} from "@jest/globals";
 import supertest from "supertest";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {ObjectId} from "mongodb";
 
 describe.each([
     {
@@ -41,22 +42,23 @@ describe.each([
             teardown: testDIContainer.teardown([])
         })
 
+        const userId = new ObjectId()
         const response = await supertest(app)
             .post(path)
             .send({msg: "a fake account body"})
-            .set({id: "a fake user id"})
+            .set({id: `${userId}`})
         simpleCheckTKResponse(response, TKResponse.Success({
             data: resBody
         }))
         if (ledgerFn !== undefined) {
             expect(ledgerFn).toHaveBeenCalledWith({
-                userId: "a fake user id",
+                userId: userId,
                 msg: "a fake account body"
             })
         }
         if (journalFn !== undefined) {
             expect(journalFn).toHaveBeenCalledWith({
-                userId: "a fake user id",
+                userId: userId,
                 msg: "a fake account body"
             })
         }

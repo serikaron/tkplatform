@@ -14,7 +14,8 @@ describe.each([
         ledgerFn: jest.fn(async () => {
             return [{
                 msg: "a fake ledger account",
-                _id: "a fake account id"
+                _id: "a fake account id",
+                userId: "a fake user id",
             }]
         }),
         resBody: [{
@@ -27,7 +28,8 @@ describe.each([
         journalFn: jest.fn(async () => {
             return [{
                 msg: "a fake journal account",
-                _id: "a fake account id"
+                _id: "a fake account id",
+                userId: "a fake user id"
             }]
         }),
         resBody: [{

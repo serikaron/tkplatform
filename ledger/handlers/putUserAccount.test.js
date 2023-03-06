@@ -45,12 +45,12 @@ test("update account", async () => {
         .set({id: "a fake user id"})
     simpleCheckTKResponse(response, TKResponse.Success())
     if (ledgerFn !== undefined) {
-        expect(ledgerFn).toHaveBeenCalledWith("a fake user id", "fake-account-id", {
+        expect(ledgerFn).toHaveBeenCalledWith("fake-account-id", "a fake user id", {
             msg: "a fake account body",
         })
     }
     if (journalFn !== undefined) {
-        expect(journalFn).toHaveBeenCalledWith("a fake user id", "fake-account-id", {
+        expect(journalFn).toHaveBeenCalledWith("fake-account-id", "a fake user id", {
             msg: "a fake account body",
         })
     }

@@ -178,10 +178,16 @@ export async function setupMongo(req) {
             return await collection.journalAccounts.find({}, {_id: 0}).toArray()
         },
         getUserLedgerAccounts: async (userId) => {
-            return await collection.userLedgerAccounts.find({userId}).toArray()
+            return await collection.userLedgerAccounts.find({
+                userId: new ObjectId(userId),
+                deleted: {$ne: true}
+            }).toArray()
         },
         getUserJournalAccounts: async (userId) => {
-            return await collection.userJournalAccounts.find({userId}).toArray()
+            return await collection.userJournalAccounts.find({
+                userId: new ObjectId(userId),
+                deleted: {$ne: true}
+            }).toArray()
         },
         addUserLedgerAccount: async (account) => {
             const r = await collection.userLedgerAccounts.insertOne(account)
@@ -191,19 +197,31 @@ export async function setupMongo(req) {
             const r = await collection.userJournalAccounts.insertOne(account)
             return r.insertedId
         },
-        setUserLedgerAccount: async (userId, accountId, account) => {
+        setUserLedgerAccount: async (accountId, userId, account) => {
             await collection.userLedgerAccounts
                 .updateOne(
-                    {userId: new ObjectId(userId), _id: new ObjectId(accountId)},
+                    {_id: new ObjectId(accountId), userId: new ObjectId(userId)},
                     {$set: account}
                 )
         },
-        setUserJournalAccount: async (userId, accountId, account) => {
+        setUserJournalAccount: async (accountId, userId, account) => {
             await collection.userJournalAccounts
                 .updateOne(
-                    {userId: new ObjectId(userId), _id: new ObjectId(accountId)},
+                    {_id: new ObjectId(accountId), userId: new ObjectId(userId)},
                     {$set: account}
                 )
+        },
+        delUserLedgerAccount: async (accountId, userId) => {
+            await collection.userLedgerAccounts.updateOne(
+                {_id: new ObjectId(accountId), userId: new ObjectId(userId)},
+                {$set: {deleted: true}}
+            )
+        },
+        delUserJournalAccount: async (accountId, userId) => {
+            await collection.userJournalAccounts.updateOne(
+                {_id: new ObjectId(accountId), userId: new ObjectId(userId)},
+                {$set: {deleted: true}}
+            )
         },
         getSiteRecords: async (userId, siteId, minDate, maxDate) => {
             const filter = siteId === undefined ? {

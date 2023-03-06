@@ -395,7 +395,7 @@ describe("test journal statistics", () => {
 
     it.each([
         // not count
-        {amount: 1000, credited: true, createdAt: now()-86400},
+        {amount: 1000, credited: true, createdAt: now() - 86400},
         // count
         {amount: 100, credited: false},
         {amount: 200, credited: true}
@@ -468,6 +468,106 @@ describe("test ledger site", () => {
                     }
                 ])
             }
+        })
+    })
+})
+
+describe.only.each([
+    "ledger", "journal"
+])("%s accounts", (key) => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+
+    const add = async (account) => {
+        await runTest({
+            method: "POST",
+            path: `/v1/user/${key}/account`,
+            body: account,
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data.accountId).toBeDefined()
+                account.id = rsp.data.accountId
+            }
+        })
+    }
+
+    const check = async (desired) => {
+        await runTest({
+            method: "GET",
+            path: `/v1/user/${key}/accounts`,
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data).toStrictEqual(desired)
+            }
+        })
+    }
+
+    it("add", async () => {
+        box.data.account1 = {
+            name: "陶宝",
+            account: "my account"
+        }
+        await add(box.data.account1)
+    })
+
+    it("check", async () => {
+        await check([box.data.account1])
+    })
+
+    it("update", async () => {
+        const update = {
+            name: "微信",
+            icon: "icon-url",
+            account: "edited account"
+        };
+        await runTest({
+            method: "PUT",
+            path: `/v1/user/${key}/account/${box.data.account1.id}`,
+            body: update,
+            baseURL,
+            userId,
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
+        })
+        Object.assign(box.data.account1, update)
+    })
+
+    it("check", async () => {
+        await check([box.data.account1])
+    })
+
+    describe("test delete", () => {
+        it("add more", async () => {
+            box.data.account2 = {
+                name: "京东",
+                account: "jd account",
+            }
+            await add(box.data.account2)
+        })
+
+        it("check", async () => {
+            await check([box.data.account1, box.data.account2])
+        })
+
+        it("delete", async () => {
+            await runTest({
+                method: "DELETE",
+                path: `/v1/user/${key}/account/${box.data.account1.id}`,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        it("check", async () => {
+            await check([box.data.account2])
         })
     })
 })

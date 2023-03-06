@@ -9,6 +9,7 @@ export function routeGetUserAccounts(router) {
             data: accounts.map(x => {
                 x.id = x._id
                 x._id = undefined
+                delete x.userId
                 return x
             })
         }))
@@ -20,6 +21,7 @@ export function routeGetUserAccounts(router) {
             data: accounts.map(x => {
                 x.id = x._id
                 x._id = undefined
+                delete x.userId
                 return x
             })
         }))
