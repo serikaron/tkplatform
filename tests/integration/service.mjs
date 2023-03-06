@@ -6,20 +6,6 @@ import * as dotenv from 'dotenv'
 import {simpleVerification} from "./verification.mjs";
 
 dotenv.config()
-
-function url(path, query) {
-    if (query === undefined) {
-        return path
-    }
-    const queryString =
-        Object.keys(query)
-            .map(key => {
-                return [key, query[key]].join("=")
-            })
-            .join("&")
-    return encodeURI(`${path}?${queryString}`)
-}
-
 function headers(userId) {
     return {
         id: userId
@@ -35,7 +21,8 @@ function axiosConfig({path, query, body, method, baseURL, userId}) {
     }
     return {
         baseURL,
-        url: url(path, query),
+        url: path,
+        params: query,
         data: body,
         method: getMethod(),
         headers: headers(userId)

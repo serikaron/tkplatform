@@ -572,6 +572,24 @@ test.concurrent.each([
             url: "/v1/ledger/template/fake-template-id",
         }
     },
+    {
+        url: "/v1/ledger/entries",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entries",
+        }
+    },
+    {
+        url: "/v1/journal/entries",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entries",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

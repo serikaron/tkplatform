@@ -2,10 +2,18 @@
 
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
-import {mergeObjects, now, today} from "../../common/utils.mjs";
+import {dateToTimestamp, mergeObjects, now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
 
 const baseURL = "http://localhost:9007"
+
+const newEntry = () => {
+    return {
+        account: "entryAccount",
+        comment: "entryComment",
+        createdAt: now()
+    }
+}
 
 class Box {
     constructor() {
@@ -14,14 +22,6 @@ class Box {
 
     get data() {
         return this._data
-    }
-
-    newEntry() {
-        return {
-            account: "entryAccount",
-            comment: "entryComment",
-            createdAt: now()
-        }
     }
 }
 
@@ -40,10 +40,16 @@ const addEntry = async (key, entry, userId) => {
     })
 }
 
-async function checkEntries(key, userId, query, desired) {
+async function checkEntries(
+    {
+        key, userId, desired,
+        query = {},
+        dateRange = {minDate: today(), maxDate: today() + 86400}
+    }
+) {
     await runTest({
         method: "GET",
-        path: `/v1/${key}/entries/${today()}/${today() + 86400}`,
+        path: `/v1/${key}/entries/${dateRange.minDate}/${dateRange.maxDate}`,
         query: query,
         baseURL,
         userId: userId,
@@ -91,16 +97,19 @@ describe.each([
             box.data.userId = `${new ObjectId()}`
 
             test("add entry", async () => {
-                box.data.entry1 = box.newEntry()
+                box.data.entry1 = newEntry()
                 await addEntry(key, box.data.entry1, box.data.userId)
             })
 
             test("check entry after add", async () => {
-                await checkEntries(key, box.data.userId, {},
-                    {
+                await checkEntries({
+                    key,
+                    userId: box.data.userId,
+                    desired: {
                         total: 1,
                         items: [box.data.entry1]
-                    });
+                    }
+                })
             })
 
             test("update specify field of entry", async () => {
@@ -108,11 +117,13 @@ describe.each([
             })
 
             test("check entry after updating", async () => {
-                await checkEntries(key, box.data.userId, {},
-                    {
+                await checkEntries({
+                    key, userId: box.data.userId,
+                    desired: {
                         total: 1,
                         items: [box.data.entry1]
-                    });
+                    }
+                });
             })
         })
 
@@ -121,22 +132,24 @@ describe.each([
             box.data.userId = `${new ObjectId()}`
 
             test("add entry1", async () => {
-                box.data.entry1 = box.newEntry()
+                box.data.entry1 = newEntry()
                 await addEntry(key, box.data.entry1, box.data.userId)
             })
 
             test("add entry1", async () => {
-                box.data.entry2 = box.newEntry()
+                box.data.entry2 = newEntry()
                 box.data.entry2.createdAt = now() - 86400
                 await addEntry(key, box.data.entry2, box.data.userId)
             })
 
             test("check", async () => {
-                await checkEntries(key, box.data.userId, {},
-                    {
+                await checkEntries({
+                    key, userId: box.data.userId,
+                    desired: {
                         total: 1,
                         items: [box.data.entry1]
-                    });
+                    }
+                });
             })
         })
 
@@ -144,29 +157,35 @@ describe.each([
             const box = new Box()
             box.data.userId = `${new ObjectId}`
 
-            box.data.entry1 = box.newEntry()
+            box.data.entry1 = newEntry()
             await addEntry(key, box.data.entry1, box.data.userId)
 
-            box.data.entry2 = box.newEntry()
+            box.data.entry2 = newEntry()
             box.data.entry2.createdAt = now() - 10
             await addEntry(key, box.data.entry2, box.data.userId)
 
-            await checkEntries(key, box.data.userId, {offset: 0, limit: 1},
-                {
+            await checkEntries({
+                key, userId: box.data.userId,
+                query: {offset: 0, limit: 1},
+                desired: {
                     total: 2,
                     items: [box.data.entry1]
-                })
-            await checkEntries(key, box.data.userId, {offset: 1, limit: 1},
-                {
+                }
+            })
+            await checkEntries({
+                key, userId: box.data.userId,
+                query: {offset: 1, limit: 1},
+                desired: {
                     total: 2,
                     items: [box.data.entry2]
-                })
+                }
+            })
         })
 
         test("query with entry id", async () => {
             const box = new Box()
             box.data.userId = `${new ObjectId()}`
-            box.data.entry = box.newEntry()
+            box.data.entry = newEntry()
 
             await addEntry(key, box.data.entry, box.data.userId)
             await checkEntry(key, box.data.userId, box.data.entry.id, box.data.entry)
@@ -175,7 +194,7 @@ describe.each([
         test("update nested field", async () => {
             const box = new Box()
             box.data.userId = `${new ObjectId()}`
-            box.data.entry = box.newEntry()
+            box.data.entry = newEntry()
             box.data.entry.field = {
                 nestedField1: "nestedField1",
                 nestedField2: "nestedField2"
@@ -192,6 +211,110 @@ describe.each([
             await updateEntry(key, box.data.entry, box.data.userId, update)
 
             await checkEntry(key, box.data.userId, box.data.entry.id, box.data.entry)
+        })
+
+        describe("delete entries", () => {
+            const entryFromDate = (date) => {
+                const out = newEntry()
+                out.createdAt = date
+                return out
+            }
+            const deleteEntry = async (userId, query) => {
+                await runTest({
+                    method: "DELETE",
+                    path: `/v1/${key}/entries`,
+                    query,
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                    }
+                })
+            }
+
+            test("delete by year", async () => {
+                const box = new Box()
+                const userId = `${new ObjectId}`
+                box.data.lastYearEntries = [
+                    dateToTimestamp(2022, 1, 1),
+                    dateToTimestamp(2022, 6, 6),
+                    dateToTimestamp(2022, 12, 31)
+                ].map(entryFromDate)
+                for (const entry of box.data.lastYearEntries) {
+                    await addEntry(key, entry, userId)
+                }
+                box.data.thisYearEntry = entryFromDate(dateToTimestamp(2023, 1, 1))
+                await addEntry(key, box.data.thisYearEntry, userId)
+
+                await deleteEntry(userId, {year: 2022})
+
+                await checkEntries({
+                    key, userId,
+                    dateRange: {
+                        minDate: dateToTimestamp(2022, 1, 1),
+                        maxDate: dateToTimestamp(2023, 12, 31)
+                    },
+                    desired: {total: 1, items: [box.data.thisYearEntry]}
+                })
+            })
+
+            test("delete by month", async () => {
+                const box = new Box()
+                const userId = `${new ObjectId}`
+                box.data.lastMonthEntries = [
+                    dateToTimestamp(2022, 1, 1),
+                    dateToTimestamp(2022, 1, 15),
+                    dateToTimestamp(2022, 1, 31)
+                ].map(entryFromDate)
+                for (const entry of box.data.lastMonthEntries) {
+                    await addEntry(key, entry, userId)
+                }
+                box.data.thisMonthEntry = entryFromDate(dateToTimestamp(2022, 2, 1))
+                await addEntry(key, box.data.thisMonthEntry, userId)
+
+                await deleteEntry(userId, {year: 2022, month: 1})
+
+                await checkEntries({
+                    key, userId,
+                    dateRange: {
+                        minDate: dateToTimestamp(2022, 1, 1),
+                        maxDate: dateToTimestamp(2022, 2, 28)
+                    },
+                    desired: {total: 1, items: [box.data.thisMonthEntry]}
+                })
+            })
+
+            test("delete by month list", async () => {
+                const box = new Box()
+                const userId = `${new ObjectId}`
+                box.data.entriesToDelete = [
+                    dateToTimestamp(2022, 1, 1),
+                    dateToTimestamp(2022, 1, 15),
+                    dateToTimestamp(2022, 1, 31),
+                    dateToTimestamp(2022, 3, 1),
+                    dateToTimestamp(2022, 3, 15),
+                    dateToTimestamp(2022, 3, 31),
+                    dateToTimestamp(2022, 12, 1),
+                    dateToTimestamp(2022, 12, 15),
+                    dateToTimestamp(2022, 12, 31),
+                ].map(entryFromDate)
+                for (const entry of box.data.entriesToDelete) {
+                    await addEntry(key, entry, userId)
+                }
+                box.data.keepingEntry = entryFromDate(dateToTimestamp(2022, 6, 1))
+                await addEntry(key, box.data.keepingEntry, userId)
+
+                await deleteEntry(userId, {year: 2022, month: [1, 3, 12]})
+
+                await checkEntries({
+                    key, userId,
+                    dateRange: {
+                        minDate: dateToTimestamp(2022, 1, 1),
+                        maxDate: dateToTimestamp(2022, 12, 31)
+                    },
+                    desired: {total: 1, items: [box.data.keepingEntry]}
+                })
+            })
         })
     })
 })
@@ -388,6 +511,9 @@ describe("test ledger statistics", () => {
             })
         })
     })
+
+    // TODO: to be implemented
+    describe("statistics with deleted entry", () => {})
 })
 
 describe("test journal statistics", () => {
@@ -430,6 +556,10 @@ describe("test journal statistics", () => {
             }
         })
     })
+
+    describe("statistics with deleted entries", () => {
+        //TODO: to be implemented
+    })
 })
 
 describe("test ledger site", () => {
@@ -448,8 +578,8 @@ describe("test ledger site", () => {
             userId,
             verify: response => {
                 simpleVerification(response)
-                expect(response.data.ledgerSiteId).toBeDefined()
-                box.data.ledgerSiteId = response.data.ledgerSiteId
+                expect(response.data.id).toBeDefined()
+                box.data.ledgerSiteId = response.data.id
             }
         })
 
@@ -702,7 +832,9 @@ describe("sites", () => {
             path: `/v1/ledger/site/${box.data.site1.id}`,
             baseURL,
             userId,
-            verify: rsp => { expect(rsp.status).toBe(200) }
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
         })
     })
 

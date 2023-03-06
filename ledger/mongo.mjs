@@ -42,7 +42,8 @@ export async function setupMongo(req) {
         getEntries: async (collectionName, userId, minDate, maxDate, offset, limit) => {
             const filter = {
                 userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate}
+                createdAt: {$gte: minDate, $lt: maxDate},
+                deleted: {$ne: true}
             };
             let query = ledger.db.collection(collectionName)
                 .find(filter)
@@ -60,11 +61,22 @@ export async function setupMongo(req) {
 
             return {total, items}
         },
+        delEntries: async (collectionName, userId, from, to) => {
+            await ledger.db.collection(collectionName)
+                .updateMany(
+                    {
+                        userId: new ObjectId(userId),
+                        createdAt: {$gte: from, $lt: to}
+                    },
+                    {$set: {deleted: true}}
+                )
+        },
         getEntry: async (collectionName, entryId, userId) => {
             return await ledger.db.collection(collectionName)
                 .findOne({
                     _id: new ObjectId(entryId),
-                    userId: new ObjectId(userId)
+                    userId: new ObjectId(userId),
+                    deleted: {$ne: true}
                 })
         },
         getLedgerStatistics: async (userId, minDate, maxDate) => {
@@ -73,6 +85,7 @@ export async function setupMongo(req) {
                     $match: {
                         userId: new ObjectId(userId),
                         createdAt: {$gte: minDate, $lt: maxDate},
+                        deleted: {$ne: true}
                     }
                 },
                 {
@@ -121,7 +134,8 @@ export async function setupMongo(req) {
                     {
                         $match: {
                             userId: new ObjectId(userId),
-                            createdAt: {$gte: minDate, $lt: maxDate}
+                            createdAt: {$gte: minDate, $lt: maxDate},
+                            deleted: {$ne: true}
                         }
                     },
                     {
@@ -138,7 +152,8 @@ export async function setupMongo(req) {
                 {
                     $match: {
                         userId: new ObjectId(userId),
-                        createdAt: {$gte: minDate, $lt: maxDate}
+                        createdAt: {$gte: minDate, $lt: maxDate},
+                        deleted: {$ne: true}
                     }
                 },
                 {

@@ -1069,7 +1069,7 @@
 
 /**
  * @swagger
- * /v1/ledger/entries(删除帐本数据):
+ * /v1/ledger/entries(删除帐本数据✅):
  *   delete:
  *     tags: ["ledger(记帐帐本)"]
  *     parameters:
@@ -1423,7 +1423,7 @@
 
 /**
  * @swagger
- * /v1/journal/entries(删除提现帐本数据):
+ * /v1/journal/entries(删除提现帐本数据✅):
  *   delete:
  *     tags: ["ledger(记帐帐本)"]
  *     parameters:
