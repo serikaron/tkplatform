@@ -147,6 +147,13 @@
 
 /**
  * @swagger
+ * /v1/user/ledger/account/:accountId(删除用户买号✅):
+ *   delete:
+ *     tags: ["ledger(记帐帐本)"]
+ */
+
+/**
+ * @swagger
  * /v1/journal/accounts(系统收款号✅):
  *   get:
  *     tags: ["ledger(记帐帐本)"]
@@ -264,6 +271,13 @@
  *       200:
  *         description: 返回成功
  *
+ */
+
+/**
+ * @swagger
+ * /v1/user/journal/account/:accountId(删除用户收款号✅):
+ *   delete:
+ *     tags: ["ledger(记帐帐本)"]
  */
 
 /**
