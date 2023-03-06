@@ -54,6 +54,18 @@ const routeInfo = [
         service: {baseURL: "http://ledger:8080"}
     },
     {
+        url: "/v1/user/ledger/account/:accountId",
+        method: "DELETE",
+        needAuth: true,
+        service: {baseURL: "http://ledger:8080"}
+    },
+    {
+        url: "/v1/user/journal/account/:accountId",
+        method: "DELETE",
+        needAuth: true,
+        service: {baseURL: "http://ledger:8080"}
+    },
+    {
         url: "/v1/ledger/entries/:minDate/:maxDate",
         method: "GET",
         needAuth: true,
