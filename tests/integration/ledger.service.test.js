@@ -472,7 +472,7 @@ describe("test ledger site", () => {
     })
 })
 
-describe.only.each([
+describe.each([
     "ledger", "journal"
 ])("%s accounts", (key) => {
     const box = new Box()
@@ -569,5 +569,79 @@ describe.only.each([
         it("check", async () => {
             await check([box.data.account2])
         })
+    })
+})
+
+describe.only("templates", () => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+
+    const defaultTemplate = (id, i) => {
+        return {
+            id,
+            "name": `通用设置${i + 1}`,
+            "account": true,
+            "taskId": false,
+            "store": true,
+            "ledgerAccount": true,
+            "shop": true,
+            "product": false,
+            "journalAccount": false,
+            "refund": {
+                "from": false,
+                "type": false
+            },
+            "received": false,
+            "status": true,
+            "screenshot": false,
+            "comment": true
+        }
+    }
+
+    const get = async () => {
+        let templates = undefined
+        await runTest({
+            method: "GET",
+            path: '/v1/ledger/templates',
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                templates = rsp.data
+            }
+        })
+        return templates
+    }
+
+    it("get default templates", async () => {
+        const templates = await get()
+        const expectTemplates = templates
+            .map(x => x.id)
+            .map(defaultTemplate)
+        expect(templates).toStrictEqual(expectTemplates)
+        box.data.templates = expectTemplates
+    })
+
+    it("update", async () => {
+        await runTest({
+            method: "PUT",
+            path: `/v1/ledger/template/${box.data.templates[3].id}`,
+            body: {
+                name: "template3",
+                refund: {type: true},
+            },
+            baseURL,
+            userId,
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
+        })
+        box.data.templates[3].name = "template3"
+        box.data.templates[3].refund.type = true
+    })
+
+    it("check after update", async () => {
+        const rsp = await get()
+        expect(rsp).toStrictEqual(box.data.templates)
     })
 })

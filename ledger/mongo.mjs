@@ -22,6 +22,7 @@ export async function setupMongo(req) {
         userJournalAccounts: ledger.db.collection("userJournalAccounts"),
         siteRecords: ledger.db.collection("siteRecords"),
         ledgerSites: ledger.db.collection("ledgerSites"),
+        ledgerTemplates: ledger.db.collection("ledgerTemplates"),
     }
     req.context.mongo = {
         client: ledger.client, db: ledger.db, collection,
@@ -274,6 +275,36 @@ export async function setupMongo(req) {
                     {projection: {_id: 1, name: 1, account: 1}}
                 )
                 .toArray()
+        },
+        addTemplates: async (userId, templates) => {
+            await collection.ledgerTemplates
+                .insertOne({
+                    userId: new ObjectId(userId),
+                    templates,
+                })
+        },
+        getTemplates: async (userId) => {
+            return await collection.ledgerTemplates
+                .findOne(
+                    {userId: new ObjectId(userId)},
+                    {projection: {templates: 1, _id: 0}}
+                )
+        },
+        updateTemplate: async (userId, templateId, update) => {
+            console.log(JSON.stringify(update, null, 4))
+            const mongoUpdate = Object.keys(update)
+                .reduce((acc, key) => {
+                    const newKey = `templates.$[tmpl].${key}`
+                    acc[newKey] = update[key]
+                    return acc
+                }, {})
+            console.log(JSON.stringify(mongoUpdate, null, 4))
+            await collection.ledgerTemplates
+                .updateOne(
+                    {userId: new ObjectId(userId)},
+                    {$set: mongoUpdate},
+                    {arrayFilters: [{"tmpl.id": new ObjectId(templateId)}]}
+                )
         }
     }
 }

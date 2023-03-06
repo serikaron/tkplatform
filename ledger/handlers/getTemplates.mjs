@@ -32,13 +32,17 @@ const defaultTemplates = () => {
 }
 export const routeGetTemplates = router => {
     router.get('/ledger/templates', async (req, res, next) => {
-        let l = await req.context.mongo.getTemplates(req.headers.id)
-        if (l.length === 0) {
-            l = defaultTemplates()
-            await req.context.mongo.addTemplates(req.headers.id, l)
+        const  dbRes = await req.context.mongo.getTemplates(req.headers.id)
+        const templates = dbRes === null ?
+            defaultTemplates() :
+            dbRes.templates
+
+        if (dbRes === null) {
+            await req.context.mongo.addTemplates(req.headers.id, templates)
         }
+
         res.tkResponse(TKResponse.Success({
-            data: l
+            data: templates
         }))
         next()
     })

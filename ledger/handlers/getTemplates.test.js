@@ -66,7 +66,7 @@ const runTest = async (
 test("add default templates when not found", async () => {
     const addTemplates = jest.fn()
     const getTemplates = jest.fn(async () => {
-        return []
+        return null
     })
     const userId = new ObjectId()
 
@@ -92,7 +92,7 @@ test("add default templates when not found", async () => {
 test("return templates when found", async () => {
     const templates = getDefaultTemplates([1,2,3,4,5].map(_ => `${new ObjectId()}`))
     const getTemplates = jest.fn(async () => {
-        return templates
+        return {templates}
     })
     const userId = new ObjectId()
 

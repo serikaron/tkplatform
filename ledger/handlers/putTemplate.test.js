@@ -41,7 +41,7 @@ test("put template should update db", async () => {
         })
 
     simpleCheckTKResponse(response, TKResponse.Success())
-    expect(updateTemplate).toHaveBeenCalledWith(`${userId}`, {
+    expect(updateTemplate).toHaveBeenCalledWith(`${userId}`, `${templateId}`, {
         "name": "tempalte-name",
         "refund.from": true
     })
