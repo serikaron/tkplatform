@@ -35,6 +35,14 @@ export function today() {
     return Math.floor(startOfToday.getTime() / 1000); // get the timestamp in milliseconds
 }
 
+export function parseDate(dateString) {
+    return Math.floor(new Date(dateString).getTime() / 1000)
+}
+
+export function dateToTimestamp(year, month, day) {
+    return parseDate(`${year}/${month}/${day}`)
+}
+
 export function dateRange(
     minDate, maxDate,
     {
