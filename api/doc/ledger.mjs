@@ -333,7 +333,7 @@
 
 /**
  * @swagger
- * /v1/ledger/site/:site(删除自定义站点):
+ * /v1/ledger/site/:site(删除自定义站点✅):
  *   delete:
  *     tags: ["ledger(记帐帐本)"]
  *
