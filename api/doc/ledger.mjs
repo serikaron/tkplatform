@@ -65,6 +65,8 @@
  *               items:
  *                 type: object
  *                 properties:
+ *                   id:
+ *                     type: string
  *                   name:
  *                     type: string
  *                     example: 陶宝
@@ -184,6 +186,8 @@
  *               items:
  *                 type: object
  *                 properties:
+ *                   id:
+ *                     type: string
  *                   name:
  *                     type: string
  *                     example: 微信
@@ -915,39 +919,43 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 name:
- *                   type: string
- *                 account:
- *                   type: boolean
- *                 taskId:
- *                   type: boolean
- *                 store:
- *                   type: boolean
- *                 ledgerAccount:
- *                   type: boolean
- *                 shop:
- *                   type: boolean
- *                 product:
- *                   type: boolean
- *                 journalAccount:
- *                   type: boolean
- *                 refund:
- *                   from:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   account:
  *                     type: boolean
- *                   type:
+ *                   taskId:
  *                     type: boolean
- *                 received:
- *                   type: boolean
- *                 status:
- *                   type: boolean
- *                 screenshot:
- *                   type: boolean
- *                 comment:
- *                   type: boolean
+ *                   store:
+ *                     type: boolean
+ *                   ledgerAccount:
+ *                     type: boolean
+ *                   shop:
+ *                     type: boolean
+ *                   product:
+ *                     type: boolean
+ *                   journalAccount:
+ *                     type: boolean
+ *                   refund:
+ *                     type: object
+ *                     properties:
+ *                       from:
+ *                         type: boolean
+ *                       type:
+ *                         type: boolean
+ *                   received:
+ *                     type: boolean
+ *                   status:
+ *                     type: boolean
+ *                   screenshot:
+ *                     type: boolean
+ *                   comment:
+ *                     type: boolean
  *
  *
  */
@@ -962,8 +970,41 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: string
- *               example: 参考查询接口返结构s
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   account:
+ *                     type: boolean
+ *                   taskId:
+ *                     type: boolean
+ *                   store:
+ *                     type: boolean
+ *                   ledgerAccount:
+ *                     type: boolean
+ *                   shop:
+ *                     type: boolean
+ *                   product:
+ *                     type: boolean
+ *                   journalAccount:
+ *                     type: boolean
+ *                   refund:
+ *                     type: object
+ *                     properties:
+ *                       from:
+ *                         type: boolean
+ *                       type:
+ *                         type: boolean
+ *                   received:
+ *                     type: boolean
+ *                   status:
+ *                     type: boolean
+ *                   screenshot:
+ *                     type: boolean
+ *                   comment:
+ *                     type: boolean
  */
 
 /**

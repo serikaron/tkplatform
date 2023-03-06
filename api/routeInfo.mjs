@@ -87,6 +87,8 @@ const routeInfo = [
     {url: "/v1/site/:userSiteId/record/:recordId", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/sites", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/site", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/templates", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/template/:templateId", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 ]
 
 export default routeInfo
