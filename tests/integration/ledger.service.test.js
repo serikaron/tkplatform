@@ -647,7 +647,7 @@ describe("templates", () => {
 })
 
 
-describe.only("sites", () => {
+describe("sites", () => {
     const box = new Box()
     const userId = `${new ObjectId()}`
 

@@ -164,7 +164,7 @@ const checkEntries = async (userId, userSiteId, offset, limit, desired) => {
 }
 
 describe("test site service", () => {
-    describe.only("test access user site", () => {
+    describe("test access user site", () => {
         const box = new Box()
         const userId = `${new ObjectId()}`
         test("Get system sites", async () => {
