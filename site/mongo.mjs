@@ -32,7 +32,10 @@ export async function setupMongo(req) {
         },
         getUserSites: async (userId) => {
             return await collection.userSites.find(
-                {userId: new ObjectId(userId)}
+                {
+                    userId: new ObjectId(userId),
+                    deleted: {$ne: true}
+                }
             ).toArray()
         },
         setUserSiteOne: async (userId, siteId, site) => {
@@ -46,8 +49,15 @@ export async function setupMongo(req) {
         getUserSite: async (siteId, userId) => {
             return await collection.userSites.findOne({
                 _id: new ObjectId(siteId),
-                userId: new ObjectId(userId)
+                userId: new ObjectId(userId),
+                deleted: {$ne: true}
             })
+        },
+        delUserSite: async (siteId, userId) => {
+            await collection.userSites.updateOne(
+                {_id: new ObjectId(siteId), userId: new ObjectId(userId)},
+                {$set: {deleted: true}}
+            )
         },
         getUserSitesBalance: async (userId) => {
             return await collection.userSites

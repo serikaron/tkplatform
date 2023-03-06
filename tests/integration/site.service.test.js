@@ -3,7 +3,7 @@
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
 import {ObjectId} from "mongodb";
-import {mergeObjects, now} from "../../common/utils.mjs";
+import {copy, mergeObjects, now} from "../../common/utils.mjs";
 
 class Box {
     constructor() {
@@ -12,7 +12,7 @@ class Box {
 
     getEmptyUserSite() {
         return {
-            site: this.data.site,
+            site: copy(this.data.site),
             "credential": {
                 "account": "",
                 "password": ""
@@ -122,6 +122,18 @@ const getSites = async (userId, box) => {
     })
 }
 
+const delSite = async (userId, userSiteId) => {
+    await runTest({
+        method: "DELETE",
+        path: `/v1/user/site/${userSiteId}`,
+        baseURL,
+        userId,
+        verify: response => {
+            expect(response.status).toBe(200)
+        }
+    })
+}
+
 const addEntry = async (userId, userSiteId, entry) => {
     await runTest({
         method: "POST",
@@ -152,7 +164,7 @@ const checkEntries = async (userId, userSiteId, offset, limit, desired) => {
 }
 
 describe("test site service", () => {
-    describe("test access user site", () => {
+    describe.only("test access user site", () => {
         const box = new Box()
         const userId = `${new ObjectId()}`
         test("Get system sites", async () => {
@@ -226,6 +238,20 @@ describe("test site service", () => {
             }
             await setUserSite(box.data.firstUserSite, userId, update)
             await checkUserSite(userId, box.data.firstUserSite)
+        })
+
+        test("Del user site", async () => {
+            await delSite(userId, box.data.firstUserSite.id)
+            await checkUserSites(userId, [box.data.secondUserSite])
+            await runTest({
+                method: "GET",
+                path: `/v1/user/site/${box.data.firstUserSite.id}`,
+                baseURL,
+                userId,
+                verify: response => {
+                    expect(response.status).toBe(404)
+                }
+            })
         })
     })
 
