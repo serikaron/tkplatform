@@ -572,7 +572,7 @@ describe.each([
     })
 })
 
-describe.only("templates", () => {
+describe("templates", () => {
     const box = new Box()
     const userId = `${new ObjectId()}`
 
@@ -643,5 +643,70 @@ describe.only("templates", () => {
     it("check after update", async () => {
         const rsp = await get()
         expect(rsp).toStrictEqual(box.data.templates)
+    })
+})
+
+
+describe.only("sites", () => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+
+    const check = async (desired) => {
+        await runTest({
+            method: "GET",
+            path: '/v1/ledger/sites',
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data).toStrictEqual(desired)
+            }
+        })
+    }
+
+    const add = async (site) => {
+        await runTest({
+            method: "POST",
+            path: '/v1/ledger/site',
+            body: site,
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data.id).toBeDefined()
+                site.id = rsp.data.id
+            }
+        })
+    }
+
+    it("add two", async () => {
+        box.data.site1 = {
+            name: "site1",
+            account: "account1"
+        }
+        await add(box.data.site1)
+        box.data.site2 = {
+            name: "site2",
+            account: "account2",
+        }
+        await add(box.data.site2)
+    })
+
+    it("check", async () => {
+        await check([box.data.site1, box.data.site2])
+    })
+
+    it("delete", async () => {
+        await runTest({
+            method: "DELETE",
+            path: `/v1/ledger/site/${box.data.site1.id}`,
+            baseURL,
+            userId,
+            verify: rsp => { expect(rsp.status).toBe(200) }
+        })
+    })
+
+    it("check after update", async () => {
+        await check([box.data.site2])
     })
 })

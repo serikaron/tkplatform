@@ -12,7 +12,7 @@ export const routePostLedgerSite = router => {
         })
 
         res.tkResponse(TKResponse.Success({
-            data: {ledgerSiteId: id}
+            data: {id}
         }))
 
         next()

@@ -20,6 +20,7 @@ import {routeGetLedgerSites} from "./handlers/getLedgerSites.mjs";
 import {routeDelUserAccount} from "./handlers/delUserAccount.mjs";
 import {routeGetTemplates} from "./handlers/getTemplates.mjs";
 import {routePutTemplate} from "./handlers/putTemplate.mjs";
+import {routeDelLedgerSite} from "./handlers/delLedgerSite.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -46,6 +47,7 @@ export function setup(app, {setup, teardown}) {
     routeDelUserAccount(router)
     routeGetTemplates(router)
     routePutTemplate(router)
+    routeDelLedgerSite(router)
 
     teardown(router)
 }

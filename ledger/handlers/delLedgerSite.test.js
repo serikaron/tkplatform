@@ -1,27 +1,24 @@
 'use restrict'
 
 import {jest} from "@jest/globals";
-import {ObjectId} from "mongodb";
 import createApp from "../../common/app.mjs";
-import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import {setup} from "../setup.mjs";
+import testDIContainer from "../../tests/unittest/dicontainer.mjs";
 import supertest from "supertest";
+import {ObjectId} from "mongodb";
 import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
-test("add site to db", async () => {
-    const siteId = new ObjectId()
-    const addLedgerSite = jest.fn(async () => {
-        return siteId
-    })
+test("delete site from db", async () => {
+    const delLedgerSite = jest.fn()
 
-    const app = createApp()
+    const app = await createApp()
     setup(app, {
         setup: testDIContainer.setup([
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        addLedgerSite
+                        delLedgerSite
                     }
                 }
                 next()
@@ -30,21 +27,12 @@ test("add site to db", async () => {
         teardown: testDIContainer.teardown([])
     })
 
+    const siteId = new ObjectId()
     const userId = new ObjectId()
     const response = await supertest(app)
-        .post("/v1/ledger/site")
-        .send({
-            name: "site-name",
-            account: "custom-account"
-        })
+        .del(`/v1/ledger/site/${siteId}`)
         .set({id: `${userId}`})
 
-    simpleCheckTKResponse(response, TKResponse.Success({
-        data: {id: `${siteId}`}
-    }))
-    expect(addLedgerSite).toHaveBeenCalledWith({
-        userId: userId,
-        name: "site-name",
-        account: "custom-account"
-    })
+    simpleCheckTKResponse(response, TKResponse.Success())
+    expect(delLedgerSite).toHaveBeenCalledWith(`${siteId}`, `${userId}`)
 })

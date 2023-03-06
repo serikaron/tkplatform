@@ -271,10 +271,17 @@ export async function setupMongo(req) {
         getLedgerSites: async (userId) => {
             return await collection.ledgerSites
                 .find(
-                    {userId: new ObjectId(userId)},
+                    {userId: new ObjectId(userId), deleted: {$ne: true}},
                     {projection: {_id: 1, name: 1, account: 1}}
                 )
                 .toArray()
+        },
+        delLedgerSite: async (siteId, userId) => {
+            await collection.ledgerSites
+                .updateOne(
+                    {_id: new ObjectId(siteId), userId: new ObjectId(userId)},
+                    {$set: {deleted: true}}
+                )
         },
         addTemplates: async (userId, templates) => {
             await collection.ledgerTemplates
