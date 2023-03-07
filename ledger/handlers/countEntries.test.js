@@ -36,8 +36,8 @@ describe.each([
     it("should call db with correct argument", async () => {
         const countEntries = jest.fn(async () => {
             return [
-                {_id: 1, count: 3},
-                {_id: 2, count: 10}
+                {month: 1, count: 3},
+                {month: 2, count: 10}
             ]
         })
 

@@ -15,6 +15,12 @@ const newEntry = () => {
     }
 }
 
+const entryFromDate = (date) => {
+    const out = newEntry()
+    out.createdAt = date
+    return out
+}
+
 class Box {
     constructor() {
         this._data = {}
@@ -214,11 +220,6 @@ describe.each([
         })
 
         describe("delete entries", () => {
-            const entryFromDate = (date) => {
-                const out = newEntry()
-                out.createdAt = date
-                return out
-            }
             const deleteEntry = async (userId, query) => {
                 await runTest({
                     method: "DELETE",
@@ -314,6 +315,40 @@ describe.each([
                     },
                     desired: {total: 1, items: [box.data.keepingEntry]}
                 })
+            })
+        })
+
+        test("count entries", async () => {
+            const userId = `${new ObjectId}`
+            const entries = [
+                dateToTimestamp(2021, 1, 1),
+                dateToTimestamp(2021, 1, 15),
+                dateToTimestamp(2021, 1, 31),
+                dateToTimestamp(2021, 2, 1),
+                dateToTimestamp(2021, 2, 15),
+                dateToTimestamp(2021, 2, 28),
+                dateToTimestamp(2021, 12, 1),
+                dateToTimestamp(2021, 12, 31),
+                dateToTimestamp(2022, 1, 1)
+            ].map(entryFromDate)
+            for (const entry of entries) {
+                await addEntry(key, entry, userId)
+            }
+
+            await runTest({
+                method: "GET",
+                path: `/v1/${key}/entries/count`,
+                query: {year: 2021},
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual([
+                        {month: 1, count: 3},
+                        {month: 2, count: 3},
+                        {month: 12, count: 2},
+                    ])
+                }
             })
         })
     })
@@ -513,7 +548,8 @@ describe("test ledger statistics", () => {
     })
 
     // TODO: to be implemented
-    describe("statistics with deleted entry", () => {})
+    describe("statistics with deleted entry", () => {
+    })
 })
 
 describe("test journal statistics", () => {

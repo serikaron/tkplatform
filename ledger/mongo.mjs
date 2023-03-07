@@ -3,6 +3,7 @@
 import * as dotenv from 'dotenv'
 import {connectLedger} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
+import {dateToTimestamp} from "../common/utils.mjs";
 
 dotenv.config()
 
@@ -78,6 +79,42 @@ export async function setupMongo(req) {
                     userId: new ObjectId(userId),
                     deleted: {$ne: true}
                 })
+        },
+        countEntries: async (collectionName, userId, year) => {
+            console.log(`year: ${year}, timestamp: ${dateToTimestamp(year, 1, 1)} - ${dateToTimestamp(year + 1, 1, 1)}`)
+            return await ledger.db.collection(collectionName)
+                .aggregate([
+                    {
+                        $match: {
+                            userId: new ObjectId(userId),
+                            deleted: {$ne: true},
+                            createdAt: {
+                                $gte: dateToTimestamp(year, 1, 1),
+                                $lt: dateToTimestamp(year + 1, 1, 1)
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: {
+                                $month: {
+                                    date: {$toDate: {$multiply: ["$createdAt", 1000]}},
+                                    timezone: "+0800"
+                                },
+                            },
+                            count: {$sum: 1}
+                        }
+                    },
+                    {$sort: {_id: 1}},
+                    {
+                        $project: {
+                            _id: 0,
+                            month: "$_id",
+                            count: 1
+                        }
+                    }
+                ])
+                .toArray()
         },
         getLedgerStatistics: async (userId, minDate, maxDate) => {
             const pipeline = [

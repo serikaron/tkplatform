@@ -16,14 +16,14 @@ const route = (router, key, collectionName) => {
         }
 
         const r = await req.context.mongo.countEntries(collectionName, req.headers.id, year)
-        const counts = r.map(x => {
-            return {
-                month: x._id,
-                count: x.count
-            }
-        })
+        // const counts = r.map(x => {
+        //     return {
+        //         month: x._id,
+        //         count: x.count
+        //     }
+        // })
 
-        res.tkResponse(TKResponse.Success({data: counts}))
+        res.tkResponse(TKResponse.Success({data: r}))
 
         next()
     })
