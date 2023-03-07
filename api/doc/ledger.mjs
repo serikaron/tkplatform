@@ -1048,10 +1048,16 @@
 
 /**
  * @swagger
- * /v1/ledger/entries/count/:year(统计帐本数量):
+ * /v1/ledger/entries/count(统计帐本数量✅):
  *   get:
  *     tags: ["ledger(记帐帐本)"]
- *     response:
+ *     parameters:
+ *     - in: path
+ *       name: year
+ *       schema:
+ *         type: number
+ *         example: year为必填参数
+ *     responses:
  *       200:
  *         content:
  *           application/json:
@@ -1077,6 +1083,7 @@
  *       name: year
  *       schema:
  *         type: number
+ *         example: year为必填参数
  *     - in: path
  *       name: month
  *       schema:
@@ -1402,10 +1409,16 @@
 
 /**
  * @swagger
- * /v1/journal/entries/count/:year(统计提现帐本数量):
+ * /v1/journal/entries/count(统计提现帐本数量✅):
  *   get:
  *     tags: ["ledger(记帐帐本)"]
- *     response:
+ *     parameters:
+ *     - in: path
+ *       name: year
+ *       schema:
+ *         type: number
+ *         example: year为必填参数
+ *     responses:
  *       200:
  *         content:
  *           application/json:
@@ -1431,6 +1444,7 @@
  *       name: year
  *       schema:
  *         type: number
+ *         example: year为必填参数
  *     - in: path
  *       name: month
  *       schema:
