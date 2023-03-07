@@ -25,6 +25,10 @@ export function isBadPhone(phoneNumber) {
     return !pattern.test(phoneNumber);
 }
 
+export function isTimestamp(timestamp) {
+    return new Date(timestamp).getTime() > 0
+}
+
 export function now() {
     return Math.floor(Date.now() / 1000)
 }

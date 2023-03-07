@@ -22,6 +22,7 @@ import {routeGetTemplates} from "./handlers/getTemplates.mjs";
 import {routePutTemplate} from "./handlers/putTemplate.mjs";
 import {routeDelLedgerSite} from "./handlers/delLedgerSite.mjs";
 import {routeDelEntries} from "./handlers/delEntries.mjs";
+import {routeCountEntries} from "./handlers/countEntries.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -50,6 +51,7 @@ export function setup(app, {setup, teardown}) {
     routePutTemplate(router)
     routeDelLedgerSite(router)
     routeDelEntries(router)
+    routeCountEntries(router)
 
     teardown(router)
 }
