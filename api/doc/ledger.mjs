@@ -505,7 +505,7 @@
  *                             type: Boolean
  *                             example: false
  *                       journalAccount:
- *                         type: Object
+ *                         type: object
  *                         properties:
  *                           name:
  *                             type: string
@@ -631,7 +631,7 @@
  *                             type: Boolean
  *                             example: false
  *                       journalAccount:
- *                         type: Object
+ *                         type: object
  *                         properties:
  *                           name:
  *                             type: string
@@ -753,7 +753,7 @@
  *                             type: Boolean
  *                             example: false
  *                       journalAccount:
- *                         type: Object
+ *                         type: object
  *                         properties:
  *                           name:
  *                             type: string
@@ -883,7 +883,7 @@
  *                             type: Boolean
  *                             example: false
  *                       journalAccount:
- *                         type: Object
+ *                         type: object
  *                         properties:
  *                           name:
  *                             type: string
@@ -1181,7 +1181,7 @@
  *                     type: Number
  *                     example: 10.0
  *                   journalAccount:
- *                     type: Object
+ *                     type: object
  *                     properties:
  *                       name:
  *                         type: string
@@ -1354,7 +1354,7 @@
  *                     type: Number
  *                     example: 10.0
  *                   journalAccount:
- *                     type: Object
+ *                     type: object
  *                     properties:
  *                       name:
  *                         type: string
