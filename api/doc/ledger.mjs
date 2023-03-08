@@ -1144,6 +1144,8 @@
  *                   site:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       name:
  *                          type: string
  *                          example: 站点1
@@ -1449,20 +1451,19 @@
  *                   site:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       name:
  *                         type: string
  *                       account:
  *                         type: string
- *                   notYetRefunded:
- *                     type: object
- *                     properties:
- *                       count:
- *                         type: number
- *                       principle:
- *                         type: number
- *                       commission:
- *                         type: number
- *                   withdrawingCount:
+ *                  total:
+ *                     type: number
+ *                   principle:
+ *                     type: number
+ *                   commission:
+ *                      type: number
+ *                   withdrawingSum:
  *                     type: number
  *
  */
