@@ -878,3 +878,55 @@ describe("sites", () => {
         await check([box.data.site2])
     })
 })
+
+describe("refund all", () => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+
+    it("should update correctly", async () => {
+        box.data.entries = [
+            {principle: true, commission: true},
+            {principle: false, commission: true},
+            {principle: true, commission: false},
+            {principle: false, commission: false},
+        ].map(x => {
+            const out = newEntry()
+            out.principle = {
+                amount: 100,
+                refunded: x.principle
+            }
+            out.commission = {
+                amount: 10,
+                refunded: x.commission
+            }
+            return out
+        })
+        for (const entry of box.data.entries) {
+            await addEntry("ledger", entry, userId)
+        }
+
+        await runTest({
+            method: "PUT",
+            path: '/v1/ledger/entries/refunded',
+            baseURL,
+            userId,
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
+        })
+
+        box.data.entries.forEach(x => {
+            x.principle.refunded = true
+            x.commission.refunded = true
+        })
+
+        await checkEntries({
+            key: "ledger",
+            userId,
+            desired: {
+                total: 4,
+                items: box.data.entries
+            }
+        })
+    })
+})

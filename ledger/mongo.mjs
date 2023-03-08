@@ -221,6 +221,18 @@ export async function setupMongo(req) {
                 .aggregate(pipeline)
                 .toArray()
         },
+        setEntriesRefunded: async (userId) => {
+            await collection.ledgerEntries
+                .updateMany(
+                    {userId: new ObjectId(userId)},
+                    {
+                        $set: {
+                            "principle.refunded": true,
+                            "commission.refunded": true
+                        }
+                    }
+                )
+        },
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()
         },
