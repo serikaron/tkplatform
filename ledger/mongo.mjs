@@ -128,22 +128,22 @@ export async function setupMongo(req) {
                 {
                     $group: {
                         _id: null,
-                        principle: {$sum: "$principle.amount"},
-                        commission: {$sum: "$commission.amount"},
+                        principle: {$sum: {$toLong: "$principle.amount"}},
+                        commission: {$sum: {$toLong: "$commission.amount"}},
                         notYetRefunded: {
                             $sum: {
                                 $add: [
                                     {
                                         $cond: [
                                             {$eq: ["$principle.refunded", false]},
-                                            "$principle.amount",
+                                            {$toLong: "$principle.amount"},
                                             0
                                         ]
                                     },
                                     {
                                         $cond: [
                                             {$eq: ["$commission.refunded", false]},
-                                            "$commission.amount",
+                                            {$toLong: "$commission.amount"},
                                             0
                                         ]
                                     }
@@ -178,7 +178,7 @@ export async function setupMongo(req) {
                     {
                         $group: {
                             _id: null,
-                            principle: {$sum: "$principle.amount"}
+                            principle: {$sum: {$toLong: "$principle.amount"}}
                         }
                     }
                 ])
@@ -200,7 +200,7 @@ export async function setupMongo(req) {
                             $sum: {
                                 $cond: [
                                     {$eq: ["$credited", false]},
-                                    "$amount",
+                                    {$toLong: "$amount"},
                                     0
                                 ]
                             }
@@ -209,7 +209,7 @@ export async function setupMongo(req) {
                             $sum: {
                                 $cond: [
                                     {$eq: ["$credited", true]},
-                                    "$amount",
+                                    {$toLong: "$amount"},
                                     0
                                 ]
                             }

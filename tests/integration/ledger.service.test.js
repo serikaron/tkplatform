@@ -490,8 +490,8 @@ describe("test ledger statistics", () => {
             },
             // count
             {
-                principle: {amount: 100, refunded: false},
-                commission: {amount: 1000, refunded: false},
+                principle: {amount: "100", refunded: false},
+                commission: {amount: "1000", refunded: false},
             },
             {
                 principle: {amount: 200, refunded: true},
@@ -557,7 +557,7 @@ describe("test journal statistics", () => {
 
     it.each([
         // not count
-        {amount: 1000, credited: true, createdAt: now() - 86400},
+        {amount: "1000", credited: true, createdAt: now() - 86400},
         // count
         {amount: 100, credited: false},
         {amount: 200, credited: true}
@@ -569,7 +569,7 @@ describe("test journal statistics", () => {
     })
 
     it.each([
-        {principle: {amount: 100, refunded: true}},
+        {principle: {amount: "100", refunded: true}},
         {principle: {amount: 200, refunded: false}},
     ])("($#) prepare ledger entry", async (entry) => {
         entry.createdAt = now()
