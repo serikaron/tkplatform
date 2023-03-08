@@ -8,11 +8,11 @@ const parse = (field, defaultValue) => {
     return isNaN(num) ? defaultValue : num
 }
 export const routeGetUserSiteJournalEntries = router => {
-    router.get('/user/site/:userSiteId/journal/entries', async (req, res, next) => {
+    router.get('/user/site/journal/entries', async (req, res, next) => {
         const offset = parse(req.query.offset, 0)
         const limit = parse(req.query.limit, 50)
 
-        const dbRes = await req.context.mongo.getUserSiteJournalEntries(req.headers.id, req.params.userSiteId, offset, limit)
+        const dbRes = await req.context.mongo.getUserSiteJournalEntries(req.headers.id, offset, limit)
         dbRes.items.forEach(x => {
             replaceId(x)
             delete x.userId

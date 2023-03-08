@@ -56,7 +56,7 @@ describe.each([
         })
 
         const response = await supertest(app)
-            .get(`/v1/user/site/${userSiteId}/journal/entries${query}`)
+            .get(`/v1/user/site/journal/entries${query}`)
             .set({id: `${userId}`})
 
         simpleCheckTKResponse(response, TKResponse.Success({
@@ -70,6 +70,6 @@ describe.each([
                 }]
             }
         }))
-        expect(getUserSiteJournalEntries).toHaveBeenCalledWith(`${userId}`, `${userSiteId}`, offset, limit)
+        expect(getUserSiteJournalEntries).toHaveBeenCalledWith(`${userId}`, offset, limit)
     })
 })

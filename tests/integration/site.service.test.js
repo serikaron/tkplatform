@@ -149,10 +149,10 @@ const addEntry = async (userId, userSiteId, entry) => {
     })
 }
 
-const checkEntries = async (userId, userSiteId, offset, limit, desired) => {
+const checkEntries = async (userId, offset, limit, desired) => {
     await runTest({
         method: "GET",
-        path: `/v1/user/site/${userSiteId}/journal/entries`,
+        path: `/v1/user/site/journal/entries`,
         query: {offset, limit},
         baseURL,
         userId,
@@ -359,8 +359,8 @@ describe("test site service", () => {
         })
 
         it("query with offset limit", async () => {
-            await checkEntries(userId, box.data.userSite.id, 0, 1, {total: 2, items: [box.data.entry2]})
-            await checkEntries(userId, box.data.userSite.id, 1, 1, {total: 2, items: [box.data.entry1]})
+            await checkEntries(userId, 0, 1, {total: 2, items: [box.data.entry2]})
+            await checkEntries(userId, 1, 1, {total: 2, items: [box.data.entry1]})
         })
 
         describe("can get this month entries", () => {
@@ -375,7 +375,7 @@ describe("test site service", () => {
                 await addEntry(userId, box.data.userSite.id, box.data.expiredEntry)
             })
             it("check", async () => {
-                await checkEntries(userId, box.data.userSite.id, null, null, {
+                await checkEntries(userId, null, null, {
                     total: 2,
                     items: [box.data.entry2, box.data.entry1]
                 })

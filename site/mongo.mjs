@@ -85,11 +85,10 @@ export async function setupMongo(req) {
                 .insertOne(entry)
             return r.insertedId
         },
-        getUserSiteJournalEntries: async (userId, userSiteId, offset, limit) => {
+        getUserSiteJournalEntries: async (userId, offset, limit) => {
             const filter = {
-                userSiteId: new ObjectId(userSiteId),
-                withdrewAt: {$gte: now() - 86400 * 30},
                 userId: new ObjectId(userId),
+                withdrewAt: {$gte: now() - 86400 * 30},
             };
             const items = await collection.withdrawJournalEntries
                 .find(filter)
