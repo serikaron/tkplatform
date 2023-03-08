@@ -971,3 +971,113 @@ describe("credit all", () => {
         })
     })
 })
+
+describe("analyse detail", () => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+    box.data.sites = [
+        new ObjectId(), new ObjectId(), new ObjectId()
+    ].map((x, i) => {
+        return {
+            id: `${x}`,
+            name: `site-${i}`,
+            account: `account-${i}`
+        }
+    })
+
+    describe("prepare", () => {
+        describe.each([
+            {site: box.data.sites[0]},
+            {site: box.data.sites[1]}
+        ])("site ($#)", ({site}) => {
+            describe.each([
+                {
+                    principle: {amount: 100, refunded: true},
+                    commission: {amount: 1000, refunded: true},
+                },
+                {
+                    principle: {amount: 200, refunded: false},
+                    commission: {amount: 2000, refunded: true},
+                },
+                {
+                    principle: {amount: 300, refunded: true},
+                    commission: {amount: 3000, refunded: false},
+                },
+                {
+                    principle: {amount: 400, refunded: false},
+                    commission: {amount: 4000, refunded: false},
+                },
+            ])("entry ($#)", ({principle, commission}) => {
+                it("prepare", async () => {
+                    const entry = newEntry()
+                    entry.principle = principle
+                    entry.commission = commission
+                    entry.site = site
+                    await addEntry("ledger", entry, userId)
+                })
+            })
+        })
+
+        describe.each([
+            {site: box.data.sites[0]},
+            {site: box.data.sites[2]}
+        ])("site ($#)", ({site}) => {
+            describe.each([
+                {amount: 100, credited: true},
+                {amount: 200, credited: false},
+                {amount: 300, credited: false},
+            ])("entry ($#)", ({amount, credited}) => {
+                it("prepare", async () => {
+                    const entry = newEntry()
+                    entry.amount = amount
+                    entry.credited = credited
+                    entry.site = site
+                    await addEntry("journal", entry, userId)
+                })
+            })
+        })
+    })
+
+    it("analyse should be correct", async () => {
+        await runTest({
+            method: "GEt",
+            path: `/v1/ledger/analyse/detail/${now() - 86400}/${now() + 86400}`,
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data.sort((a, b) => {
+                    if (a.id < b.id) { return -1 }
+                    if (a.id > b.id) { return 1 }
+                    return 0
+                })).toStrictEqual([
+                    {
+                        site: box.data.sites[0],
+                        total: 7600,
+                        principle: 600,
+                        commission: 7000,
+                        withdrawingSum: 500
+                    },
+                    {
+                        site: box.data.sites[1],
+                        total: 7600,
+                        principle: 600,
+                        commission: 7000,
+                        withdrawingSum: 0
+                    },
+                    {
+                        site: box.data.sites[2],
+                        total: 0,
+                        principle: 0,
+                        commission: 0,
+                        withdrawingSum: 500
+                    },
+                ].sort((a, b) => {
+                    if (a.id < b.id) { return -1 }
+                    if (a.id > b.id) { return 1 }
+                    return 0
+                }))
+            }
+        })
+    })
+})

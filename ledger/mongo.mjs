@@ -383,6 +383,78 @@ export async function setupMongo(req) {
                     {$set: mongoUpdate},
                     {arrayFilters: [{"tmpl.id": new ObjectId(templateId)}]}
                 )
+        },
+        getAnalyseDetail: async (userId, minDate, maxDate) => {
+            const match = {
+                $match: {
+                    userId: new ObjectId(userId),
+                    deleted: {$ne: true},
+                    createdAt: {$gte: minDate, $lt: maxDate}
+                }
+            }
+            const ledgerGroup = {
+                $group: {
+                    _id: "$site.id",
+                    site: {$first: "$site"},
+                    total: {
+                        $sum: {
+                            $add: [
+                                {
+                                    $cond: [
+                                        {$eq: ["$principle.refunded", false]},
+                                        {$toLong: "$principle.amount"},
+                                        0
+                                    ]
+                                },
+                                {
+                                    $cond: [
+                                        {$eq: ["$commission.refunded", false]},
+                                        {$toLong: "$commission.amount"},
+                                        0
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    principle: {
+                        $sum: {
+                            $cond: [
+                                {$eq: ["$principle.refunded", false]},
+                                {$toLong: "$principle.amount"},
+                                0
+                            ]
+                        }
+                    },
+                    commission: {
+                        $sum: {
+                            $cond: [
+                                {$eq: ["$commission.refunded", false]},
+                                {$toLong: "$commission.amount"},
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+            const journalGroup = {
+                $group: {
+                    _id: "$site.id",
+                    site: {$first: "$site"},
+                    withdrawingSum: {
+                        $sum: {
+                            $cond: [
+                                {$eq: ["$credited", false]},
+                                {$toLong: "$amount"},
+                                0
+                            ]
+                        }
+                    }
+                }
+            }
+            return {
+                ledger: await collection.ledgerEntries.aggregate([match, ledgerGroup]).toArray(),
+                journal: await collection.withdrawJournalEntries.aggregate([match, journalGroup]).toArray()
+            }
         }
     }
 }

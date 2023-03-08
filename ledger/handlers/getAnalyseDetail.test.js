@@ -12,9 +12,36 @@ import {jest} from "@jest/globals";
 
 test("call db with correct argument", async () => {
     const getAnalyseDetail = jest.fn(async () => {
-        return [
-            "return what db return"
-        ]
+        return {
+            ledger: [
+                {
+                    _id: "id1",
+                    site: "site-1",
+                    total: 100,
+                    principle: 100,
+                    commission: 100
+                },
+                {
+                    _id: "id2",
+                    site: "site-2",
+                    total: 200,
+                    principle: 200,
+                    commission: 200
+                }
+            ],
+            journal: [
+                {
+                    _id: "id1",
+                    site: "site-1",
+                    withdrawingSum: 1000,
+                },
+                {
+                    _id: "id3",
+                    site: "site-3",
+                    withdrawingSum: 3000,
+                },
+            ]
+        }
     })
 
     const app = createApp()
@@ -40,7 +67,29 @@ test("call db with correct argument", async () => {
         .set({id: `${userId}`})
 
     simpleCheckTKResponse(response, TKResponse.Success({
-        data: ["return what db return"]
+        data: [
+            {
+                site: "site-1",
+                total: 100,
+                principle: 100,
+                commission: 100,
+                withdrawingSum: 1000,
+            },
+            {
+                site: "site-2",
+                total: 200,
+                principle: 200,
+                commission: 200,
+                withdrawingSum: 0,
+            },
+            {
+                site: "site-3",
+                total: 0,
+                principle: 0,
+                commission: 0,
+                withdrawingSum: 3000,
+            },
+        ]
     }))
     expect(getAnalyseDetail).toHaveBeenCalledWith(`${userId}`, minDate, maxDate)
 })
