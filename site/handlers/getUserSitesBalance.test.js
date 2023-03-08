@@ -21,6 +21,10 @@ test("get balance from userSites", async () => {
                 site: {
                     name: "site-name"
                 },
+                credential: {
+                    account: "account",
+                    password: "password",
+                },
                 balance: 100
             }
         ]
@@ -51,6 +55,7 @@ test("get balance from userSites", async () => {
             site: {
                 name: "site-name"
             },
+            credentialAccount: "account",
             balance: 100
         }]
     }))

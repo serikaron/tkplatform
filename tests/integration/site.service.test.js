@@ -263,6 +263,7 @@ describe("test site service", () => {
             return {
                 id: userSite.id,
                 site: userSite.site,
+                credentialAccount: userSite.credential.account,
                 balance: userSite.balance === undefined ? 0 : userSite.balance
             }
         }

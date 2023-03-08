@@ -1,20 +1,21 @@
 'use strict'
 
-import {replaceId} from "../../common/utils.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
+
+const siteBalance = userSite => {
+    return {
+        id: userSite._id,
+        site: userSite.site,
+        credentialAccount: userSite.credential.account,
+        balance: userSite.balance === undefined ? 0 : userSite.balance
+    }
+}
 
 export const routeGetSitesBalance = (router) => {
     router.get('/user/sites/balance', async (req, res, next) => {
         const l = await req.context.mongo.getUserSitesBalance(req.headers.id)
-        l.forEach(x => {
-            replaceId(x)
-            delete x.userId
-            if (x.balance === undefined) {
-                x.balance = 0
-            }
-        })
         res.tkResponse(TKResponse.Success({
-            data: l
+            data: l.map(siteBalance)
         }))
         next()
     })

@@ -65,7 +65,7 @@ export async function setupMongo(req) {
                     userId: new ObjectId(userId),
                     verified: true
                 }, {
-                    projection: {site: 1, balance: 1}
+                    projection: {site: 1, balance: 1, credential: 1}
                 })
                 .toArray()
         },
