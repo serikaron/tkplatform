@@ -4,13 +4,13 @@ import {TKError} from "./errors/error.mjs";
 
 
 export function enteringLog(req, res, next) {
-    console.log(`receive user:${req.headers.id} request ${req.method} ${req.url}`)
+    console.log(`receive user:${req.headers.id} request ${req.method} ${req.url} query:${req.query} body:${req.body}`)
     next()
 }
 
 export function injection(req, res, next) {
     res.response = ({status = 200, code = 0, msg = "success", data = {}}) => {
-        console.log(`response, req: ${req.url}, res: ${JSON.stringify(data, null, 4)}`)
+        console.log(`response user:${req.headers.id} request ${req.method} ${req.url} query:${req.query} body:${req.body} response:${data}`)
         req.res = {
             status,
             response: {
@@ -47,11 +47,7 @@ export function responseHandler(req, res) {
 
 export function errorHandler(error, req, res, next) {
     console.log(`errorHeandler ${error}`)
-    if (req.method === "GET") {
-        console.log(`path:${req.path}, query:${JSON.stringify(req.query)}, params:${JSON.stringify(req.params)}`)
-    } else {
-        console.log(`path:${req.path}, body:${JSON.stringify(req.body)}`)
-    }
+    console.log(`error user:${req.headers.id} request ${req.method} ${req.url} query:${req.query} body:${req.body}`)
     if (error instanceof TKError) {
         // console.log(`TKError: ${error.toString()}`)
         res.response({
