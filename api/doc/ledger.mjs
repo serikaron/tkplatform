@@ -1435,7 +1435,7 @@
 
 /**
  * @swagger
- * /v1/ledger/analyse/detail/:minDate/:maxDate(记帐分析-明细):
+ * /v1/ledger/analyse/detail/:minDate/:maxDate(记帐分析-明细✅):
  *   get:
  *     tags: ["ledger(记帐帐本)"]
  *     responses:
@@ -1457,8 +1457,8 @@
  *                         type: string
  *                       account:
  *                         type: string
- *                  total:
- *                     type: number
+ *                   total:
+ *                      type: number
  *                   principle:
  *                     type: number
  *                   commission:
