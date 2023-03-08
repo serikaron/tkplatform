@@ -1093,7 +1093,7 @@
 
 /**
  * @swagger
- * /v1/ledger/entries/refunded(全部设置为已返):
+ * /v1/ledger/entries/refunded(全部设置为已返✅):
  *   put:
  *     tags: ["ledger(记帐帐本)"]
  */
@@ -1454,7 +1454,7 @@
 
 /**
  * @swagger
- * /v1/journal/entries/credited(全部设置为已到帐):
+ * /v1/journal/entries/credited(全部设置为已到帐✅):
  *   put:
  *     tags: ["ledger(记帐帐本)"]
  */
