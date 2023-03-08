@@ -590,6 +590,15 @@ test.concurrent.each([
             url: "/v1/journal/entries",
         }
     },
+    {
+        url: "/v1/ledger/analyse/detail/minDate/maxDate",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/analyse/detail/minDate/maxDate",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
