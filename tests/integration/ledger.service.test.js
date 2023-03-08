@@ -930,3 +930,44 @@ describe("refund all", () => {
         })
     })
 })
+
+describe("credit all", () => {
+    const box = new Box()
+    const userId = `${new ObjectId()}`
+
+    it("should update correctly", async () => {
+        box.data.entries = [
+            true, false
+        ].map(x => {
+            const out = newEntry()
+            out.credited = x
+            return out
+        })
+        for (const entry of box.data.entries) {
+            await addEntry("journal", entry, userId)
+        }
+
+        await runTest({
+            method: "PUT",
+            path: '/v1/journal/entries/credited',
+            baseURL,
+            userId,
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
+        })
+
+        box.data.entries.forEach(x => {
+            x.credited = true
+        })
+
+        await checkEntries({
+            key: "journal",
+            userId,
+            desired: {
+                total: 2,
+                items: box.data.entries
+            }
+        })
+    })
+})

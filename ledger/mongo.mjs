@@ -233,6 +233,13 @@ export async function setupMongo(req) {
                     }
                 )
         },
+        setEntriesCredited: async (userId) => {
+            await collection.withdrawJournalEntries
+                .updateMany(
+                    {userId: new ObjectId(userId)},
+                    {$set: {credited: true}}
+                )
+        },
         getStores: async () => {
             return await collection.stores.find({}, {_id: 0}).toArray()
         },
