@@ -365,11 +365,6 @@
  *         type: string
  *         example: 站点ID
  *     - in: path
- *       name: siteId
- *       schema:
- *         type: string
- *         example: 站点ID
- *     - in: path
  *       name: refundStatus
  *       schema:
  *         type: number
@@ -384,24 +379,10 @@
  *       schema:
  *         type: string
  *     - in: path
- *       name: account
+ *       name: key
  *       schema:
  *         type: string
- *     - in: path
- *       name: ledgerAccount
- *       schema:
- *         type: string
- *         example: 买号
- *     - in: path
- *       name: stop
- *       schema:
- *         type: string
- *         example: 商家/店铺
- *     - in: path
- *       name: orderId
- *       schema:
- *         type: string
- *         example: 订单号
+ *         example: 帐号/买号/商家/店铺/订单号
  *     - in: path
  *       name: minPrinciple
  *       schema:
@@ -1131,19 +1112,10 @@
  *         type: number
  *         example: 0-全部，1-已到帐，2-未到帐
  *     - in: path
- *       name: account
+ *       name: key
  *       schema:
  *         type: string
- *     - in: path
- *       name: journalAccount
- *       schema:
- *         type: string
- *         example: 收款号
- *     - in: path
- *       name: orderId
- *       schema:
- *         type: string
- *         example: 订单号
+ *         example: 帐号/收款号/订单号
  *     - in: path
  *       name: minAmount
  *       schema:

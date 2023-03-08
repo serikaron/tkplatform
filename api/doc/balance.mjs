@@ -2,9 +2,19 @@
 
 /**
  * @swagger
- * /v1/user/sites/balance(站点余额✅):
+ * /v1/user/sites/balance(站点余额):
  *   get:
  *     tags: [balance(站点余额)]
+ *     parameters:
+ *     - in: path
+ *       name: userSiteId
+ *       schema:
+ *         type: string
+ *     - in: path
+ *       name: key
+ *       schema:
+ *         type: string
+ *         example: 搜索帐号s
  *     responses:
  *       200:
  *         content:
@@ -31,6 +41,9 @@
  *                       alias:
  *                         type: string
  *                         example: 备注名
+ *                   credentialAccount:
+ *                     type: string
+ *                     example: 帐号(13902822010)
  *                   balance:
  *                     type: number
  */
@@ -74,9 +87,14 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/journal/entries(查询提现记录✅):
+ * /v1/user/site/journal/entries(查询提现记录):
  *   get:
  *     tags: [balance(站点余额)]
+ *     parameters:
+ *     - in: path
+ *       name: userSiteId
+ *       schema:
+ *         type: string
  *     responses:
  *       200:
  *         content:
