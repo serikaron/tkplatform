@@ -2,7 +2,7 @@
 
 /**
  * @swagger
- * /v1/user/sites/balance(站点余额):
+ * /v1/user/sites/balance(站点余额✅):
  *   get:
  *     tags: [balance(站点余额)]
  *     parameters:
@@ -87,7 +87,7 @@
 
 /**
  * @swagger
- * /v1/user/site/journal/entries(查询提现记录):
+ * /v1/user/site/journal/entries(查询提现记录✅):
  *   get:
  *     tags: [balance(站点余额)]
  *     parameters:
