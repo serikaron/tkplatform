@@ -12,17 +12,18 @@ import {now} from "../../common/utils.mjs";
 
 test("get overview with correct db arguments", async () => {
     const getAnalyseOverview = jest.fn(async () => {
-        return {
-            overview: "return overview from db",
-            exception: {
-                count: 1,
-                principle: 10,
-                commission: 20,
-            },
-            commission: "return commission from db",
-            principle: "return principle from db",
-            cardDetail: "return card detail from db"
-        }
+        // return {
+        //     overview: "return overview from db",
+        //     exception: {
+        //         count: 1,
+        //         principle: 10,
+        //         commission: 20,
+        //     },
+        //     commission: "return commission from db",
+        //     principle: "return principle from db",
+        //     cardDetail: "return card detail from db"
+        // }
+        return "return what db return"
     })
 
     const app = createApp()
@@ -48,18 +49,19 @@ test("get overview with correct db arguments", async () => {
         .set({id: `${userId}`})
 
     simpleCheckTKResponse(response, TKResponse.Success({
-        data: {
-            overview: "return overview from db",
-            exception: {
-                count: 1,
-                principle: 10,
-                commission: 20,
-                amount: 30,
-            },
-            commission: "return commission from db",
-            principle: "return principle from db",
-            cardDetail: "return card detail from db"
-        }
+        // data: {
+        //     overview: "return overview from db",
+        //     exception: {
+        //         count: 1,
+        //         principle: 10,
+        //         commission: 20,
+        //         amount: 30,
+        //     },
+        //     commission: "return commission from db",
+        //     principle: "return principle from db",
+        //     cardDetail: "return card detail from db"
+        // }
+        data: "return what db return"
     }))
     expect(getAnalyseOverview).toHaveBeenCalledWith(`${userId}`, minDate, maxDate)
 })

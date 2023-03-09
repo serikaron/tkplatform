@@ -1280,6 +1280,8 @@
  *                   journalAccount:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       name:
  *                         type: string
  *                         example: 微信
