@@ -106,6 +106,7 @@ const routeInfo = [
     {url: "/v1/ledger/entries", method: "DELETE", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entries", method: "DELETE", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/analyse/detail/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/ledger/analyse/overview/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 ]
 
 export default routeInfo

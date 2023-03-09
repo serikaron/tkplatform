@@ -7,6 +7,151 @@ import {dateToTimestamp} from "../common/utils.mjs";
 
 dotenv.config()
 
+class Filter {
+    constructor() {
+        this._filter = {}
+    }
+
+    static generalFilter(userId, minDate, maxDate) {
+        const filter = new Filter()
+        return filter
+            .userId(userId)
+            .createdAt(minDate, maxDate)
+            .notDeleted()
+    }
+
+    get filter() {
+        return this._filter
+    }
+
+    userId(id) {
+        this._filter.userId = new ObjectId(id)
+        return this
+    }
+
+    createdAt(minDate, maxDate) {
+        this._filter.createdAt = {$gte: minDate, $lt: maxDate}
+        return this
+    }
+
+    notDeleted() {
+        this._filter.deleted = {$ne: true}
+        return this
+    }
+
+    toFilter() {
+        return this._filter
+    }
+
+    toMatch() {
+        return {$match: this._filter}
+    }
+}
+
+class Aggregate {
+    static get exceptionCond() {
+        return {$eq: ["$status", 1]}
+    }
+
+    static amount(field) {
+        return {$toLong: field}
+    }
+
+    static notYetRefunded(field) {
+        return {$ne: [field, true]}
+    }
+
+    static get principleBase() {
+        return {
+            amount: Aggregate.amount("$principle.amount"),
+            notYetCond: Aggregate.notYetRefunded("$principle.refunded")
+        }
+    }
+
+    static get commissionBase() {
+        return {
+            amount: Aggregate.amount("$commission.amount"),
+            notYetCond: Aggregate.notYetRefunded("$commission.refunded")
+        }
+    }
+
+    static get exception() {
+        return {
+            count: {
+                $sum: {
+                    $cond: [Aggregate.exceptionCond, 1, 0]
+                }
+            },
+            principle: {
+                $sum: {
+                    $cond: [
+                        Aggregate.exceptionCond,
+                        Aggregate.principleBase.amount,
+                        0
+                    ]
+                }
+            },
+            commission: {
+                $sum: {
+                    $cond: [
+                        Aggregate.exceptionCond,
+                        Aggregate.commissionBase.amount,
+                        0
+                    ]
+                }
+            }
+        }
+    }
+
+    static get principle() {
+        return {
+            total: {
+                $sum: Aggregate.principleBase.amount
+            },
+            notYetRefunded: {
+                amount: {
+                    $sum: {
+                        $cond: [
+                            Aggregate.principleBase.notYetCond,
+                            Aggregate.principleBase.amount,
+                            0
+                        ]
+                    }
+                },
+                count: {
+                    $sum: {
+                        $cond: [Aggregate.principleBase.notYetCond, 1, 0]
+                    }
+                }
+            },
+        }
+    }
+
+    static get commission() {
+        return {
+            total: {
+                $sum: Aggregate.commissionBase.amount
+            },
+            notYetRefunded: {
+                amount: {
+                    $sum: {
+                        $cond: [
+                            Aggregate.commissionBase.notYetCond,
+                            Aggregate.commissionBase.amount,
+                            0
+                        ]
+                    }
+                },
+                count: {
+                    $sum: {
+                        $cond: [Aggregate.commissionBase.notYetCond, 1, 0]
+                    }
+                }
+            }
+        }
+    }
+}
+
 export async function setupMongo(req) {
     if (req.context === undefined) {
         req.context = {}
@@ -455,6 +600,137 @@ export async function setupMongo(req) {
                 ledger: await collection.ledgerEntries.aggregate([match, ledgerGroup]).toArray(),
                 journal: await collection.withdrawJournalEntries.aggregate([match, journalGroup]).toArray()
             }
+        },
+        getAnalyseOverview: async (userId, minDate, maxDate) => {
+            const ledger = await collection.ledgerEntries
+                .aggregate([
+                    Filter.generalFilter(userId, minDate, maxDate)
+                        .toMatch(),
+                    {
+                        $group: {
+                            _id: null,
+                            principleTotal: Aggregate.principle.total,
+                            principleNotYetAmount: Aggregate.principle.notYetRefunded.amount,
+                            principleNotYetCount: Aggregate.principle.notYetRefunded.count,
+                            commissionTotal: Aggregate.commission.total,
+                            commissionNotYetAmount: Aggregate.commission.notYetRefunded.amount,
+                            commissionNotYetCount: Aggregate.commission.notYetRefunded.count,
+                            count: {$sum: 1},
+                            exceptionCount: Aggregate.exception.count,
+                            exceptionPrinciple: Aggregate.exception.principle,
+                            exceptionCommission: Aggregate.exception.commission,
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            overview: {
+                                commission: "$commissionTotal",
+                                principle: "$principleTotal",
+                                notYetRefunded: {$add: ["$principleNotYetAmount", "$commissionNotYetAmount"]},
+                                count: "$count",
+                            },
+                            exception: {
+                                count: "$exceptionCount",
+                                principle: "$exceptionPrinciple",
+                                commission: "$exceptionCommission",
+                                amount: {$add: ["$exceptionPrinciple", "$exceptionCommission"]},
+                            },
+                            principle: {
+                                notYetCount: "$principleNotYetCount",
+                                notYetAmount: "$principleNotYetAmount",
+                                refundedCount: {$subtract: ["$count", "$principleNotYetCount"]},
+                                refundedAmount: {$subtract: ["$principleTotal", "$principleNotYetAmount"]},
+                            },
+                            commission: {
+                                notYetCount: "$commissionNotYetCount",
+                                notYetAmount: "$commissionNotYetAmount",
+                                refundedCount: {$subtract: ["$count", "$commissionNotYetCount"]},
+                                refundedAmount: {$subtract: ["$commissionTotal", "$commissionNotYetAmount"]},
+                            },
+                        }
+                    }
+                ])
+                .toArray()
+
+            const journal = await collection.withdrawJournalEntries
+                .aggregate([
+                    Filter.generalFilter(userId, minDate, maxDate).toMatch(),
+                    {
+                        $group: {
+                            _id: "$journalAccount.id",
+                            journalAccount: {$first: "$journalAccount"},
+                            notYetCredited: {
+                                $sum: {
+                                    $cond: [
+                                        {$ne: ["$credited", true]},
+                                        {$toLong: "$amount"},
+                                        0
+                                    ]
+                                }
+                            },
+                            credited: {
+                                $sum: {
+                                    $cond: [
+                                        {$ne: ["$credited", true]},
+                                        0,
+                                        {$toLong: "$amount"}
+                                    ]
+                                }
+                            },
+                            count: {$sum: 1}
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            totalNotYet: {$sum: "$notYetCredited"},
+                            totalCredited: {$sum: "$credited"},
+                            totalCount: {$sum: "$count"},
+                            items: {
+                                $push: {
+                                    journalAccount: "$journalAccount",
+                                    notYetCredited: "$notYetCredited",
+                                    credited: "$credited",
+                                    count: "$count"
+                                }
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            total: {
+                                notYetCredited: "$totalNotYet",
+                                credited: "$totalCredited",
+                                count: "$totalCount"
+                            },
+                            items: {
+                                journalAccount: 1,
+                                notYetCredited: 1,
+                                credited: 1,
+                                count: 1,
+                            }
+                        }
+                    }
+                ])
+                .toArray()
+
+            console.log(JSON.stringify(journal[0]))
+            return {
+                overview: ledger[0].overview,
+                exception: ledger[0].exception,
+                commission: ledger[0].commission,
+                principle: ledger[0].principle,
+                cardDetail: journal[0]
+            }
+            // return {
+            //     overview: r[0],
+            //     exception: {principle: 0, commission: 0},
+            //     principle: {},
+            //     commission: {},
+            //     creditDetail: {},
+            // }
         }
     }
 }

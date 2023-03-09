@@ -4,13 +4,13 @@ import {TKError} from "./errors/error.mjs";
 
 
 export function enteringLog(req, res, next) {
-    console.log(`receive user:${req.headers.id} request ${req.method} ${req.url} query:${req.query} body:${req.body}`)
+    console.log(`receive user:${req.headers.id} request ${req.method} ${req.url} query:${JSON.stringify(req.query)} body:${JSON.stringify(req.body)}`)
     next()
 }
 
 export function injection(req, res, next) {
     res.response = ({status = 200, code = 0, msg = "success", data = {}}) => {
-        console.log(`response user:${req.headers.id} request ${req.method} ${req.url} query:${req.query} body:${req.body} response:${data}`)
+        console.log(`response user:${req.headers.id} request ${req.method} ${req.url} query:${JSON.stringify(req.query)} body:${JSON.stringify(req.body)} response:${JSON.stringify(data)}`)
         req.res = {
             status,
             response: {
