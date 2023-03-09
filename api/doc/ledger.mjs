@@ -488,6 +488,8 @@
  *                       journalAccount:
  *                         type: object
  *                         properties:
+ *                           id:
+ *                             type: string
  *                           name:
  *                             type: string
  *                             example: 微信
@@ -614,6 +616,8 @@
  *                       journalAccount:
  *                         type: object
  *                         properties:
+ *                           id:
+ *                             type: string
  *                           name:
  *                             type: string
  *                             example: 微信
@@ -736,6 +740,8 @@
  *                       journalAccount:
  *                         type: object
  *                         properties:
+ *                           id:
+ *                             type: string
  *                           name:
  *                             type: string
  *                             example: 微信
@@ -866,6 +872,8 @@
  *                       journalAccount:
  *                         type: object
  *                         properties:
+ *                           id:
+ *                             type: string
  *                           name:
  *                             type: string
  *                             example: 微信
@@ -1164,6 +1172,8 @@
  *                   journalAccount:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       name:
  *                         type: string
  *                         example: 微信
@@ -1224,6 +1234,8 @@
  *                   journalAccount:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       name:
  *                         type: string
  *                         example: 微信
@@ -1339,6 +1351,8 @@
  *                   journalAccount:
  *                     type: object
  *                     properties:
+ *                       id:
+ *                         type: string
  *                       name:
  *                         type: string
  *                         example: 微信
@@ -1472,7 +1486,7 @@
 
 /**
  * @swagger
- * /v1/ledger/analyse/overview/:minDate/:maxDate(记帐分析-总览):
+ * /v1/ledger/analyse/overview/:minDate/:maxDate(记帐分析-总览✅):
  *   get:
  *     tags: ["ledger(记帐帐本)"]
  *     responses:
@@ -1507,32 +1521,64 @@
  *                 commission:
  *                   type: object
  *                   properties:
- *                     notYetRefunded:
- *                       type: object
- *                       properties:
- *                         count:
- *                           type: number
- *                         amount:
- *                           type: number
+ *                     notYetCount:
+ *                       type: number
+ *                     notYetAmount:
+ *                       type: number
+ *                     refundedCount:
+ *                       type: number
+ *                     refundedAmount:
+ *                       type: number
  *                 principle:
  *                   type: object
  *                   properties:
- *                     notYetRefunded:
- *                       type: object
- *                       properties:
- *                         count:
- *                           type: number
- *                         amount:
- *                           type: number
+ *                     notYetCount:
+ *                       type: number
+ *                     notYetAmount:
+ *                       type: number
+ *                     refundedCount:
+ *                       type: number
+ *                     refundedAmount:
+ *                       type: number
  *                 cardDetail:
  *                   type: object
  *                   properties:
- *                     notYetCredited:
- *                       type: number
- *                     credited:
- *                       type: number
- *                     count:
- *                       type: number
+ *                     total:
+ *                       type: object
+ *                       properties:
+ *                           notYetCredited:
+ *                             type: number
+ *                           credited:
+ *                             type: number
+ *                           count:
+ *                             type: number
+ *                     items:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           journalAccount:
+ *                             type: object
+ *                             properties:
+ *                               id:
+ *                                 type: string
+ *                               name:
+ *                                 type: string
+ *                                 example: 微信
+ *                               icon:
+ *                                 type: string
+ *                                 example: /static/accounts/wechat.png
+ *                               userAccount:
+ *                                 type: string
+ *                                 example: 用户输入的帐号
+ *                           notYetCredited:
+ *                             type: number
+ *                           credited:
+ *                             type: number
+ *                           count:
+ *                             type: number
+ *
+ *
  *
  *
  *
