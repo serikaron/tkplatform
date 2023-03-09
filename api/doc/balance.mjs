@@ -7,7 +7,7 @@
  *     tags: [balance(站点余额)]
  *     parameters:
  *     - in: path
- *       name: userSiteId
+ *       name: siteId
  *       schema:
  *         type: string
  *     - in: path

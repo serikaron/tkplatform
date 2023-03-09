@@ -393,6 +393,11 @@
  *       schema:
  *         type: number
  *         example: 本金
+ *     - in: path
+ *       name: status
+ *       schema:
+ *         type: number
+ *         example: 0-全部，1-正常，2-异常
  *     responses:
  *       200:
  *         description: 返回列表
