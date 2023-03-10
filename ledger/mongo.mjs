@@ -39,6 +39,11 @@ class Filter {
         return this
     }
 
+    plug(filter) {
+        Object.assign(this._filter, filter)
+        return this
+    }
+
     toFilter() {
         return this._filter
     }
@@ -185,27 +190,39 @@ export async function setupMongo(req) {
                 {$set: update}
             )
         },
-        getEntries: async (collectionName, userId, minDate, maxDate, offset, limit) => {
-            const filter = {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                deleted: {$ne: true}
-            };
-            let query = ledger.db.collection(collectionName)
-                .find(filter)
+        getEntries: async (collectionName, userId, minDate, maxDate, offset, limit, optionalFilter) => {
+            const filter = Filter.generalFilter(userId, minDate, maxDate)
+            makeOptionalFilter(filter, optionalFilter)
+            const r = await ledger.db.collection(collectionName)
+                .aggregate([
+                    filter.toMatch(),
+                    {$sort: {"createdAt": -1}},
+                    {
+                        $facet: {
+                            items: [{$skip: offset === null ? 0 : offset}, {$limit: limit === null ? 50 : limit}],
+                            count: [
+                                {
+                                    $count: "total"
+                                }
+                            ],
+                        }
+                    },
+                    {
+                        $project: {
+                            total: {
+                                $arrayElemAt: [
+                                    "$count.total",
+                                    0
+                                ]
+                            },
+                            items: 1
+                        }
+                    }
+                ])
+                .toArray()
 
-            if (offset !== null) {
-                query = query.skip(offset)
-            }
-            if (limit !== null) {
-                query = query.limit(limit)
-            }
-
-            const items = await query.sort({createdAt: -1}).toArray()
-            const total = await ledger.db.collection(collectionName)
-                .countDocuments(filter)
-
-            return {total, items}
+            console.log(JSON.stringify(r[0]))
+            return r[0]
         },
         delEntries: async (collectionName, userId, from, to) => {
             await ledger.db.collection(collectionName)
@@ -737,4 +754,56 @@ export async function setupMongo(req) {
 
 export async function cleanMongo(req) {
     await req.context.mongo.client.close()
+}
+
+function makeFilter(key, value) {
+    switch (key) {
+        case "siteName":
+            return {"site.name": value}
+        case "siteId":
+            return {"site.id": value}
+        case "refundStatus": {
+            switch (value) {
+                case 1:
+                    return {"principle.refunded": true, "commission.refunded": true}
+                case 2:
+                    return {$or: [{"principle.refunded": false}, {"commission.refunded": false}]}
+                case 3:
+                    return {"principle.refunded": false}
+                case 4:
+                    return {"commission.refunded": false}
+            }
+            break
+        }
+        case "refundFrom": {
+            return {"refund.from": value - 1}
+        }
+        case "storeId":
+            return {"store.id": value}
+        case "key":
+            const regex = `.*${value}.*`
+            const fields = [
+                "account",
+                "ledgerAccount.account",
+                "shop",
+                "orderId"
+            ]
+            return {
+                $or: fields.map(x => {
+                    return {[x]: {$regex: regex}}
+                })
+            }
+        case "minPrinciple":
+            return {$expr: {$gte: [Aggregate.principleBase.amount, value]}}
+        case "maxPrinciple":
+            return {$exp: {$lte: [Aggregate.principleBase.amount, value]}}
+        case "status":
+            return {"status": value - 1}
+    }
+}
+
+function makeOptionalFilter(filter, optionalFilter) {
+    Object.entries(optionalFilter).forEach(x => {
+        filter.plug(makeFilter(x[0], x[1]))
+    })
 }

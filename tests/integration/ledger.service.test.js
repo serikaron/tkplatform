@@ -1282,3 +1282,186 @@ describe("analyse overview", () => {
         expect(actuallyItems).toStrictEqual(expectItems)
     })
 })
+
+describe("test ledger entries filter", () => {
+    const makeEntry = (replace) => {
+        const entry = newEntry()
+        entry.site = {
+            id: `${new ObjectId()}`,
+            name: "siteName",
+        }
+        entry.principle = {
+            amount: 100,
+            refunded: true
+        }
+        entry.commission = {
+            amount: 10,
+            refunded: true
+        }
+        entry.store = {
+            id: `${new ObjectId()}`,
+            name: "storeName",
+        }
+        entry.account = "account"
+        entry.ledgerAccount = {
+            account: "ledgerAccount"
+        }
+        entry.shop = "shop"
+        entry.orderId = "orderId"
+        entry.refund = {
+            from: 0
+        }
+        entry.status = 0
+
+        Object.assign(entry, replace)
+
+        return entry
+    }
+
+    const replaceSite = {id: `${new ObjectId()}`, name: "小吉他"}
+    const replaceStore = {id: `${new ObjectId()}`, name: "陶宝"}
+    const userId = `${new ObjectId()}`
+    const box = new Box()
+    box.data.entries = {}
+
+    const d = [
+        {
+            key: "replace-site",
+            replacement: {site: replaceSite},
+        },
+        {
+            key: "refund-from",
+            replacement: {refund: {from: 1}},
+        },
+        {
+            key: "principle-unrefunded",
+            replacement: {principle: {amount: 200, refunded: false}}
+        },
+        {
+            key: "commission-unrefunded",
+            replacement: {commission: {amount: 20, refunded: false}},
+        },
+        {
+            key: "all-unrefunded",
+            replacement: {
+                principle: {amount: 300, refunded: false},
+                commission: {amount: 30, refunded: false},
+            }
+        },
+        {
+            key: "replace-store",
+            replacement: {store: replaceStore}
+        },
+        {
+            key: "account",
+            replacement: {account: "大头文"}
+        },
+        {
+            key: "ledger-account",
+            replacement: {ledgerAccount: {account: "大头文"}}
+        },
+        {
+            key: "shop",
+            replacement: {shop: "苹果店"}
+        },
+        {
+            key: "order-id",
+            replacement: {orderId: "99876"}
+        },
+        {
+            key: "status",
+            replacement: {status: 1}
+        }
+    ]
+    d.forEach(x => {
+        box.data.entries[x.key] = makeEntry(x.replacement)
+    })
+
+    describe.each(d.map(x => x.key))
+    ("($#) prepare entries for filter", (key) => {
+        it("post", async () => {
+            const entry = box.data.entries[key]
+            await addEntry("ledger", entry, userId)
+        })
+    })
+
+    describe.each([
+        {
+            filter: {siteName: "小吉他"},
+            result: [box.data.entries["replace-site"]]
+        },
+        {
+            filter: {siteId: replaceSite.id},
+            result: [box.data.entries["replace-site"]]
+        },
+        {
+            filter: {refundStatus: 1},
+            result: Object.keys(box.data.entries)
+                .filter(x => x.search("unrefunded") === -1)
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {refundStatus: 2},
+            result: Object.keys(box.data.entries)
+                .filter(x => x.search("unrefunded") !== -1)
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {refundStatus: 3},
+            result: [box.data.entries["principle-unrefunded"], box.data.entries["all-unrefunded"]]
+        },
+        {
+            filter: {refundStatus: 4},
+            result: [box.data.entries["commission-unrefunded"], box.data.entries["all-unrefunded"]]
+        },
+        {
+            filter: {refundFrom: 1},
+            result: Object.keys(box.data.entries)
+                .filter(x => x !== "refund-from")
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {refundFrom: 2},
+            result: [box.data.entries["refund-from"]]
+        },
+        {
+            filter: {storeId: replaceStore.id},
+            result: [box.data.entries["replace-store"]]
+        },
+        {
+            filter: {key: "头"},
+            result: [box.data.entries["account"], box.data.entries["ledger-account"]]
+        },
+        {
+            filter: {key: "苹果"},
+            result: [box.data.entries["shop"]]
+        },
+        {
+            filter: {key: "99876"},
+            result: [box.data.entries["order-id"]]
+        },
+        {
+            filter: {status: 1},
+            result: Object.keys(box.data.entries)
+                .filter(x => x !== "status")
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {status: 2},
+            result: [box.data.entries["status"]]
+        },
+    ])
+    ("($filter) filter should work correctly", ({filter, result}) => {
+        it("check", async () => {
+            await checkEntries({
+                key: "ledger",
+                userId,
+                query: filter,
+                desired: {
+                    total: result.length,
+                    items: result
+                }
+            })
+        })
+    })
+})
