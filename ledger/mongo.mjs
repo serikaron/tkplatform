@@ -192,7 +192,11 @@ export async function setupMongo(req) {
         },
         getEntries: async (collectionName, userId, minDate, maxDate, offset, limit, optionalFilter) => {
             const filter = Filter.generalFilter(userId, minDate, maxDate)
-            makeOptionalFilter(filter, optionalFilter)
+            makeOptionalFilter(filter, optionalFilter,
+                collectionName === "ledgerEntries" ?
+                    ["account", "ledgerAccount.account", "shop", "orderId"] :
+                    ["account", "journalAccount.account", "orderId"]
+            )
             const r = await ledger.db.collection(collectionName)
                 .aggregate([
                     filter.toMatch(),
@@ -756,7 +760,7 @@ export async function cleanMongo(req) {
     await req.context.mongo.client.close()
 }
 
-function makeFilter(key, value) {
+function makeFilter(key, value, searchFields) {
     switch (key) {
         case "siteName":
             return {"site.name": value}
@@ -772,8 +776,9 @@ function makeFilter(key, value) {
                     return {"principle.refunded": false}
                 case 4:
                     return {"commission.refunded": false}
+                default:
+                    return null
             }
-            break
         }
         case "refundFrom": {
             return {"refund.from": value - 1}
@@ -782,28 +787,58 @@ function makeFilter(key, value) {
             return {"store.id": value}
         case "key":
             const regex = `.*${value}.*`
-            const fields = [
-                "account",
-                "ledgerAccount.account",
-                "shop",
-                "orderId"
-            ]
             return {
-                $or: fields.map(x => {
+                $or: searchFields.map(x => {
                     return {[x]: {$regex: regex}}
                 })
             }
-        case "minPrinciple":
-            return {$expr: {$gte: [Aggregate.principleBase.amount, value]}}
-        case "maxPrinciple":
-            return {$exp: {$lte: [Aggregate.principleBase.amount, value]}}
+        case "principle":
+            if ("min" in value && "max" in value) {
+                return {
+                    $expr: {
+                        $and: [
+                            {$gte: [Aggregate.principleBase.amount, value.min]},
+                            {$lte: [Aggregate.principleBase.amount, value.max]},
+                        ]
+                    }
+                }
+            } else if ("min" in value) {
+                return {$expr: {$gte: [Aggregate.principleBase.amount, value.min]}}
+            } else if ("max" in value) {
+                return {$expr: {$lte: [Aggregate.principleBase.amount, value.max]}}
+            } else {
+                return null
+            }
         case "status":
             return {"status": value - 1}
+        case "credited":
+            return {"credited": value === 1}
+        case "amount":
+            if ("min" in value && "max" in value) {
+                return {
+                    $expr: {
+                        $and: [
+                            {$gte: [Aggregate.amount("$amount"), value.min]},
+                            {$lte: [Aggregate.amount("$amount"), value.max]},
+                        ]
+                    }
+                }
+            } else if ("min" in value) {
+                return {$expr: {$gte: [Aggregate.amount("$amount"), value.min]}}
+            } else if ("max" in value) {
+                return {$expr: {$lte: [Aggregate.amount("$amount"), value.max]}}
+            } else {
+                return null
+            }
     }
+    return null
 }
 
-function makeOptionalFilter(filter, optionalFilter) {
+function makeOptionalFilter(filter, optionalFilter, searchFields) {
     Object.entries(optionalFilter).forEach(x => {
-        filter.plug(makeFilter(x[0], x[1]))
+        const f = makeFilter(x[0], x[1], searchFields)
+        if (f !== null) {
+            filter.plug(f)
+        }
     })
 }

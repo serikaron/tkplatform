@@ -1047,10 +1047,10 @@ describe("analyse detail", () => {
             verify: rsp => {
                 simpleVerification(rsp)
                 expect(rsp.data.sort((a, b) => {
-                    if (a.id < b.id) {
+                    if (a.site.id < b.site.id) {
                         return -1
                     }
-                    if (a.id > b.id) {
+                    if (a.site.id > b.site.id) {
                         return 1
                     }
                     return 0
@@ -1077,10 +1077,10 @@ describe("analyse detail", () => {
                         withdrawingSum: 500
                     },
                 ].sort((a, b) => {
-                    if (a.id < b.id) {
+                    if (a.site.id < b.site.id) {
                         return -1
                     }
-                    if (a.id > b.id) {
+                    if (a.site.id > b.site.id) {
                         return 1
                     }
                     return 0
@@ -1450,11 +1450,151 @@ describe("test ledger entries filter", () => {
             filter: {status: 2},
             result: [box.data.entries["status"]]
         },
+        {
+            filter: {minPrinciple: 200},
+            result: ["principle-unrefunded", "all-unrefunded"]
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {maxPrinciple: 199},
+            result: Object.keys(box.data.entries)
+                .filter(x => x !== "principle-unrefunded" && x !== "all-unrefunded")
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {minPrinciple: 200, maxPrinciple: 299},
+            result: [box.data.entries["principle-unrefunded"]]
+        },
     ])
     ("($filter) filter should work correctly", ({filter, result}) => {
         it("check", async () => {
             await checkEntries({
                 key: "ledger",
+                userId,
+                query: filter,
+                desired: {
+                    total: result.length,
+                    items: result
+                }
+            })
+        })
+    })
+})
+
+describe("test journal entries filter", () => {
+    const makeEntry = (replace) => {
+        const entry = newEntry()
+        entry.site = {
+            id: `${new ObjectId()}`,
+            name: "siteName",
+        }
+        entry.credited = false
+        entry.account = "account"
+        entry.journalAccount = {
+            account: "ledgerAccount"
+        }
+        entry.orderId = "orderId"
+        entry.amount = 100
+
+        Object.assign(entry, replace)
+
+        return entry
+    }
+
+    const replaceSite = {id: `${new ObjectId()}`, name: "小吉他"}
+    const userId = `${new ObjectId()}`
+    const box = new Box()
+    box.data.entries = {}
+
+    const d = [
+        {
+            key: "replace-site",
+            replacement: {site: replaceSite},
+        },
+        {
+            key: "credited",
+            replacement: {credited: true},
+        },
+        {
+            key: "account",
+            replacement: {account: "大头文"}
+        },
+        {
+            key: "journal-account",
+            replacement: {journalAccount: {account: "大头文"}}
+        },
+        {
+            key: "order-id",
+            replacement: {orderId: "99876"}
+        },
+        {
+            key: "amount-200",
+            replacement: {amount: 200}
+        },
+        {
+            key: "amount-300",
+            replacement: {amount: 300}
+        },
+    ]
+    d.forEach(x => {
+        box.data.entries[x.key] = makeEntry(x.replacement)
+    })
+
+    describe.each(d.map(x => x.key))
+    ("($#) prepare entries for filter", (key) => {
+        it("post", async () => {
+            const entry = box.data.entries[key]
+            await addEntry("journal", entry, userId)
+        })
+    })
+
+    describe.each([
+        {
+            filter: {siteName: "小吉他"},
+            result: [box.data.entries["replace-site"]]
+        },
+        {
+            filter: {siteId: replaceSite.id},
+            result: [box.data.entries["replace-site"]]
+        },
+        {
+            filter: {key: "头"},
+            result: [box.data.entries["account"], box.data.entries["journal-account"]]
+        },
+        {
+            filter: {key: "99876"},
+            result: [box.data.entries["order-id"]]
+        },
+        {
+            filter: {credited: 1},
+            result: [box.data.entries["credited"]]
+        },
+        {
+            filter: {credited: 2},
+            result: Object.keys(box.data.entries)
+                .filter(x => x !== "credited")
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {minAmount: 200},
+            result: ["amount-200", "amount-300"]
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {maxAmount: 199},
+            result: Object.keys(box.data.entries)
+                .filter(x => x.search("amount") === -1)
+                .map(x => box.data.entries[x])
+        },
+        {
+            filter: {minAmount: 200, maxAmount: 299},
+            result: [box.data.entries["amount-200"]]
+        },
+    ])
+    ("($filter) filter should work correctly", ({filter, result}) => {
+        it("check", async () => {
+            await checkEntries({
+                key: "journal",
                 userId,
                 query: filter,
                 desired: {

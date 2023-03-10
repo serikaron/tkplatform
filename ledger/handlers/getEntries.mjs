@@ -28,20 +28,26 @@ const optionalFilter = (query) => {
         optionalFilter.credited = Number(credited);
     }
 
+    optionalFilter.principle = {}
     if (minPrinciple && !isNaN(Number(minPrinciple))) {
-        optionalFilter.minPrinciple = Number(minPrinciple);
+        optionalFilter.principle.min = Number(minPrinciple)
     }
-
     if (maxPrinciple && !isNaN(Number(maxPrinciple))) {
-        optionalFilter.maxPrinciple = Number(maxPrinciple);
+        optionalFilter.principle.max = Number(maxPrinciple);
+    }
+    if (Object.keys(optionalFilter.principle).length === 0){
+        delete optionalFilter.principle
     }
 
+    optionalFilter.amount = {}
     if (minAmount && !isNaN(Number(minAmount))) {
-        optionalFilter.minAmount = Number(minAmount)
+        optionalFilter.amount.min = Number(minAmount)
     }
-
     if (maxAmount && !isNaN(Number(maxAmount))) {
-        optionalFilter.maxAmount = Number(maxAmount)
+        optionalFilter.amount.max = Number(maxAmount)
+    }
+    if (Object.keys(optionalFilter.amount).length === 0){
+        delete optionalFilter.amount
     }
 
     return optionalFilter

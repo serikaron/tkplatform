@@ -136,10 +136,10 @@ describe.each([
         {params: "?refundFrom=2", optionalFilter: {refundFrom: 2}},
         {params: "?storeId=a-store-id", optionalFilter: {storeId: "a-store-id"}},
         {params: "?key=a-search-key", optionalFilter: {key: "a-search-key"}},
-        {params: "?minPrinciple=123", optionalFilter: {minPrinciple: 123}},
-        {params: "?maxPrinciple=456", optionalFilter: {maxPrinciple: 456}},
-        {params: "?minAmount=678", optionalFilter: {minAmount: 678}},
-        {params: "?maxAmount=789", optionalFilter: {maxAmount: 789}},
+        {params: "?minPrinciple=123", optionalFilter: {principle: {min: 123}}},
+        {params: "?maxPrinciple=456", optionalFilter: {principle: {max: 456}}},
+        {params: "?minAmount=678", optionalFilter: {amount: {min: 678}}},
+        {params: "?maxAmount=789", optionalFilter: {amount: {max: 789}}},
         {params: "?credited=0", optionalFilter: {}},
         {params: "?credited=1", optionalFilter: {credited: 1}},
         {
@@ -151,8 +151,7 @@ describe.each([
                 refundFrom: 1,
                 storeId: "a-store-id",
                 key: "a-search-key",
-                minPrinciple: 123,
-                maxPrinciple: 456
+                principle: {min: 123, max: 456}
             }
         }
     ])
