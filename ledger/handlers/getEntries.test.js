@@ -138,6 +138,10 @@ describe.each([
         {params: "?key=a-search-key", optionalFilter: {key: "a-search-key"}},
         {params: "?minPrinciple=123", optionalFilter: {minPrinciple: 123}},
         {params: "?maxPrinciple=456", optionalFilter: {maxPrinciple: 456}},
+        {params: "?minAmount=678", optionalFilter: {minAmount: 678}},
+        {params: "?maxAmount=789", optionalFilter: {maxAmount: 789}},
+        {params: "?credited=0", optionalFilter: {}},
+        {params: "?credited=1", optionalFilter: {credited: 1}},
         {
             params: "?siteName=a-site-name&siteId=a-site-id&refundStatus=1&refundFrom=1&storeId=a-store-id&key=a-search-key&minPrinciple=123&maxPrinciple=456",
             optionalFilter: {

@@ -5,7 +5,7 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 import {dateRange, replaceId} from "../../common/utils.mjs";
 
 const optionalFilter = (query) => {
-    const {offset, limit, refundStatus, refundFrom, minPrinciple, maxPrinciple, ...optionalFilter} = query;
+    const {offset, limit, refundStatus, refundFrom, credited, minPrinciple, maxPrinciple, minAmount, maxAmount, ...optionalFilter} = query;
 
     if (refundStatus
         && Number.isInteger(Number(refundStatus))
@@ -21,6 +21,13 @@ const optionalFilter = (query) => {
         optionalFilter.refundFrom = Number(refundFrom);
     }
 
+    if (credited
+        && Number.isInteger(Number(credited))
+        && Number(credited) !== 0
+    ) {
+        optionalFilter.credited = Number(credited);
+    }
+
     if (minPrinciple && !isNaN(Number(minPrinciple))) {
         optionalFilter.minPrinciple = Number(minPrinciple);
     }
@@ -28,6 +35,15 @@ const optionalFilter = (query) => {
     if (maxPrinciple && !isNaN(Number(maxPrinciple))) {
         optionalFilter.maxPrinciple = Number(maxPrinciple);
     }
+
+    if (minAmount && !isNaN(Number(minAmount))) {
+        optionalFilter.minAmount = Number(minAmount)
+    }
+
+    if (maxAmount && !isNaN(Number(maxAmount))) {
+        optionalFilter.maxAmount = Number(maxAmount)
+    }
+
     return optionalFilter
 }
 const makeArguments = (req, res, next) => {
