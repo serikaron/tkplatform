@@ -1090,7 +1090,7 @@ describe("analyse detail", () => {
     })
 })
 
-describe.only("analyse overview", () => {
+describe("analyse overview", () => {
 
     const getOverview = async (userId) => {
         let data = undefined
@@ -1285,7 +1285,7 @@ describe.only("analyse overview", () => {
         })
     })
 
-    describe.only("without entries", () => {
+    describe("without entries", () => {
         const userId = `${new ObjectId()}`
         it("should be ok", async () => {
             const overview = await getOverview(userId)

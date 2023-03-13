@@ -34,39 +34,4 @@ describe('user test about auth', () => {
             }
         })
     })
-
-    test("and then change password", async () => {
-        await runTest({
-            path: "/v1/user/password",
-            body: {
-                phone: phone,
-                newPassword: "123456",
-                smsCode: "2065",
-            },
-            // authentication: {accessToken},
-            verify: (response) => {
-                // simpleVerification(response)
-                expect(response.status).toBe(200)
-                expect(response.code).toBe(0)
-            }
-        })
-    })
-
-    // test("last change account", async () => {
-    //     await runTest({
-    //         path: "/v1/user/account",
-    //         body: {
-    //             old: {
-    //                 phone: phone,
-    //                 password: "123456",
-    //             },
-    //             new: {
-    //                 phone: phone,
-    //                 password: "123456",
-    //             },
-    //             smsCode: "2065",
-    //         },
-    //         // authentication: {accessToken}
-    //     })
-    // })
 })

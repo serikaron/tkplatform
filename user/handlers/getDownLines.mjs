@@ -7,7 +7,9 @@ export const routeGetDownLines = router => {
         const downLines = await req.context.mongo.getDownLines(req.headers.id)
         // console.log(`downlines: ${JSON.stringify(downLines)}`)
         if (downLines === null
+            || downLines === undefined
             || downLines === []) {
+            // console.log("empty down lines")
             res.tkResponse(TKResponse.Success({
                 data: {
                     total: 0,

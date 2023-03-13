@@ -28,11 +28,11 @@ export async function setupMongo(req) {
         },
         getInviter: async (userId) => {
             return await collection.users
-                .findOne({
-                    _id: new ObjectId(userId)
-                }, {
-                    projection: {downLines: 1, member: 1}
-                })
+                .findOne(
+                    // objectId is 12-byte length,(24 characters), we use the last 8 characters as inviterId
+                    {$expr: {$eq: [{$substr: [{$toString: "$_id"}, 16, 8]}, userId]}},
+                    {projection: {downLines: 1, member: 1}}
+                )
         },
         register: async (user) => {
             // console.log(`register: ${JSON.stringify(user)}`)
@@ -117,7 +117,7 @@ export async function setupMongo(req) {
                 }, {
                     $set: {"downLines.$[downLine].alias": update.alias}
                 }, {
-                    arrayFilters:[{"downLine.id": new ObjectId(downLineUserId)}]
+                    arrayFilters: [{"downLine.id": new ObjectId(downLineUserId)}]
                 })
         },
         getPassword: async ({userId, phone}) => {

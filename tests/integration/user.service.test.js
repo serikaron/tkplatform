@@ -255,11 +255,20 @@ describe("test user service", () => {
             box.data.inviter = {id: box.userId}
         })
 
+        it("empty down lines should work perfectly", async () => {
+            box.data.downLines = []
+            await check()
+        })
+
         it("add two down lines", async () => {
+            const inviterId = () => {
+                return box.data.inviter.id
+                    .substring(box.data.inviter.id.length - 8)
+            }
             box.data.downLines = []
             for (let i = 0; i < 2; ++i) {
                 const phone = genPhone()
-                await register(phone, box, {id: box.data.inviter.id})
+                await register(phone, box, {id: inviterId()})
                 box.data.downLines.push({
                     id: box.userId,
                     phone
@@ -384,7 +393,7 @@ describe("test user service", () => {
                     simpleVerification(rsp)
                     expect(rsp.data).toStrictEqual(
                         {
-                            id: box.userId,
+                            id: box.userId.substring(box.userId.length - 8),
                             phone,
                             member: {
                                 expiration: now() + 7 * 86400

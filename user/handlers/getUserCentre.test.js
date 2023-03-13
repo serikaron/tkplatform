@@ -44,9 +44,11 @@ test("combine all information and return", async () => {
         .get("/v1/user/centre")
         .set({id: `${userId}`})
 
+    const userIdString = `${userId}`
+    const expectId = userIdString.substring(userIdString.length - 8)
     simpleCheckTKResponse(response, TKResponse.Success({
         data: {
-            id: `${userId}`,
+            id: expectId,
             phone,
             member: {
                 expiration: memberExpiration

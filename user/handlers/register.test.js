@@ -354,7 +354,7 @@ describe("test register", () => {
                 ])("($#) with prize setting", (prize) => {
                     it("all should be correct", async () => {
                         const getInviter = jest.fn(async (id) => {
-                            console.log(`exists: ${JSON.stringify(relationship.existsDownLines)}`)
+                            // console.log(`exists: ${JSON.stringify(relationship.existsDownLines)}`)
                             return {
                                 _id: new ObjectId(id),
                                 downLines: copy(relationship.existsDownLines),

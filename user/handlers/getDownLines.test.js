@@ -73,3 +73,44 @@ test("get downlines", async () => {
     expect(getDownLineInfo).toHaveBeenNthCalledWith(1, downLineIds[0])
     expect(getDownLineInfo).toHaveBeenNthCalledWith(2, downLineIds[1])
 })
+
+describe.each([
+    {downLines: undefined},
+    {downLines: null},
+    {downLines: []}
+])
+("bad down line ($#)", ({downLines}) => {
+    it("should handle correctly", async () => {
+        const getDownLines = jest.fn(async () => {
+            return downLines
+        })
+
+        const app = createApp()
+        setup(app, {
+            setup: testDIContainer.setup([
+                (req, res, next) => {
+                    req.context = {
+                        mongo: {
+                            getDownLines,
+                        }
+                    }
+                    next()
+                }
+            ]),
+            teardown: testDIContainer.teardown([])
+        })
+
+        const userId = new ObjectId()
+        const response = await supertest(app)
+            .get('/v1/user/downLines')
+            .set({id: `${userId}`})
+
+        simpleCheckTKResponse(response, TKResponse.Success({
+            data: {
+                total: 0,
+                items: []
+            }
+        }))
+        expect(getDownLines).toHaveBeenCalledWith(`${userId}`)
+    })
+})
