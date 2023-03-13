@@ -737,7 +737,8 @@ export async function setupMongo(req) {
                 ])
                 .toArray()
 
-            console.log(JSON.stringify(journal[0]))
+            console.log(`overview, ledger: ${JSON.stringify(ledger)}`)
+            console.log(`overview, ledger: ${JSON.stringify(journal)}`)
             return {
                 overview: ledger[0].overview,
                 exception: ledger[0].exception,

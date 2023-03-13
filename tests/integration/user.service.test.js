@@ -368,7 +368,7 @@ describe("test user service", () => {
         })
     })
 
-    describe.only("test user centre", () => {
+    describe("test user centre", () => {
         const box = new Box()
         const phone = genPhone()
 
