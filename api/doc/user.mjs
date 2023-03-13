@@ -278,6 +278,8 @@
  *             schema:
  *               type: object
  *               properties:
+ *                 phone:
+ *                   type: string
  *                 name:
  *                   type: string
  *                 registeredAt:
@@ -296,8 +298,27 @@
  *                   properties:
  *                     expiration:
  *                       type: number
- *                 siteCount:
- *                   type: number
+ *                 sites:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       site:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           name:
+ *                             type: string
+ *                             example: 站点1
+ *                           icon:
+ *                             type: string
+ *                             example: /static/sites/001.png
+ *                           alias:
+ *                             type: string
+ *                             example: 备注名
  *                 contact:
  *                   type: object
  *                   properties:
@@ -318,6 +339,8 @@
  *                     phone:
  *                       type: object
  *                       properties:
+ *                         account:
+ *                           type: string
  *                         open:
  *                           type: boolean
  *
