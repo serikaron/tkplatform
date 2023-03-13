@@ -1090,7 +1090,8 @@ describe("analyse detail", () => {
     })
 })
 
-describe("analyse overview", () => {
+describe.only("analyse overview", () => {
+
     const getOverview = async (userId) => {
         let data = undefined
         await runTest({
@@ -1106,171 +1107,137 @@ describe("analyse overview", () => {
         return data
     }
 
-    const userId = `${new ObjectId()}`
-    const box = new Box()
+    describe("with entries", () => {
+        const userId = `${new ObjectId()}`
+        const box = new Box()
 
-    describe.each([
-        {
-            principle: {amount: 10, refunded: true},
-            commission: {amount: 20, refunded: true},
-            status: 0,
-        },
-        {
-            principle: {amount: 30, refunded: false},
-            commission: {amount: 40, refunded: true},
-            status: 0,
-        },
-        {
-            principle: {amount: 50, refunded: true},
-            commission: {amount: 60, refunded: false},
-            status: 0,
-        },
-        {
-            principle: {amount: 70, refunded: false},
-            commission: {amount: 80, refunded: false},
-            status: 0,
-        },
-        {
-            principle: {amount: 90, refunded: true},
-            commission: {amount: 100, refunded: true},
-            status: 1,
-        },
-        {
-            principle: {amount: 110, refunded: false},
-            commission: {amount: 120, refunded: false},
-            status: 1,
-        },
-    ])
-    ("prepare ledger entry ($#)", ({principle, commission, status}) => {
-        it("post", async () => {
-            const entry = newEntry()
-            entry.principle = principle
-            entry.commission = commission
-            entry.status = status
-            await addEntry("ledger", entry, userId)
-        })
-    })
-
-    test("overview", async () => {
-        const overview = await getOverview(userId)
-        expect(overview.overview).toStrictEqual({
-            principle: 360,
-            commission: 420,
-            notYetRefunded: 470,
-            count: 6,
-        })
-    })
-
-    test("exception", async () => {
-        const overview = await getOverview(userId)
-        expect(overview.exception).toStrictEqual({
-            count: 2,
-            amount: 420,
-            principle: 200,
-            commission: 220,
-        })
-    })
-
-    test("principle", async () => {
-        const overview = await getOverview(userId)
-        expect(overview.principle).toStrictEqual({
-            notYetCount: 3,
-            notYetAmount: 210,
-            refundedCount: 3,
-            refundedAmount: 150,
-        })
-    })
-
-    test("commission", async () => {
-        const overview = await getOverview(userId)
-        expect(overview.commission).toStrictEqual({
-            notYetCount: 3,
-            notYetAmount: 260,
-            refundedCount: 3,
-            refundedAmount: 160,
-        })
-    })
-
-    describe("prepare journal entries", () => {
-        box.data.accounts = [
-            {id: `${new ObjectId()}`, accountName: "微信"},
-            {id: `${new ObjectId()}`, accountName: "支付宝"},
-            {id: `${new ObjectId()}`, accountName: "工行"},
-            {id: `${new ObjectId()}`, accountName: "招行"},
-        ].map(x => {
-            return {
-                id: x.id,
-                name: x.accountName,
-                icon: `${x.accountName}-icon`,
-                userAccount: `${x.accountName}-userAccount`
-            }
-        })
-
-        it.each([
-            {journalAccount: box.data.accounts[0], amount: 10, credited: true},
-            {journalAccount: box.data.accounts[0], amount: 20, credited: false},
-            {journalAccount: box.data.accounts[1], amount: 30, credited: true},
-            {journalAccount: box.data.accounts[1], amount: 40, credited: false},
-            {journalAccount: box.data.accounts[2], amount: 50, credited: true},
-            {journalAccount: box.data.accounts[2], amount: 60, credited: false},
-            {journalAccount: box.data.accounts[3], amount: 70, credited: true},
-            {journalAccount: box.data.accounts[3], amount: 80, credited: false},
-            {journalAccount: box.data.accounts[0], amount: 90, credited: true},
-            {journalAccount: box.data.accounts[0], amount: 100, credited: false},
+        describe.each([
+            {
+                principle: {amount: 10, refunded: true},
+                commission: {amount: 20, refunded: true},
+                status: 0,
+            },
+            {
+                principle: {amount: 30, refunded: false},
+                commission: {amount: 40, refunded: true},
+                status: 0,
+            },
+            {
+                principle: {amount: 50, refunded: true},
+                commission: {amount: 60, refunded: false},
+                status: 0,
+            },
+            {
+                principle: {amount: 70, refunded: false},
+                commission: {amount: 80, refunded: false},
+                status: 0,
+            },
+            {
+                principle: {amount: 90, refunded: true},
+                commission: {amount: 100, refunded: true},
+                status: 1,
+            },
+            {
+                principle: {amount: 110, refunded: false},
+                commission: {amount: 120, refunded: false},
+                status: 1,
+            },
         ])
-        ("post entry ($#)", async ({journalAccount, amount, credited}) => {
-            const entry = newEntry()
-            entry.journalAccount = journalAccount
-            entry.amount = amount
-            entry.credited = credited
-            await addEntry("journal", entry, userId)
-        })
-    })
-
-    test("cardDetail", async () => {
-        const overview = await getOverview(userId)
-        expect(overview.cardDetail.total).toStrictEqual({
-            notYetCredited: 300,
-            credited: 250,
-            count: 10,
+        ("prepare ledger entry ($#)", ({principle, commission, status}) => {
+            it("post", async () => {
+                const entry = newEntry()
+                entry.principle = principle
+                entry.commission = commission
+                entry.status = status
+                await addEntry("ledger", entry, userId)
+            })
         })
 
-        const actuallyItems = overview.cardDetail.items.sort((a, b) => {
-            if (a.journalAccount.id < b.journalAccount.id) {
-                return -1
-            }
-            if (a.journalAccount.id > b.journalAccount.id) {
-                return 1
-            }
-            return 0
+        test("overview", async () => {
+            const overview = await getOverview(userId)
+            expect(overview.overview).toStrictEqual({
+                principle: 360,
+                commission: 420,
+                notYetRefunded: 470,
+                count: 6,
+            })
         })
-        const expectItems = [
-            {
-                journalAccount: box.data.accounts[0],
-                notYetCredited: 120,
-                credited: 100,
-                count: 4
-            },
-            {
-                journalAccount: box.data.accounts[1],
-                notYetCredited: 40,
-                credited: 30,
+
+        test("exception", async () => {
+            const overview = await getOverview(userId)
+            expect(overview.exception).toStrictEqual({
                 count: 2,
-            },
-            {
-                journalAccount: box.data.accounts[2],
-                notYetCredited: 60,
-                credited: 50,
-                count: 2,
-            },
-            {
-                journalAccount: box.data.accounts[3],
-                notYetCredited: 80,
-                credited: 70,
-                count: 2,
-            },
-        ]
-            .sort((a, b) => {
+                amount: 420,
+                principle: 200,
+                commission: 220,
+            })
+        })
+
+        test("principle", async () => {
+            const overview = await getOverview(userId)
+            expect(overview.principle).toStrictEqual({
+                notYetCount: 3,
+                notYetAmount: 210,
+                refundedCount: 3,
+                refundedAmount: 150,
+            })
+        })
+
+        test("commission", async () => {
+            const overview = await getOverview(userId)
+            expect(overview.commission).toStrictEqual({
+                notYetCount: 3,
+                notYetAmount: 260,
+                refundedCount: 3,
+                refundedAmount: 160,
+            })
+        })
+
+        describe("prepare journal entries", () => {
+            box.data.accounts = [
+                {id: `${new ObjectId()}`, accountName: "微信"},
+                {id: `${new ObjectId()}`, accountName: "支付宝"},
+                {id: `${new ObjectId()}`, accountName: "工行"},
+                {id: `${new ObjectId()}`, accountName: "招行"},
+            ].map(x => {
+                return {
+                    id: x.id,
+                    name: x.accountName,
+                    icon: `${x.accountName}-icon`,
+                    userAccount: `${x.accountName}-userAccount`
+                }
+            })
+
+            it.each([
+                {journalAccount: box.data.accounts[0], amount: 10, credited: true},
+                {journalAccount: box.data.accounts[0], amount: 20, credited: false},
+                {journalAccount: box.data.accounts[1], amount: 30, credited: true},
+                {journalAccount: box.data.accounts[1], amount: 40, credited: false},
+                {journalAccount: box.data.accounts[2], amount: 50, credited: true},
+                {journalAccount: box.data.accounts[2], amount: 60, credited: false},
+                {journalAccount: box.data.accounts[3], amount: 70, credited: true},
+                {journalAccount: box.data.accounts[3], amount: 80, credited: false},
+                {journalAccount: box.data.accounts[0], amount: 90, credited: true},
+                {journalAccount: box.data.accounts[0], amount: 100, credited: false},
+            ])
+            ("post entry ($#)", async ({journalAccount, amount, credited}) => {
+                const entry = newEntry()
+                entry.journalAccount = journalAccount
+                entry.amount = amount
+                entry.credited = credited
+                await addEntry("journal", entry, userId)
+            })
+        })
+
+        test("cardDetail", async () => {
+            const overview = await getOverview(userId)
+            expect(overview.cardDetail.total).toStrictEqual({
+                notYetCredited: 300,
+                credited: 250,
+                count: 10,
+            })
+
+            const actuallyItems = overview.cardDetail.items.sort((a, b) => {
                 if (a.journalAccount.id < b.journalAccount.id) {
                     return -1
                 }
@@ -1279,7 +1246,84 @@ describe("analyse overview", () => {
                 }
                 return 0
             })
-        expect(actuallyItems).toStrictEqual(expectItems)
+            const expectItems = [
+                {
+                    journalAccount: box.data.accounts[0],
+                    notYetCredited: 120,
+                    credited: 100,
+                    count: 4
+                },
+                {
+                    journalAccount: box.data.accounts[1],
+                    notYetCredited: 40,
+                    credited: 30,
+                    count: 2,
+                },
+                {
+                    journalAccount: box.data.accounts[2],
+                    notYetCredited: 60,
+                    credited: 50,
+                    count: 2,
+                },
+                {
+                    journalAccount: box.data.accounts[3],
+                    notYetCredited: 80,
+                    credited: 70,
+                    count: 2,
+                },
+            ]
+                .sort((a, b) => {
+                    if (a.journalAccount.id < b.journalAccount.id) {
+                        return -1
+                    }
+                    if (a.journalAccount.id > b.journalAccount.id) {
+                        return 1
+                    }
+                    return 0
+                })
+            expect(actuallyItems).toStrictEqual(expectItems)
+        })
+    })
+
+    describe.only("without entries", () => {
+        const userId = `${new ObjectId()}`
+        it("should be ok", async () => {
+            const overview = await getOverview(userId)
+            expect(overview).toStrictEqual({
+                overview: {
+                    commission: 0,
+                    principle: 0,
+                    notYetRefunded: 0,
+                    count: 0
+                },
+                exception: {
+                    count: 0,
+                    principle: 0,
+                    commission: 0,
+                    amount: 0
+                },
+                commission: {
+                    notYetCount: 0,
+                    notYetAmount: 0,
+                    refundedCount: 0,
+                    refundedAmount: 0,
+                },
+                principle: {
+                    notYetCount: 0,
+                    notYetAmount: 0,
+                    refundedCount: 0,
+                    refundedAmount: 0,
+                },
+                cardDetail: {
+                    total: {
+                        notYetCredited: 0,
+                        credited: 0,
+                        count: 0
+                    },
+                    items: []
+                }
+            })
+        })
     })
 })
 

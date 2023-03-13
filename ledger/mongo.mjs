@@ -740,11 +740,38 @@ export async function setupMongo(req) {
             console.log(`overview, ledger: ${JSON.stringify(ledger)}`)
             console.log(`overview, ledger: ${JSON.stringify(journal)}`)
             return {
-                overview: ledger[0].overview,
-                exception: ledger[0].exception,
-                commission: ledger[0].commission,
-                principle: ledger[0].principle,
-                cardDetail: journal[0]
+                overview: ledger.length !== 0 ? ledger[0].overview : {
+                    commission: 0,
+                    principle: 0,
+                    notYetRefunded: 0,
+                    count: 0,
+                },
+                exception: ledger.length !== 0 ? ledger[0].exception : {
+                    count: 0,
+                    principle: 0,
+                    commission: 0,
+                    amount: 0,
+                },
+                commission: ledger.length !== 0 ? ledger[0].commission : {
+                    notYetCount: 0,
+                    notYetAmount: 0,
+                    refundedCount: 0,
+                    refundedAmount: 0,
+                },
+                principle: ledger.length !== 0 ? ledger[0].principle : {
+                    notYetCount: 0,
+                    notYetAmount: 0,
+                    refundedCount: 0,
+                    refundedAmount: 0,
+                },
+                cardDetail: journal.length !== 0 ? journal[0] : {
+                    total: {
+                        notYetCredited: 0,
+                        credited: 0,
+                        count: 0,
+                    },
+                    items: []
+                }
             }
             // return {
             //     overview: r[0],
