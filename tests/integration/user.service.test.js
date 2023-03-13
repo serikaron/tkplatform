@@ -367,4 +367,38 @@ describe("test user service", () => {
             await login(box.data.phone3, "123456", true)
         })
     })
+
+    describe.only("test user centre", () => {
+        const box = new Box()
+        const phone = genPhone()
+
+        it("should be ok", async () => {
+            await register(phone, box)
+
+            await runTest({
+                method: "GET",
+                path: '/v1/user/centre',
+                baseURL,
+                userId: box.userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual(
+                        {
+                            id: box.userId,
+                            phone,
+                            member: {
+                                expiration: now() + 7 * 86400
+                            },
+                            identified: false,
+                            notice: [],
+                            wallet: {
+                                cash: 0,
+                                rice: 0
+                            }
+                        }
+                    )
+                }
+            })
+        })
+    })
 })

@@ -132,6 +132,13 @@ export async function setupMongo(req) {
                 .findOne(filter, {
                     projection: {phone: 1, password: 1}
                 })
+        },
+        getUserCentre: async (userId) => {
+            return await collection.users
+                .findOne(
+                    {_id: new ObjectId(userId)},
+                    {projection: {phone: 1, member: 1}}
+                )
         }
     }
 }
