@@ -81,7 +81,7 @@ export async function setupMongo(req) {
                     _id: new ObjectId(userId)
                 }, {
                     projection: {
-                        _id: 0, name: 1, contact: 1, member: 1, registeredAt: 1
+                        _id: 0, phone: 1, name: 1, contact: 1, member: 1, registeredAt: 1
                     }
                 })
         },

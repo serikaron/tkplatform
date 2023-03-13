@@ -145,6 +145,7 @@ describe("test user service", () => {
 
         it("check", async () => {
             await check(box.userId, {
+                phone,
                 name: "edited name",
                 registeredAt: now(),
                 activeDays: {
@@ -155,7 +156,7 @@ describe("test user service", () => {
                 member: {
                     expiration: now() + 7 * 86400
                 },
-                siteCount: 0,
+                sites: [],
                 contact: {
                     qq: {
                         account: "11111111",
@@ -166,6 +167,7 @@ describe("test user service", () => {
                         open: true,
                     },
                     phone: {
+                        account: phone,
                         open: true
                     }
                 }
@@ -173,9 +175,10 @@ describe("test user service", () => {
         })
 
         describe("query others overview", () => {
+            const anotherPhone = genPhone()
             it("prepare another user", async () => {
                 box.data.activeUserId = box.userId
-                await register(genPhone(), box)
+                await register(anotherPhone, box)
                 box.data.passiveUserId = box.userId
             })
             it("update passive user", async () => {
@@ -183,6 +186,7 @@ describe("test user service", () => {
             })
             it("check passive user", async () => {
                 await check(box.data.activeUserId, {
+                    phone: anotherPhone,
                     name: "passive user",
                     registeredAt: now(),
                     activeDays: {
@@ -193,7 +197,7 @@ describe("test user service", () => {
                     member: {
                         expiration: now() + 7 * 86400
                     },
-                    siteCount: 0,
+                    sites: [],
                     contact: {
                         qq: {
                             account: "1234567890",
@@ -204,6 +208,7 @@ describe("test user service", () => {
                             open: false,
                         },
                         phone: {
+                            account: anotherPhone,
                             open: false
                         }
                     }

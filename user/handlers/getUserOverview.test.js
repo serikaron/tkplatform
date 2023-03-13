@@ -21,6 +21,7 @@ describe.each([
     },
     {
         dbUser: {
+            phone: "13333333333",
             member: {
                 expiration,
             },
@@ -41,6 +42,7 @@ describe.each([
             }
         },
         responseUser: {
+            phone: "13333333333",
             member: {
                 expiration,
             },
@@ -56,6 +58,7 @@ describe.each([
                     open: false
                 },
                 phone: {
+                    account: "13333333333",
                     open: true
                 }
             },
@@ -69,13 +72,22 @@ describe.each([
     describe.each([
         {
             siteResponse: TKResponse.fromError(new InternalError()),
-            siteCount: 0
+            sites: []
         },
         {
-            siteResponse: TKResponse.Success({data: {count: 10}}),
-            siteCount: 10
+            siteResponse: TKResponse.Success({data: [
+                    {
+                        id: "id should pass through to user",
+                        site: "site also pass through",
+                        otherFields: "should be skipped",
+                    }
+                ]}),
+            sites: [{
+                id: "id should pass through to user",
+                site: "site also pass through",
+            }]
         }
-    ])("($#) site count from site", ({siteResponse, siteCount}) => {
+    ])("($#) site count from site", ({siteResponse, sites}) => {
         describe.each([
             {
                 paymentResponse: TKResponse.fromError(new InternalError()),
@@ -101,7 +113,7 @@ describe.each([
                     const getOverview = jest.fn(async () => {
                         return dbUser
                     })
-                    const countUserSites = jest.fn(async () => {
+                    const getUserSites = jest.fn(async () => {
                         return siteResponse
                     })
                     const countRecharge = jest.fn(async () => {
@@ -117,7 +129,7 @@ describe.each([
                                     },
                                     stubs: {
                                         site: {
-                                            countUserSites
+                                            getUserSites
                                         },
                                         payment: {
                                             countRecharge
@@ -141,9 +153,9 @@ describe.each([
                     }
 
                     responseUser.rechargeCount = rechargeCount
-                    responseUser.siteCount = siteCount
+                    responseUser.sites = sites
                     simpleCheckTKResponse(response, TKResponse.Success({data: responseUser}))
-                    expect(countUserSites).toHaveBeenCalledWith(`${usingId}`)
+                    expect(getUserSites).toHaveBeenCalledWith(`${usingId}`)
                     expect(countRecharge).toHaveBeenCalledWith(`${usingId}`)
                     expect(getOverview).toHaveBeenCalledWith(`${usingId}`)
                 })

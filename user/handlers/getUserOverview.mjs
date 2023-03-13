@@ -30,12 +30,18 @@ const getOverview = async (req) => {
         "30": 0,
         total: 0
     }
+    overview.contact.phone.account = overview.phone
     req.overview = overview
 }
 
-const countSite = async (req) => {
-    const r = await req.context.stubs.site.countUserSites(req.usingId)
-    req.overview.siteCount = r.isError() ? 0 : r.data.count
+const getSites = async (req) => {
+    const r = await req.context.stubs.site.getUserSites(req.usingId)
+    req.overview.sites = r.isError() ? [] : r.data.map(site => {
+        return {
+            id: site.id,
+            site: site.site
+        }
+    })
 }
 
 const countRecharge = async req => {
@@ -51,7 +57,7 @@ export const routeGetUserOverview = router => {
     router.get("/overview", ...makeMiddleware([
         getUsingId,
         getOverview,
-        countSite,
+        getSites,
         countRecharge,
         response
     ]))

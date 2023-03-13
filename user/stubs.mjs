@@ -53,6 +53,14 @@ export function setupStub(req) {
                     method: "GET",
                     headers: {id: userId}
                 })
+            },
+            getUserSites: async (userId) => {
+                return await axiosCall({
+                    url: '/v1/user/sites',
+                    baseURL: "http://site:8080",
+                    method: "GET",
+                    headers: {id: userId}
+                })
             }
         },
         payment: {
