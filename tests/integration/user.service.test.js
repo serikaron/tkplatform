@@ -223,6 +223,7 @@ describe("test user service", () => {
                 verify: response => {
                     simpleVerification(response)
                     expect(response.data.total).toBe(box.data.downLines.length)
+                    expect(response.data.withdraw).toBe(0)
                     response.data.items.forEach(x => {
                         expect(x.registeredAt).toBeGreaterThan(now() - 10)
                         expect(x.registeredAt).toBeLessThanOrEqual(now())

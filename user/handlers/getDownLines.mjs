@@ -12,6 +12,7 @@ export const routeGetDownLines = router => {
             // console.log("empty down lines")
             res.tkResponse(TKResponse.Success({
                 data: {
+                    withdraw: 0,
                     total: 0,
                     items: []
                 }
@@ -27,6 +28,7 @@ export const routeGetDownLines = router => {
             }
             res.tkResponse(TKResponse.Success({
                 data: {
+                    withdraw: 0,
                     total: downLines.length,
                     items: downLines
                 }

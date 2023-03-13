@@ -53,6 +53,7 @@ test("get downlines", async () => {
 
     simpleCheckTKResponse(response, TKResponse.Success({
         data: {
+            withdraw: 0,
             total: 2,
             items: downLineIds.map(id => {
                 return {
@@ -107,6 +108,7 @@ describe.each([
 
         simpleCheckTKResponse(response, TKResponse.Success({
             data: {
+                withdraw: 0,
                 total: 0,
                 items: []
             }
