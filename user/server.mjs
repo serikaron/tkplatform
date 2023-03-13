@@ -10,6 +10,7 @@ import {routeGetUserOverview} from "./handlers/getUserOverview.mjs";
 import {routePutUserOverview} from "./handlers/putUserOverview.mjs";
 import {routeGetDownLines} from "./handlers/getDownLines.mjs";
 import {routePutUserDownLine} from "./handlers/putDownLine.mjs";
+import {routeGetUserCentre} from "./handlers/getUserCentre.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -28,6 +29,7 @@ export function setup(app, {
     routePutUserOverview(router)
     routeGetDownLines(router)
     routePutUserDownLine(router)
+    routeGetUserCentre(router)
 
     teardown(router)
 }
