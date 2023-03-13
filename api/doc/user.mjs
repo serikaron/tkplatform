@@ -543,3 +543,40 @@
  *                     type: number
  *
  */
+
+/**
+ * @swagger
+ * /v1/user/centre(个人中心首页✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *                 member:
+ *                   type: object
+ *                   properties:
+ *                     expiration:
+ *                       type: number
+ *                 identified:
+ *                   type: boolean
+ *                 notice:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                 wallet:
+ *                   type: object
+ *                   properties:
+ *                     cash:
+ *                       type: number
+ *                     rice:
+ *                       type: number
+ *
+ */
