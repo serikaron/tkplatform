@@ -156,6 +156,7 @@ describe("test user service", () => {
                 member: {
                     expiration: now() + 7 * 86400
                 },
+                siteCount: 0,
                 sites: [],
                 contact: {
                     qq: {
@@ -198,6 +199,7 @@ describe("test user service", () => {
                         expiration: now() + 7 * 86400
                     },
                     sites: [],
+                    siteCount: 0,
                     contact: {
                         qq: {
                             account: "1234567890",

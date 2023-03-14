@@ -36,6 +36,7 @@ const getOverview = async (req) => {
 
 const getSites = async (req) => {
     const r = await req.context.stubs.site.getUserSites(req.usingId)
+    req.overview.siteCount = r.isError() ? 0 : r.data.length
     req.overview.sites = r.isError() ? [] : r.data.map(site => {
         return {
             id: site.id,

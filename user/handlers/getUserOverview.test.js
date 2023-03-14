@@ -154,6 +154,7 @@ describe.each([
 
                     responseUser.rechargeCount = rechargeCount
                     responseUser.sites = sites
+                    responseUser.siteCount = sites.length
                     simpleCheckTKResponse(response, TKResponse.Success({data: responseUser}))
                     expect(getUserSites).toHaveBeenCalledWith(`${usingId}`)
                     expect(countRecharge).toHaveBeenCalledWith(`${usingId}`)
