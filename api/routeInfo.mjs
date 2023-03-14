@@ -31,7 +31,7 @@ const routeInfo = [
     {url: "/v1/user/sites", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/sites/balance", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/balance", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
-    {url: "/v1/user/site/:userSiteId/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/user/site/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
 
     // ledger
