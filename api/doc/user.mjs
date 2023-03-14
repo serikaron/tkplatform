@@ -298,6 +298,8 @@
  *                   properties:
  *                     expiration:
  *                       type: number
+ *                 siteCount:
+ *                   type: number
  *                 sites:
  *                   type: array
  *                   items:
@@ -359,24 +361,6 @@
  *               properties:
  *                 name:
  *                   type: string
- *                 registeredAt:
- *                   type: number
- *                 activeDays:
- *                   type: object
- *                   properties:
- *                     total:
- *                       type: number
- *                     30:
- *                       type: number
- *                 rechargeCount:
- *                   type: number
- *                 member:
- *                   type: object
- *                   properties:
- *                     expiration:
- *                       type: number
- *                 siteCount:
- *                   type: number
  *                 contact:
  *                   type: object
  *                   properties:
