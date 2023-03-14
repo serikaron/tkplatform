@@ -429,6 +429,15 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/ledger/entries/count?year=2023",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entries/count?year=2023",
+        }
+    },
+    {
         url: "/v1/ledger/entry/123",
         method: "GET",
         needAuth: true,
@@ -471,6 +480,15 @@ test.concurrent.each([
         service: {
             baseURL: "http://ledger:8080",
             url: "/v1/journal/entries/123/234?offset=1&limit=2",
+        }
+    },
+    {
+        url: "/v1/journal/entries/count?year=2023",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entries/count?year=2023",
         }
     },
     {
