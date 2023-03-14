@@ -635,6 +635,24 @@ test.concurrent.each([
             url: "/v1/ledger/analyse/detail/minDate/maxDate",
         }
     },
+    {
+        url: "/v1/ledger/entry/fake-entry-id",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/ledger/entry/fake-entry-id",
+        }
+    },
+    {
+        url: "/v1/journal/entry/fake-entry-id",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/journal/entry/fake-entry-id",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
