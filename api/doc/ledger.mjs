@@ -1095,6 +1095,13 @@
 
 /**
  * @swagger
+ * /v1/ledger/entry/:entryId(删除帐本记录✅):
+ *   delete:
+ *     tags: ["ledger(记帐帐本)"]
+ */
+
+/**
+ * @swagger
  * /v1/ledger/entries/refunded(全部设置为已返✅):
  *   put:
  *     tags: ["ledger(记帐帐本)"]
@@ -1455,6 +1462,13 @@
  *       schema:
  *         type: array
  *
+ */
+
+/**
+ * @swagger
+ * /v1/journal/entry/:entryId(删除提现帐本记录✅):
+ *   delete:
+ *     tags: ["ledger(记帐帐本)"]
  */
 
 /**

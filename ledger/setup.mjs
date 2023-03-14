@@ -27,6 +27,7 @@ import {routePutEntriesRefunded} from "./handlers/putEntriesRefunded.mjs";
 import {routePutEntriesCredited} from "./handlers/putEntriesCredited.mjs";
 import {routeGetAnalyseDetail} from "./handlers/getAnalyseDetail.mjs";
 import {routeGetAnalyseOverview} from "./handlers/getAnalyseOverview.mjs";
+import {routeDelEntry} from "./handlers/delEntry.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -60,6 +61,7 @@ export function setup(app, {setup, teardown}) {
     routePutEntriesCredited(router)
     routeGetAnalyseDetail(router)
     routeGetAnalyseOverview(router)
+    routeDelEntry(router)
 
     teardown(router)
 }

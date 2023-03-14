@@ -79,6 +79,18 @@ async function checkEntry(key, userId, entryId, desired) {
     })
 }
 
+async function checkEntry404(key, userId, entryId) {
+    await runTest({
+        method: "GET",
+        path: `/v1/${key}/entry/${entryId}`,
+        baseURL,
+        userId,
+        verify: response => {
+            expect(response.status).toBe(404)
+        }
+    })
+}
+
 async function updateEntry(key, entry, userId, update) {
     await runTest({
         method: "PUT",
@@ -315,6 +327,34 @@ describe.each([
                     },
                     desired: {total: 1, items: [box.data.keepingEntry]}
                 })
+            })
+
+            test("delete by id", async () => {
+                const userId = `${new ObjectId}`
+                const entry1 = newEntry()
+                await addEntry(key, entry1, userId)
+                const entry2 = newEntry()
+                await addEntry(key, entry2, userId)
+                await checkEntries({
+                    key,
+                    userId,
+                    desired: {total: 2, items: [entry1, entry2]}
+                })
+                await runTest({
+                    method: "DELETE",
+                    path: `/v1/${key}/entry/${entry1.id}`,
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                    }
+                })
+                await checkEntries({
+                    key,
+                    userId,
+                    desired: {total: 1, items: [entry2]}
+                })
+                await checkEntry404(key, userId, entry1.id)
             })
         })
 

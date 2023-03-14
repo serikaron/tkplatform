@@ -246,6 +246,13 @@ export async function setupMongo(req) {
                     deleted: {$ne: true}
                 })
         },
+        delEntry: async (collectionName, entryId, userId) => {
+            await ledger.db.collection(collectionName)
+                .updateOne(
+                    {_id: new ObjectId(entryId), userId: new ObjectId(userId)},
+                    {$set: {deleted: true}}
+                )
+        },
         countEntries: async (collectionName, userId, year) => {
             console.log(`year: ${year}, timestamp: ${dateToTimestamp(year, 1, 1)} - ${dateToTimestamp(year + 1, 1, 1)}`)
             return await ledger.db.collection(collectionName)
