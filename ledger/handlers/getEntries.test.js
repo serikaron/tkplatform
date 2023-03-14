@@ -142,6 +142,9 @@ describe.each([
         {params: "?maxAmount=789", optionalFilter: {amount: {max: 789}}},
         {params: "?credited=0", optionalFilter: {}},
         {params: "?credited=1", optionalFilter: {credited: 1}},
+        {params: "?status=0", optionalFilter: {}},
+        {params: "?status=1", optionalFilter: {status: 1}},
+        {params: "?status=2", optionalFilter: {status: 2}},
         {
             params: "?siteName=a-site-name&siteId=a-site-id&refundStatus=1&refundFrom=1&storeId=a-store-id&key=a-search-key&minPrinciple=123&maxPrinciple=456",
             optionalFilter: {

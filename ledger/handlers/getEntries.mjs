@@ -5,7 +5,7 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 import {dateRange, replaceId} from "../../common/utils.mjs";
 
 const optionalFilter = (query) => {
-    const {offset, limit, refundStatus, refundFrom, credited, minPrinciple, maxPrinciple, minAmount, maxAmount, ...optionalFilter} = query;
+    const {offset, limit, refundStatus, refundFrom, credited, minPrinciple, maxPrinciple, minAmount, maxAmount, status, ...optionalFilter} = query;
 
     if (refundStatus
         && Number.isInteger(Number(refundStatus))
@@ -26,6 +26,13 @@ const optionalFilter = (query) => {
         && Number(credited) !== 0
     ) {
         optionalFilter.credited = Number(credited);
+    }
+
+    if (status
+        && Number.isInteger(Number(status))
+        && Number(status) !== 0
+    ) {
+        optionalFilter.status = Number(status);
     }
 
     optionalFilter.principle = {}
