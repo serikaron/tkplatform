@@ -55,7 +55,14 @@ test.concurrent.each([
             return "a1b2"
         }),
         status: 200, code: 0, msg: "success"
-    }
+    },
+    {
+        params: {key: "13333333333", code: "a1b2"},
+        redisGet: jest.fn(async () => {
+            return "A1B2"
+        }),
+        status: 200, code: 0, msg: "success"
+    },
 ])("case ($#) verify result should return", async ({params, redisGet, status, code, msg}) => {
     await runTest({
         params, redisGet, status, code, msg

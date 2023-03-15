@@ -8,7 +8,7 @@ const MAGIC_CODE = "v53J"
 async function checkCaptcha(req, res) {
     if (req.params.captcha !== MAGIC_CODE) {
         const captcha = await req.context.redis.getCaptcha(req.params.key)
-        if (captcha === null || captcha !== req.params.captcha) {
+        if (captcha === null || captcha.toUpperCase() !== req.params.captcha.toUpperCase()) {
             throw new CaptchaError()
         }
     }
