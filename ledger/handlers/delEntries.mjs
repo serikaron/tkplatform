@@ -7,11 +7,11 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 
 const pickYear = (req) => {
     console.log(JSON.stringify(req.query))
-    if (isBadFieldString(req.query.year)) {
+    if (isBadFieldString(req.params.year)) {
         throw new InvalidArgument()
     }
 
-    const year = Number(req.query.year)
+    const year = Number(req.params.year)
     if (isNaN(year)) {
         throw new InvalidArgument()
     }
@@ -20,30 +20,30 @@ const pickYear = (req) => {
 }
 
 const pickMonth = (req) => {
-    if (req.query.month === undefined) {
+    console.log(JSON.stringify(req.params))
+    const monthList = req.params.month.split(",")
+    if (monthList.length === 12) {
         return
     }
-
-    const month = req.query.month
 
     const isInvalidMonth = (m) => {
         return isNaN(m) || m <= 0 || m > 12
     }
 
-    if (Array.isArray(month)) {
-        const l = month.map(Number)
+    // if (Array.isArray(month)) {
+        const l = monthList.map(Number)
         const invalid = l.filter(isInvalidMonth).length > 0
         if (invalid) {
             throw new InvalidArgument()
         }
         req.input.month = l
-    } else {
-        const m = Number(month)
-        if (isInvalidMonth(m)) {
-            throw new InvalidArgument()
-        }
-        req.input.month = [m]
-    }
+    // } else {
+    //     const m = Number(month)
+    //     if (isInvalidMonth(m)) {
+    //         throw new InvalidArgument()
+    //     }
+    //     req.input.month = [m]
+    // }
 }
 
 const convertDate = (req) => {
@@ -78,7 +78,7 @@ const response = (req, res) => {
 }
 
 const route = (router, key, collectionName) => {
-    router.delete(`/${key}/entries`, ...makeMiddleware([
+    router.delete(`/${key}/entries/:year/:month`, ...makeMiddleware([
         pickYear,
         pickMonth,
         convertDate,

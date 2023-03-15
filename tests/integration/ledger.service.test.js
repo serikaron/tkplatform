@@ -232,11 +232,10 @@ describe.each([
         })
 
         describe("delete entries", () => {
-            const deleteEntry = async (userId, query) => {
+            const deleteEntry = async (userId, year, month) => {
                 await runTest({
                     method: "DELETE",
-                    path: `/v1/${key}/entries`,
-                    query,
+                    path: `/v1/${key}/entries/${year}/${month}`,
                     baseURL,
                     userId,
                     verify: rsp => {
@@ -259,7 +258,7 @@ describe.each([
                 box.data.thisYearEntry = entryFromDate(dateToTimestamp(2023, 1, 1))
                 await addEntry(key, box.data.thisYearEntry, userId)
 
-                await deleteEntry(userId, {year: 2022})
+                await deleteEntry(userId, "2022", "1,2,3,4,5,6,7,8,9,10,11,12")
 
                 await checkEntries({
                     key, userId,
@@ -285,7 +284,7 @@ describe.each([
                 box.data.thisMonthEntry = entryFromDate(dateToTimestamp(2022, 2, 1))
                 await addEntry(key, box.data.thisMonthEntry, userId)
 
-                await deleteEntry(userId, {year: 2022, month: 1})
+                await deleteEntry(userId, "2022", "1")
 
                 await checkEntries({
                     key, userId,
@@ -317,7 +316,7 @@ describe.each([
                 box.data.keepingEntry = entryFromDate(dateToTimestamp(2022, 6, 1))
                 await addEntry(key, box.data.keepingEntry, userId)
 
-                await deleteEntry(userId, {year: 2022, month: [1, 3, 12]})
+                await deleteEntry(userId, "2022", "1, 3, 12")
 
                 await checkEntries({
                     key, userId,

@@ -17,17 +17,13 @@ describe.each([
 ])("testing $key", ({key, collectionName}) => {
     describe("year is required, and month should be an array", () => {
         describe.each([
-            {queryString: ""},
-            {queryString: "?year=abc"},
-            {queryString: "?year=2021&month=abc"},
-            {queryString: "?year=2021&month=abc&month=aaa"},
-            {queryString: "?year=2021&month=0"},
-            {queryString: "?year=2021&month=13"},
-            {queryString: "?year=2021&month=0&month=1"},
-            {queryString: "?year=2021&month=13&month=1"},
-            {queryString: "?year=2021&month=13&month=0"},
+            {year: "2023", month: "abc"},
+            {year: "2023", month: "abc,def"},
+            {year: "2023", month: "0"},
+            {year: "2023", month: "13"},
+            {year: "2023", month: "1,2,3,13"},
         ])
-        ("invalid input ($#)", ({queryString}) => {
+        ("invalid input ($#)", ({year, month}) => {
             it("should return failed", async () => {
                 const app = createApp()
                 setup(app, {
@@ -35,7 +31,8 @@ describe.each([
                     teardown: testDIContainer.teardown([])
                 })
 
-                const path = `/v1/${key}/entries${queryString}`
+                const path = `/v1/${key}/entries/${year}/${month}`
+                console.log(path)
                 const response = await supertest(app)
                     .del(path)
 
@@ -46,19 +43,22 @@ describe.each([
 
     describe.each([
         {
-            queryString: "?year=2023",
+            year: "2023",
+            month: "1,2,3,4,5,6,7,8,9,10,11,12",
             dbArguments: [{
                 from: dateToTimestamp(2023, 1, 1),
                 to: dateToTimestamp(2024, 1, 1)
             }]
         }, {
-            queryString: "?year=2023&month=1",
+            year: "2023",
+            month: "1",
             dbArguments: [{
                 from: dateToTimestamp(2023, 1, 1),
                 to: dateToTimestamp(2023, 2, 1)
             }]
         }, {
-            queryString: "?year=2023&month=1&month=3",
+            year: "2023",
+            month: "1,3",
             dbArguments: [{
                 from: dateToTimestamp(2023, 1, 1),
                 to: dateToTimestamp(2023, 2, 1)
@@ -67,13 +67,14 @@ describe.each([
                 to: dateToTimestamp(2023, 4, 1)
             }]
         }, {
-            queryString: "?year=2023&month=12",
+            year: "2023",
+            month: "12",
             dbArguments: [{
                 from: dateToTimestamp(2023, 12, 1),
                 to: dateToTimestamp(2024, 1, 1)
             }]
         }
-    ])("input from query ($#)", ({queryString, dbArguments}) => {
+    ])("input from query ($#)", ({year, month, dbArguments}) => {
         describe("delete entries from db", () => {
             it("should be ok", async () => {
                 const delEntries = jest.fn()
@@ -93,7 +94,7 @@ describe.each([
                     teardown: testDIContainer.teardown([])
                 })
 
-                const path = `/v1/${key}/entries${queryString}`
+                const path = `/v1/${key}/entries/${year}/${month}`
                 const userId = new ObjectId()
                 const response = await supertest(app)
                     .del(path)
@@ -101,7 +102,7 @@ describe.each([
 
                 simpleCheckTKResponse(response, TKResponse.Success())
                 dbArguments.forEach((a, i) => {
-                    expect(delEntries).toHaveBeenNthCalledWith(i+1, collectionName, `${userId}`, a.from, a.to)
+                    expect(delEntries).toHaveBeenNthCalledWith(i + 1, collectionName, `${userId}`, a.from, a.to)
                 })
             })
         })
