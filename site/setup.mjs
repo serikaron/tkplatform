@@ -13,6 +13,7 @@ import {routeGetUserSiteJournalEntries} from "./handlers/getUserSiteJournalEntri
 import {routeCountUserSites} from "./handlers/countUserSites.mjs";
 import {routeDelUserSite} from "./handlers/delUserSite.mjs";
 import {routeGetRecommend} from "./handlers/getRecommend.mjs";
+import {routeGetSitesStatistics} from "./handlers/getSitesStatistics.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -32,6 +33,7 @@ export function setup(app, {setup, teardown}) {
     routeCountUserSites(router)
     routeDelUserSite(router)
     routeGetRecommend(router)
+    routeGetSitesStatistics(router)
 
     teardown(router)
 }

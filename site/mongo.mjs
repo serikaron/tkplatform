@@ -74,7 +74,7 @@ export async function setupMongo(req) {
                 .updateOne({
                     _id: new ObjectId(userSiteId),
                     userId: new ObjectId(userId),
-                },{
+                }, {
                     $set: update
                 })
         },
@@ -103,6 +103,41 @@ export async function setupMongo(req) {
         countUserSites: async (userId) => {
             return await collection.userSites
                 .countDocuments({userId: new ObjectId(userId)})
+        },
+        getSitesByUserSiteId: async (userSiteIds) => {
+            return await collection.userSites
+                .aggregate([
+                    {
+                        $match: {
+                            _id: {
+                                $in: userSiteIds.map(x => new ObjectId(x))
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: "$site.id",
+                            site: {$first: "$site"}
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            site: 1
+                        }
+                    }
+                ])
+                .toArray()
+        },
+        getSitesExcept: async (userId, siteIds) => {
+            return await collection.userSites
+                .aggregate([
+                    {$match: {userId: new ObjectId(userId)}},
+                    {$group: {_id: "$site.id", site: {$first: "$site"}}},
+                    {$match: {"site.id": {$nin: siteIds}}},
+                    {$project: {_id: 0, site: 1}},
+                ])
+                .toArray()
         }
     }
 }
