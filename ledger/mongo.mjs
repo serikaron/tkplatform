@@ -472,10 +472,12 @@ export async function setupMongo(req) {
             const filter = siteId === undefined ? {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
+                deleted: {$ne: true},
             } : {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
                 siteId: new ObjectId(siteId),
+                deleted: {$ne: true},
             }
             return await collection.siteRecords.find(filter)
                 .sort({creaatedAt: -1})
@@ -485,10 +487,12 @@ export async function setupMongo(req) {
             const filter = siteId === undefined ? {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
+                deleted: {$ne: true},
             } : {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
                 siteId: new ObjectId(siteId),
+                deleted: {$ne: true},
             }
             return await collection.siteRecords
                 .countDocuments(filter)
@@ -506,6 +510,36 @@ export async function setupMongo(req) {
                 }, {
                     $set: {kept: true}
                 })
+        },
+        delSiteRecord: async (recordId, userId, siteId) => {
+            await collection.siteRecords
+                .updateOne({
+                    _id: new ObjectId(recordId),
+                    userId: new ObjectId(userId),
+                    siteId: new ObjectId(siteId)
+                }, {
+                    $set: {deleted: true}
+                })
+        },
+        countSitesRecords: async (userId, minDate, maxDate) => {
+            return await collection.siteRecords
+                .aggregate([
+                    Filter.generalFilter(userId, minDate, maxDate).toMatch(),
+                    {
+                        $group: {
+                            _id: "$siteId",
+                            count: {$sum: 1}
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            siteId: "$_id",
+                            count: 1
+                        }
+                    }
+                ])
+                .toArray()
         },
         addLedgerSite: async (site) => {
             const r = await collection.ledgerSites

@@ -661,3 +661,123 @@
  *                         example: 1-记帐
  *
  */
+
+/**
+ * @swagger
+ * /v1/site/:userSiteId/record/:recordId(删除成功记录✅):
+ *   delete:
+ *     tags: ["site(站点)"]
+ *     description: 成功记录
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/sites/statistics(今日报告✅):
+ *   get:
+ *     tags: ["site(站点)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: number
+ *                 total:
+ *                   type: number
+ *                 notYetSites:
+ *                   type: array
+ *                   items:
+ *                      type: object
+ *                      properties:
+ *                        id:
+ *                          type: string
+ *                        name:
+ *                          type: string
+ *                          example: 站点1
+ *                        icon:
+ *                          type: string
+ *                          example: /static/sites/001.png
+ *                        status:
+ *                          type: number
+ *                          example: 1-运营中
+ *                        rates:
+ *                          type: object
+ *                          properties:
+ *                            hot:
+ *                              type: Number
+ *                              example: 4.4
+ *                            quality:
+ *                              type: Number
+ *                              example: 4.4
+ *                        isFree:
+ *                          type: boolean
+ *                        added:
+ *                          type: boolean
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/site/:userSiteId/recommend(推荐时段✅):
+ *   get:
+ *     tags: ["site(站点)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   hour:
+ *                     type: number
+ *                   weight:
+ *                     type: number
+ *                     example: 0 ～ 100 之间的数
+ */
+
+/**
+ * @swagger
+ * /v1/site/:userSiteId/logs(提交运行日志✅):
+ *   post:
+ *     tags: ["site(站点)"]
+ *     requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   loggedAt:
+ *                     type: number
+ *                     example: timestamp
+ *                   content:
+ *                     type: string
+ */
+
+/**
+ * @swagger
+ * /v1/site/:userSiteId/logs(查询运行日志✅):
+ *   get:
+ *     tags: ["site(站点)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   loggedAt:
+ *                     type: number
+ *                     example: timestamp
+ *                   content:
+ *                     type: string
+ *
+ */

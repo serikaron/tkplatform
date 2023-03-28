@@ -321,6 +321,45 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/site/fake-site-id/recommend",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/site/fake-site-id/recommend",
+        }
+    },
+    {
+        url: "/v1/sites/statistics",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/sites/statistics",
+        }
+    },
+    {
+        url: "/v1/site/fake-site-id/logs",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/site/fake-site-id/logs",
+        }
+    },
+    {
+        url: "/v1/site/fake-site-id/logs",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/site/fake-site-id/logs",
+        }
+    },
+
+    // --------- site end -------------
+
+    {
         url: "/v1/ledger/stores",
         method: "GET",
         needAuth: true,
@@ -548,6 +587,15 @@ test.concurrent.each([
     {
         url: "/v1/site/fake-site-id/record/fake-record-id",
         method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/fake-site-id/record/fake-record-id",
+        }
+    },
+    {
+        url: "/v1/site/fake-site-id/record/fake-record-id",
+        method: "DELETE",
         needAuth: true,
         service: {
             baseURL: "http://ledger:8080",

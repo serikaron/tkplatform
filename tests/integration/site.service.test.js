@@ -410,4 +410,116 @@ describe("test site service", () => {
             })
         })
     })
+
+    describe("test sites statistics", () => {
+        const box = new Box()
+        const userId = `${new ObjectId()}`
+
+        test("prepare user site", async () => {
+            await getSites(userId, box)
+            box.data.userSite_1_1 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite_1_1)
+            box.data.userSite_1_2 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite_1_2)
+            box.data.userSite_2_1 = box.getEmptyUserSite()
+            box.data.userSite_2_1.site = box.data.sites[1]
+            await addUserSite(box.data.sites[1].id, userId, box.data.userSite_2_1)
+            box.data.userSite_3_1 = box.getEmptyUserSite()
+            box.data.userSite_3_1.site = box.data.sites[2]
+            await addUserSite(box.data.sites[2].id, userId, box.data.userSite_3_1)
+            box.data.userSite_4_1 = box.getEmptyUserSite()
+            box.data.userSite_4_1.site = box.data.sites[3]
+            await addUserSite(box.data.sites[3].id, userId, box.data.userSite_4_1)
+        })
+        test("prepare site record", async () => {
+            const ledgerBaseUrl = "http://localhost:9007"
+            const addSiteRecord = async (userSiteId) => {
+                await runTest({
+                    method: "POST",
+                    path: `/v1/site/${userSiteId}/record`,
+                    body: {principle: 100, commission: 200},
+                    baseURL: ledgerBaseUrl,
+                    userId: userId,
+                    verify: simpleVerification
+                })
+            }
+            await addSiteRecord(box.data.userSite_1_1.id)
+            await addSiteRecord(box.data.userSite_1_2.id)
+            await addSiteRecord(box.data.userSite_2_1.id)
+        })
+        test("check", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/sites/statistics',
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    rsp.data.notYetSites
+                        .sort((a, b) => {
+                            if (a.id < b.id) {
+                                return -1
+                            }
+                            if (a.id > b.id) {
+                                return 1
+                            }
+                            return 0
+                        })
+                    expect(rsp.data).toStrictEqual({
+                        success: 2,
+                        total: 4,
+                        notYetSites: [box.data.sites[2], box.data.sites[3]]
+                            .sort((a, b) => {
+                                if (a.id < b.id) {
+                                    return -1
+                                }
+                                if (a.id > b.id) {
+                                    return 1
+                                }
+                                return 0
+                            })
+                    })
+                }
+            })
+        })
+    })
+
+    describe("test site logs", () => {
+        const userId = `${new ObjectId()}`
+        const userSiteId = `${new ObjectId()}`
+        const earlyTime = now() - 86400
+        const laterTime = now()
+
+        test('add', async () => {
+            await runTest({
+                method: "POST",
+                path: `/v1/site/${userSiteId}/logs`,
+                body: [
+                    {loggedAt: laterTime, content: "log1"},
+                    {loggedAt: earlyTime, content: "log2"},
+                ],
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        test('get', async () => {
+            await runTest({
+                method: "GET",
+                path: `/v1/site/${userSiteId}/logs`,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual([
+                        {loggedAt: earlyTime, content: "log2"},
+                        {loggedAt: laterTime, content: "log1"},
+                    ])
+                }
+            })
+        })
+    })
 })

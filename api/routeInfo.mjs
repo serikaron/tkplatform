@@ -33,6 +33,11 @@ const routeInfo = [
     {url: "/v1/user/site/:userSiteId/balance", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/sites/statistics", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/site/:userSiteId/logs", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/site/:userSiteId/logs", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
+    // site end
 
     // ledger
     {url: "/v1/ledger/stores", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080", url: '/v1/stores'}},
@@ -99,6 +104,7 @@ const routeInfo = [
     {url: "/v1/site/records/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/site/:userSiteId/record", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/site/:userSiteId/record/:recordId", method: "PUT", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/site/:userSiteId/record/:recordId", method: "DELETE", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/sites", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/site", method: "POST", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/site/:siteId", method: "DELETE", needAuth: true, service: {baseURL: "http://ledger:8080"}},
