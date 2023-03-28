@@ -488,7 +488,7 @@ describe("test site record", () => {
             path: `/v1/site/${box.data.siteId1}/record/${box.data.id3}`,
             baseURL,
             userId: box.data.userId1,
-            verify: rsp =>{
+            verify: rsp => {
                 expect(rsp.status).toBe(200)
             }
         })
@@ -542,6 +542,21 @@ describe("test site record", () => {
         })
     })
 
+    test("count sites records", async () => {
+        await runTest({
+            method: "GET",
+            path: "/v1/sites/records/count",
+            baseURL,
+            userId: box.data.userId1,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data).toStrictEqual([
+                    {siteId: `${box.data.siteId1}`, count: 1},
+                    {siteId: `${box.data.siteId2}`, count: 1},
+                ])
+            }
+        })
+    })
     // test("check search with timestamp", async () => {
     //     await runTest({
     //         method: "POST",

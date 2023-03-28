@@ -521,6 +521,26 @@ export async function setupMongo(req) {
                     $set: {deleted: true}
                 })
         },
+        countSitesRecords: async (userId, minDate, maxDate) => {
+            return await collection.siteRecords
+                .aggregate([
+                    Filter.generalFilter(userId, minDate, maxDate).toMatch(),
+                    {
+                        $group: {
+                            _id: "$siteId",
+                            count: {$sum: 1}
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            siteId: "$_id",
+                            count: 1
+                        }
+                    }
+                ])
+                .toArray()
+        },
         addLedgerSite: async (site) => {
             const r = await collection.ledgerSites
                 .insertOne(site)
