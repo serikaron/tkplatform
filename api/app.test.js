@@ -329,6 +329,15 @@ test.concurrent.each([
             url: "/v1/site/fake-site-id/recommend",
         }
     },
+    {
+        url: "/v1/sites/statistics",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: "/v1/sites/statistics",
+        }
+    },
 
     // --------- site end -------------
 

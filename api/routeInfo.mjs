@@ -34,6 +34,7 @@ const routeInfo = [
     {url: "/v1/user/site/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/sites/statistics", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     // site end
 
     // ledger
