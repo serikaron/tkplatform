@@ -664,7 +664,7 @@
 
 /**
  * @swagger
- * /v1/site/:userSiteId/record/:recordId(删除成功记录):
+ * /v1/site/:userSiteId/record/:recordId(删除成功记录✅):
  *   delete:
  *     tags: ["site(站点)"]
  *     description: 成功记录
@@ -673,7 +673,7 @@
 
 /**
  * @swagger
- * /v1/sites/statistics(今日报告):
+ * /v1/sites/statistics(今日报告✅):
  *   get:
  *     tags: ["site(站点)"]
  *     responses:
@@ -721,7 +721,7 @@
 
 /**
  * @swagger
- * /v1/site/:userSiteId/recommend(推荐时段):
+ * /v1/site/:userSiteId/recommend(推荐时段✅):
  *   get:
  *     tags: ["site(站点)"]
  *     responses:
@@ -742,7 +742,7 @@
 
 /**
  * @swagger
- * /v1/site/:userSiteId/log(提交运行日志):
+ * /v1/site/:userSiteId/logs(提交运行日志✅):
  *   post:
  *     tags: ["site(站点)"]
  *     requestBody:
@@ -762,7 +762,7 @@
 
 /**
  * @swagger
- * /v1/site/:userSiteId/logs(查询运行日志):
+ * /v1/site/:userSiteId/logs(查询运行日志✅):
  *   get:
  *     tags: ["site(站点)"]
  *     responses:

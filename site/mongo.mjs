@@ -16,7 +16,8 @@ export async function setupMongo(req) {
     const collection = {
         sites: site.db.collection("sites"),
         userSites: site.db.collection("userSites"),
-        withdrawJournalEntries: site.db.collection("withdrawJournalEntries")
+        withdrawJournalEntries: site.db.collection("withdrawJournalEntries"),
+        siteLogs: site.db.collection('siteLogs'),
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
@@ -137,6 +138,29 @@ export async function setupMongo(req) {
                     {$match: {"site.id": {$nin: siteIds}}},
                     {$project: {_id: 0, site: 1}},
                 ])
+                .toArray()
+        },
+        addSiteLogs: async (userId, userSiteId, logs) => {
+            await collection.siteLogs
+                .insertMany(
+                    logs.map(x => {
+                        x.userId = new ObjectId(userId)
+                        x.userSiteId = new ObjectId(userSiteId)
+                        return x
+                    })
+                )
+        },
+        getSiteLogs: async (userId, userSiteId) => {
+            return await collection.siteLogs
+                .find(
+                    {
+                        userId: new ObjectId(userId),
+                        userSiteId: new ObjectId(userSiteId),
+                        loggedAt: {$gte: now() - 7 * 86400, $lte: now()},
+                    },
+                    {projection: {_id: 0, loggedAt: 1, content: 1}}
+                )
+                .sort({loggedAt: 1})
                 .toArray()
         }
     }

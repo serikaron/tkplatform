@@ -14,6 +14,8 @@ import {routeCountUserSites} from "./handlers/countUserSites.mjs";
 import {routeDelUserSite} from "./handlers/delUserSite.mjs";
 import {routeGetRecommend} from "./handlers/getRecommend.mjs";
 import {routeGetSitesStatistics} from "./handlers/getSitesStatistics.mjs";
+import {routeGetSiteLogs} from "./handlers/getSiteLogs.mjs";
+import {routePostSiteLogs} from "./handlers/postSiteLogs.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -34,6 +36,8 @@ export function setup(app, {setup, teardown}) {
     routeDelUserSite(router)
     routeGetRecommend(router)
     routeGetSitesStatistics(router)
+    routeGetSiteLogs(router)
+    routePostSiteLogs(router)
 
     teardown(router)
 }

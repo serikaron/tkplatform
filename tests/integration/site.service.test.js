@@ -483,4 +483,43 @@ describe("test site service", () => {
             })
         })
     })
+
+    describe("test site logs", () => {
+        const userId = `${new ObjectId()}`
+        const userSiteId = `${new ObjectId()}`
+        const earlyTime = now() - 86400
+        const laterTime = now()
+
+        test('add', async () => {
+            await runTest({
+                method: "POST",
+                path: `/v1/site/${userSiteId}/logs`,
+                body: [
+                    {loggedAt: laterTime, content: "log1"},
+                    {loggedAt: earlyTime, content: "log2"},
+                ],
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        test('get', async () => {
+            await runTest({
+                method: "GET",
+                path: `/v1/site/${userSiteId}/logs`,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual([
+                        {loggedAt: earlyTime, content: "log2"},
+                        {loggedAt: laterTime, content: "log1"},
+                    ])
+                }
+            })
+        })
+    })
 })
