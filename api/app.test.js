@@ -567,6 +567,15 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/site/fake-site-id/record/fake-record-id",
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/fake-site-id/record/fake-record-id",
+        }
+    },
+    {
         url: "/v1/ledger/sites",
         method: "GET",
         needAuth: true,
