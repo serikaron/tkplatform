@@ -470,6 +470,48 @@ describe("test site record", () => {
         })
     })
 
+    test("delete site record", async () => {
+        await runTest({
+            method: "POST",
+            path: `/v1/site/${box.data.siteId1}/record`,
+            body: {principle: 100, commission: 200},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.recordId).not.toBeUndefined()
+                box.data.id3 = response.data.recordId
+            }
+        })
+        await runTest({
+            method: "DELETE",
+            path: `/v1/site/${box.data.siteId1}/record/${box.data.id3}`,
+            baseURL,
+            userId: box.data.userId1,
+            verify: rsp =>{
+                expect(rsp.status).toBe(200)
+            }
+        })
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {siteId: box.data.siteId1},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.total).toBe(1)
+                expect(response.data.rate).toBe(1000)
+                const record = response.data.list[0]
+                expect(record.id).toBe(box.data.id1)
+                expect(record.kept).toBe(true)
+                expect(record.createdAt).toBeLessThanOrEqual(now())
+                expect(record.principle).toBe(100)
+                expect(record.commission).toBe(200)
+            }
+        })
+    })
+
     test("check search without siteId", async () => {
         await runTest({
             method: "POST",
