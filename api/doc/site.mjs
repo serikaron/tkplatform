@@ -386,7 +386,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId(删除站点):
+ * /v1/user/site/:userSiteId(删除站点✅):
  *   delete:
  *     tags: ["site(站点)"]
  */
@@ -414,7 +414,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/setting/sync(同步设置):
+ * /v1/user/site/:userSiteId/setting/sync(同步设置✅):
  *   put:
  *     tags: ["site(站点)"]
  *     description: 同步设置
@@ -442,7 +442,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:useSiteId/report(情况上报):
+ * /v1/user/site/:useSiteId/report(情况上报✅):
  *   post:
  *     tags: ["site(站点)"]
  *     description: 同步设置
@@ -460,7 +460,7 @@
 
 /**
  * @swagger
- * /v1/site/problem/templates(问题上报模板):
+ * /v1/site/problem/templates(问题上报模板✅):
  *   get:
  *     tags: ["site(站点)"]
  *     description: 问题上报模板
@@ -476,7 +476,7 @@
 
 /**
  * @swagger
- * /v1/missing/site(缺失上报):
+ * /v1/missing/site(缺失上报✅):
  *   post:
  *     tags: ["site(站点)"]
  *     description: 查询站点
@@ -531,7 +531,7 @@
 
 /**
  * @swagger
- * /v1/missing/sites(缺失上报-待添加):
+ * /v1/missing/sites(缺失上报-待添加✅):
  *   get:
  *     tags: ["site(站点)"]
  *     parameters:
