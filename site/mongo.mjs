@@ -19,6 +19,7 @@ export async function setupMongo(req) {
         withdrawJournalEntries: site.db.collection("withdrawJournalEntries"),
         siteLogs: site.db.collection('siteLogs'),
         reports: site.db.collection('reports'),
+        missingSites: site.db.collection("missingSites"),
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
@@ -181,6 +182,18 @@ export async function setupMongo(req) {
                     userSiteId: new ObjectId(userSiteId),
                     report,
                 })
+        },
+        addMissing: async (userId, missing) => {
+            missing.userId = new ObjectId(userId)
+            await collection.missingSites
+                .insertOne(missing)
+        },
+        getMissing: async (userId) => {
+            return await collection.missingSites
+                .find({
+                    userId: new ObjectId(userId)
+                })
+                .toArray()
         }
     }
 }

@@ -383,6 +383,24 @@ test.concurrent.each([
             url: '/v1/site/problem/templates',
         }
     },
+    {
+        url: '/v1/missing/sites',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/missing/sites'
+        }
+    },
+    {
+        url: '/v1/missing/site',
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/missing/site'
+        }
+    },
 
     // --------- site end -------------
 

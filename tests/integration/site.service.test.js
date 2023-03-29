@@ -594,4 +594,42 @@ describe("test site service", () => {
         })
     })
 
+    describe("test missing site", () => {
+        const userId = `${new ObjectId()}`
+        test("add", async () => {
+            await runTest({
+                method: "POST",
+                path: '/v1/missing/site',
+                body: {name: "missing site name"},
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        test("get", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/missing/sites',
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual({
+                        total: 1,
+                        list: [
+                            {
+                                name: "missing site name",
+                                status: 0,
+                                comment: "",
+                                thumb: false
+                            }
+                        ]
+                    })
+                }
+            })
+        })
+    })
 })
