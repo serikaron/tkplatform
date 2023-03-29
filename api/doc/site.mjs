@@ -393,27 +393,6 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/recommend/times(时段推荐✅):
- *   get:
- *     tags: ["site(站点)"]
- *     description: 时段推荐
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     hour:
- *                       type: Number
- *                     rate:
- *                       type: Number
- *                       example: 0.5
- */
-
-/**
- * @swagger
  * /v1/user/site/:userSiteId/setting/sync(同步设置✅):
  *   put:
  *     tags: ["site(站点)"]
@@ -758,7 +737,7 @@
  *                 properties:
  *                   loggedAt:
  *                     type: number
- *                     example: timestamp
+ *                     example: Number timestamp
  *                   content:
  *                     type: string
  */
@@ -779,7 +758,7 @@
  *                 properties:
  *                   loggedAt:
  *                     type: number
- *                     example: timestamp
+ *                     example: Number timestamp
  *                   content:
  *                     type: string
  *
