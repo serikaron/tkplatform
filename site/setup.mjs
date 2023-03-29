@@ -18,6 +18,7 @@ import {routeGetSiteLogs} from "./handlers/getSiteLogs.mjs";
 import {routePostSiteLogs} from "./handlers/postSiteLogs.mjs";
 import {routeSyncSettings} from "./handlers/syncSettings.mjs";
 import {routeAddReport} from "./handlers/addReport.mjs";
+import {routeGetProblemTemplates} from "./handlers/getProblemTemplates.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -42,6 +43,7 @@ export function setup(app, {setup, teardown}) {
     routePostSiteLogs(router)
     routeSyncSettings(router)
     routeAddReport(router)
+    routeGetProblemTemplates(router)
 
     teardown(router)
 }

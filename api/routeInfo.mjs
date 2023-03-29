@@ -39,6 +39,7 @@ const routeInfo = [
     {url: "/v1/site/:userSiteId/logs", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/setting/sync", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: '/v1/user/site/:userSiteId/report', method: "POST", needAuth: true, service: {baseURL: 'http://site:8080'}},
+    {url: '/v1/site/problem/templates', method: "GET", needAuth: true, service: {baseURL: 'http://site:8080'}},
     // site end
 
     // ledger

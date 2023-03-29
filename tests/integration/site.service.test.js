@@ -584,6 +584,14 @@ describe("test site service", () => {
                 expect(rsp.status).toBe(200)
             }
         })
+
+        await runTest({
+            method: "GET",
+            path: '/v1/site/problem/templates',
+            baseURL,
+            userId: `${new ObjectId()}`,
+            verify: simpleVerification
+        })
     })
 
 })
