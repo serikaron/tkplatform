@@ -572,4 +572,18 @@ describe("test site service", () => {
             await checkUserSites(userId, [box.data.userSite1, box.data.userSite2])
         })
     })
+
+    test("test add report", async () => {
+        await runTest({
+            method: "POST",
+            path: `/v1/user/site/${new ObjectId()}/report`,
+            body: {problem: "i have sth to say"},
+            baseURL,
+            userId: `${new ObjectId()}`,
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
+        })
+    })
+
 })

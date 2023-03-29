@@ -365,6 +365,15 @@ test.concurrent.each([
             url: '/v1/user/site/fake-site-id/setting/sync',
         }
     },
+    {
+        url: '/v1/user/site/fake-site-id/report',
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/user/site/fake-site-id/report'
+        }
+    },
 
     // --------- site end -------------
 

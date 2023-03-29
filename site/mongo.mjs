@@ -18,6 +18,7 @@ export async function setupMongo(req) {
         userSites: site.db.collection("userSites"),
         withdrawJournalEntries: site.db.collection("withdrawJournalEntries"),
         siteLogs: site.db.collection('siteLogs'),
+        reports: site.db.collection('reports'),
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
@@ -171,6 +172,14 @@ export async function setupMongo(req) {
                     deleted: {$ne: true}
                 },{
                     $set: update
+                })
+        },
+        addReport: async (userId, userSiteId, report) => {
+            await collection.reports
+                .insertOne({
+                    userId: new ObjectId(userId),
+                    userSiteId: new ObjectId(userSiteId),
+                    report,
                 })
         }
     }
