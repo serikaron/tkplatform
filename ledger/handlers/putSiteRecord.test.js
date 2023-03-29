@@ -15,7 +15,7 @@ const runTest = async (
         body,
         tkResponse,
         keepRecord,
-        userId, siteId, recordId
+        userId, userSiteId, recordId
     }
 ) => {
     const app = createApp()
@@ -33,9 +33,9 @@ const runTest = async (
         teardown: testDIContainer.teardown([])
     })
 
-    console.log(`/v1/site/${siteId}/record/${recordId}`)
+    console.log(`/v1/site/${userSiteId}/record/${recordId}`)
     const response = await supertest(app)
-        .put(`/v1/site/${siteId}/record/${recordId}`)
+        .put(`/v1/site/${userSiteId}/record/${recordId}`)
         .send(body)
         .set({id: `${userId}`})
     simpleCheckTKResponse(response, tkResponse)
@@ -55,14 +55,14 @@ describe.each([
 
 test("keep record", async () => {
     const keepRecord = jest.fn()
-    const siteId = new ObjectId()
+    const userSiteId = new ObjectId()
     const recordId = new ObjectId()
     const userId = new ObjectId()
     await runTest({
         body: {kept: 1},
         tkResponse: TKResponse.Success(),
         keepRecord,
-        siteId, recordId, userId
+        userSiteId, recordId, userId
     })
-    expect(keepRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${siteId}`)
+    expect(keepRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`)
 })

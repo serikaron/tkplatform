@@ -10,6 +10,16 @@ import {simpleCheckTKResponse} from "../../tests/unittest/test-runner.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 test('return from db', async () => {
+    const siteId = new ObjectId()
+    const getUserSite = jest.fn(async () => {
+        return TKResponse.Success({
+            data: {
+                site: {
+                    id: `${siteId}`
+                }
+            }
+        })
+    })
     const getRecommend = jest.fn(async () => {
         return [
             {hour: 1, weight: 1},
@@ -24,6 +34,11 @@ test('return from db', async () => {
                 req.context = {
                     mongo: {
                         getRecommend
+                    },
+                    stubs: {
+                        site: {
+                            getUserSite
+                        }
                     }
                 }
                 next()
@@ -32,10 +47,10 @@ test('return from db', async () => {
         teardown: testDIContainer.teardown([])
     })
 
-    const siteId = new ObjectId()
+    const userSiteId = new ObjectId()
     const userId = new ObjectId()
     const response = await supertest(app)
-        .get(`/v1/site/${siteId}/recommend`)
+        .get(`/v1/site/${userSiteId}/recommend`)
         .set({id: `${userId}`})
 
     simpleCheckTKResponse(response, TKResponse.Success({
@@ -67,4 +82,5 @@ test('return from db', async () => {
         ]
     }))
     expect(getRecommend).toHaveBeenCalledWith(`${siteId}`)
+    expect(getUserSite).toHaveBeenCalledWith(`${userId}`, `${userSiteId}`)
 })

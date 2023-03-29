@@ -1,10 +1,16 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {InternalError} from "../../common/errors/00000-basic.mjs";
 
 export const routeGetRecommend = (router) => {
-    router.get('/site/:siteId/recommend', async (req, res, next) => {
-        const r = await req.context.mongo.getRecommend(req.params.siteId)
+    router.get('/site/:userSiteId/recommend', async (req, res, next) => {
+        const stubRsp = await req.context.stubs.site.getUserSite(req.headers.id, req.params.userSiteId)
+        if (stubRsp.isError()) {
+            throw new InternalError()
+        }
+
+        const r = await req.context.mongo.getRecommend(stubRsp.data.site.id)
         const max = Math.max(...r.map(x => x.weight))
 
         const data = []

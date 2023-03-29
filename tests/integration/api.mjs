@@ -55,7 +55,7 @@ function axiosConfig({path, query, body, authentication, method}) {
     }
 }
 
-async function call({path, query, body, authentication, method}) {
+export async function call({path, query, body, authentication, method}) {
     try {
         const config = axiosConfig({path, query, body, authentication, method})
         // console.log(`axiosConfig: ${JSON.stringify(config)}`)

@@ -2,10 +2,11 @@
 
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
-import {dateToTimestamp, mergeObjects, now, today} from "../../common/utils.mjs";
+import {copy, dateToTimestamp, mergeObjects, now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
 
 const baseURL = "http://localhost:9007"
+const siteBaseURL = "http://localhost:9006"
 
 const newEntry = () => {
     return {
@@ -21,6 +22,38 @@ const entryFromDate = (date) => {
     return out
 }
 
+const getEmptyUserSite = (site) => {
+    return {
+        site: copy(site),
+        "credential": {
+            "account": "",
+            "password": ""
+        },
+        "verified": false,
+        "account": {
+            "list": []
+        },
+        "setting": {
+            "interval": {
+                "min": 200,
+                "max": 300,
+            },
+            "schedule": [
+                {
+                    "from": "",
+                    "to": "",
+                    activated: false
+                },
+                {
+                    "from": "",
+                    "to": "",
+                    activated: false
+                },
+            ]
+        }
+    }
+}
+
 class Box {
     constructor() {
         this._data = {}
@@ -29,6 +62,38 @@ class Box {
     get data() {
         return this._data
     }
+}
+
+const addUserSite = async (siteId, userId, userSite) => {
+    await runTest({
+        method: "POST",
+        path: "/v1/user/site",
+        body: {siteId},
+        baseURL: siteBaseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(response.data.id).not.toBeUndefined()
+            userSite.id = response.data.id
+            expect(response.data).toStrictEqual(userSite)
+        }
+    })
+}
+
+const getSites = async (userId, box) => {
+    await runTest({
+        method: "GET",
+        path: "/v1/sites",
+        baseURL: siteBaseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(Array.isArray(response.data)).toBe(true)
+            expect(response.data.length).toBeGreaterThan(0)
+            box.data.site = response.data[0]
+            box.data.sites = response.data
+        }
+    })
 }
 
 const addEntry = async (key, entry, userId) => {
@@ -395,10 +460,18 @@ describe.each([
 
 describe("test site record", () => {
     const box = new Box()
-    box.data.siteId1 = `${new ObjectId()}`
     box.data.userId1 = `${new ObjectId()}`
-    box.data.siteId2 = `${new ObjectId()}`
     box.data.userId2 = `${new ObjectId()}`
+
+    test("prepare site", async () => {
+        await getSites(box.data.userId1, box)
+        box.data.site1 = getEmptyUserSite(box.data.sites[0])
+        await addUserSite(box.data.sites[0].id, box.data.userId1, box.data.site1)
+        box.data.siteId1 = box.data.site1.id
+        box.data.site2 = getEmptyUserSite(box.data.sites[0])
+        await addUserSite(box.data.sites[0].id, box.data.userId1, box.data.site2)
+        box.data.siteId2 = box.data.site2.id
+    })
 
     test("add site record", async () => {
         await runTest({
@@ -550,35 +623,44 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: rsp => {
                 simpleVerification(rsp)
-                expect(rsp.data).toStrictEqual([
+                expect(rsp.data.sort((a, b) => {
+                    if (a.siteId > b.siteId) { return -1 }
+                    if (a.siteId < b.siteId) { return 1 }
+                    return 0
+                })).toStrictEqual([
                     {siteId: `${box.data.siteId1}`, count: 1},
                     {siteId: `${box.data.siteId2}`, count: 1},
-                ])
+                ].sort((a, b) => {
+                    if (a.siteId > b.siteId) { return -1 }
+                    if (a.siteId < b.siteId) { return 1 }
+                    return 0
+                }))
             }
         })
     })
 
-    // test("get recommend", async () => {
-    //     const currentHour = new Date(now()).getHours()
-    //     await runTest({
-    //         method: "GET",
-    //         path: `/v1/site/${box.data.siteId1}/recommend`,
-    //         baseURL,
-    //         userId: box.data.userId,
-    //         verify: rsp => {
-    //             simpleVerification(rsp)
-    //             const r = []
-    //             for (let i = 0; i < 24; ++i) {
-    //                 if (i === currentHour) {
-    //                     r.push({hour: i, weight: 100})
-    //                 } else {
-    //                     r.push({hour: i, weight: 0})
-    //                 }
-    //             }
-    //             expect(rsp.data).toStrictEqual(r)
-    //         }
-    //     })
-    // })
+    test("get recommend", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/site/${box.data.siteId1}/recommend`,
+            baseURL,
+            userId: box.data.userId1,
+            verify: rsp => {
+                simpleVerification(rsp)
+                const item = rsp.data.find(x => x.weight > 0)
+                expect(item).not.toBeUndefined()
+                // const r = []
+                // for (let i = 0; i < 24; ++i) {
+                //     if (i === currentHour) {
+                //         r.push({hour: i, weight: 100})
+                //     } else {
+                //         r.push({hour: i, weight: 0})
+                //     }
+                // }
+                // expect(rsp.data).toStrictEqual(r)
+            }
+        })
+    })
 
     // test("check search with timestamp", async () => {
     //     await runTest({

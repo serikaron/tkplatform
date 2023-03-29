@@ -468,30 +468,30 @@ export async function setupMongo(req) {
                 {$set: {deleted: true}}
             )
         },
-        getSiteRecords: async (userId, siteId, minDate, maxDate) => {
-            const filter = siteId === undefined ? {
+        getSiteRecords: async (userId, userSiteId, minDate, maxDate) => {
+            const filter = userSiteId === undefined ? {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
                 deleted: {$ne: true},
             } : {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
-                siteId: new ObjectId(siteId),
+                userSiteId: new ObjectId(userSiteId),
                 deleted: {$ne: true},
             }
             return await collection.siteRecords.find(filter)
-                .sort({creaatedAt: -1})
+                .sort({createdAt: -1})
                 .toArray()
         },
-        countSiteRecords: async (userId, siteId, minDate, maxDate) => {
-            const filter = siteId === undefined ? {
+        countSiteRecords: async (userId, userSiteId, minDate, maxDate) => {
+            const filter = userSiteId === undefined ? {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
                 deleted: {$ne: true},
             } : {
                 userId: new ObjectId(userId),
                 createdAt: {$gte: minDate, $lt: maxDate},
-                siteId: new ObjectId(siteId),
+                userSiteId: new ObjectId(userSiteId),
                 deleted: {$ne: true},
             }
             return await collection.siteRecords
@@ -501,22 +501,22 @@ export async function setupMongo(req) {
             const r = await collection.siteRecords.insertOne(record)
             return r.insertedId
         },
-        keepRecord: async (recordId, userId, siteId) => {
+        keepRecord: async (recordId, userId, userSiteId) => {
             await collection.siteRecords
                 .updateOne({
                     _id: new ObjectId(recordId),
                     userId: new ObjectId(userId),
-                    siteId: new ObjectId(siteId)
+                    userSiteId: new ObjectId(userSiteId)
                 }, {
                     $set: {kept: true}
                 })
         },
-        delSiteRecord: async (recordId, userId, siteId) => {
+        delSiteRecord: async (recordId, userId, userSiteId) => {
             await collection.siteRecords
                 .updateOne({
                     _id: new ObjectId(recordId),
                     userId: new ObjectId(userId),
-                    siteId: new ObjectId(siteId)
+                    userSiteId: new ObjectId(userSiteId)
                 }, {
                     $set: {deleted: true}
                 })
@@ -527,7 +527,7 @@ export async function setupMongo(req) {
                     Filter.generalFilter(userId, minDate, maxDate).toMatch(),
                     {
                         $group: {
-                            _id: "$siteId",
+                            _id: "$userSiteId",
                             count: {$sum: 1}
                         }
                     },
@@ -823,12 +823,29 @@ export async function setupMongo(req) {
             // }
         },
         getRecommend: async (siteId) => {
-            await collection.siteRecords
+            return await collection.siteRecords
                 .aggregate([
+                    {$match: {siteId: new ObjectId(siteId)}},
                     {
-                        $match: {}
+                        $group: {
+                            _id: {
+                                $hour: {
+                                    date: {$toDate: {$multiply: ["$createdAt", 1000]}},
+                                    timezone: "+0800"
+                                },
+                            },
+                            weight: {$sum: 1}
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            hour: "$_id",
+                            weight: 1
+                        }
                     }
                 ])
+                .toArray()
         }
     }
 }
