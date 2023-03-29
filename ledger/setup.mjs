@@ -30,6 +30,7 @@ import {routeGetAnalyseOverview} from "./handlers/getAnalyseOverview.mjs";
 import {routeDelEntry} from "./handlers/delEntry.mjs";
 import {routeDelSiteRecord} from "./handlers/delSiteRecord.mjs";
 import {routeCountSiteRecords} from "./handlers/countSitesRecords.mjs";
+import {routeGetRecommend} from "./handlers/getRecommend.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -66,6 +67,7 @@ export function setup(app, {setup, teardown}) {
     routeDelEntry(router)
     routeDelSiteRecord(router)
     routeCountSiteRecords(router)
+    routeGetRecommend(router)
 
     teardown(router)
 }

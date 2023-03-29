@@ -557,6 +557,29 @@ describe("test site record", () => {
             }
         })
     })
+
+    // test("get recommend", async () => {
+    //     const currentHour = new Date(now()).getHours()
+    //     await runTest({
+    //         method: "GET",
+    //         path: `/v1/site/${box.data.siteId1}/recommend`,
+    //         baseURL,
+    //         userId: box.data.userId,
+    //         verify: rsp => {
+    //             simpleVerification(rsp)
+    //             const r = []
+    //             for (let i = 0; i < 24; ++i) {
+    //                 if (i === currentHour) {
+    //                     r.push({hour: i, weight: 100})
+    //                 } else {
+    //                     r.push({hour: i, weight: 0})
+    //                 }
+    //             }
+    //             expect(rsp.data).toStrictEqual(r)
+    //         }
+    //     })
+    // })
+
     // test("check search with timestamp", async () => {
     //     await runTest({
     //         method: "POST",
@@ -1745,3 +1768,5 @@ describe("test journal entries filter", () => {
         })
     })
 })
+
+

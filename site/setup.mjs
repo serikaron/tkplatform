@@ -12,7 +12,6 @@ import {routePostUserSiteJournalEntry} from "./handlers/postUserSiteJournalEntry
 import {routeGetUserSiteJournalEntries} from "./handlers/getUserSiteJournalEntries.mjs";
 import {routeCountUserSites} from "./handlers/countUserSites.mjs";
 import {routeDelUserSite} from "./handlers/delUserSite.mjs";
-import {routeGetRecommend} from "./handlers/getRecommend.mjs";
 import {routeGetSitesStatistics} from "./handlers/getSitesStatistics.mjs";
 import {routeGetSiteLogs} from "./handlers/getSiteLogs.mjs";
 import {routePostSiteLogs} from "./handlers/postSiteLogs.mjs";
@@ -39,7 +38,6 @@ export function setup(app, {setup, teardown}) {
     routeGetUserSiteJournalEntries(router)
     routeCountUserSites(router)
     routeDelUserSite(router)
-    routeGetRecommend(router)
     routeGetSitesStatistics(router)
     routeGetSiteLogs(router)
     routePostSiteLogs(router)

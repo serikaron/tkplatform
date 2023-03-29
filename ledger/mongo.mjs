@@ -778,8 +778,8 @@ export async function setupMongo(req) {
                 ])
                 .toArray()
 
-            console.log(`overview, ledger: ${JSON.stringify(ledger)}`)
-            console.log(`overview, ledger: ${JSON.stringify(journal)}`)
+            // console.log(`overview, ledger: ${JSON.stringify(ledger)}`)
+            // console.log(`overview, ledger: ${JSON.stringify(journal)}`)
             return {
                 overview: ledger.length !== 0 ? ledger[0].overview : {
                     commission: 0,
@@ -821,6 +821,14 @@ export async function setupMongo(req) {
             //     commission: {},
             //     creditDetail: {},
             // }
+        },
+        getRecommend: async (siteId) => {
+            await collection.siteRecords
+                .aggregate([
+                    {
+                        $match: {}
+                    }
+                ])
         }
     }
 }
