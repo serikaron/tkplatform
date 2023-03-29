@@ -162,6 +162,16 @@ export async function setupMongo(req) {
                 )
                 .sort({loggedAt: 1})
                 .toArray()
+        },
+        syncSettings: async (userId, siteId, update) => {
+            await collection.userSites
+                .updateMany({
+                    userId: new ObjectId(userId),
+                    "site.id": siteId,
+                    deleted: {$ne: true}
+                },{
+                    $set: update
+                })
         }
     }
 }

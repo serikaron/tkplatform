@@ -522,4 +522,54 @@ describe("test site service", () => {
             })
         })
     })
+
+    describe("test sync settings", () => {
+        const box = new Box()
+        const userId = `${new ObjectId()}`
+
+        it("prepare", async () => {
+            await getSites(userId, box)
+            box.data.userSite1 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite1)
+            box.data.userSite2 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite2)
+
+            await setUserSite(box.data.userSite1, userId, {
+                setting: {
+                    interval: {
+                        min: 999,
+                        max: 1999,
+                    },
+                    schedule: [
+                        {from: "30:00", to: "40:00", activated: false},
+                        {from: "20:00", to: "50:00", activated: true}
+                    ]
+                }
+            })
+        })
+
+        it("sync", async () => {
+            await runTest({
+                method: "PUT",
+                path: `/v1/user/site/${box.data.userSite1.id}/setting/sync`,
+                body: {interval: {sync: 1}, schedule: [{sync: 1}, {sync: 2}]},
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        it("check", async () => {
+            box.data.userSite2.setting = {
+                interval: {min: 999, max: 1999},
+                schedule: [
+                    {from: "30:00", to: "40:00", activated: false},
+                    {from: "20:00", to: "50:00", activated: false}
+                ]
+            }
+            await checkUserSites(userId, [box.data.userSite1, box.data.userSite2])
+        })
+    })
 })

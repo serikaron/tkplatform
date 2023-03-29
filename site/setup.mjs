@@ -16,6 +16,7 @@ import {routeGetRecommend} from "./handlers/getRecommend.mjs";
 import {routeGetSitesStatistics} from "./handlers/getSitesStatistics.mjs";
 import {routeGetSiteLogs} from "./handlers/getSiteLogs.mjs";
 import {routePostSiteLogs} from "./handlers/postSiteLogs.mjs";
+import {routeSyncSettings} from "./handlers/syncSettings.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -38,6 +39,7 @@ export function setup(app, {setup, teardown}) {
     routeGetSitesStatistics(router)
     routeGetSiteLogs(router)
     routePostSiteLogs(router)
+    routeSyncSettings(router)
 
     teardown(router)
 }
