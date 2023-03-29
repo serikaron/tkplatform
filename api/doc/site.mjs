@@ -393,7 +393,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/recommend/times(时段推荐):
+ * /v1/user/site/:userSiteId/recommend/times(时段推荐✅):
  *   get:
  *     tags: ["site(站点)"]
  *     description: 时段推荐
@@ -659,6 +659,9 @@
  *                       kept:
  *                         type: number
  *                         example: 1-记帐
+ *                       empty:
+ *                         type: boolean
+ *                         example: 是否为空单
  *
  */
 
