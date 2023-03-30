@@ -418,4 +418,30 @@ describe("test user service", () => {
             })
         })
     })
+
+    describe("test backend", () => {
+        test("register", async () => {
+            await runTest({
+                method: "POST",
+                path: "/v1/backend/register",
+                body: {username: "abc", password: "123"},
+                baseURL,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        test("login", async () => {
+            await runTest({
+                method: "POST",
+                path: "/v1/backend/login",
+                body: {username: "abc", password: "123"},
+                baseURL,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+    })
 })
