@@ -12,7 +12,16 @@ export const routePutSiteRecord = router => {
             throw new InvalidArgument()
         }
 
-        await req.context.mongo.keepRecord(req.params.recordId, req.headers.id, req.params.userSiteId)
+        const update = {}
+        const kept = Number(req.body.kept)
+        if (!isNaN(kept) && kept === 1) {
+            update.kept = true
+        }
+        if (req.body.empty) {
+            update.empty = true
+        }
+
+        await req.context.mongo.updateRecord(req.params.recordId, req.headers.id, req.params.userSiteId, update)
 
         res.tkResponse(TKResponse.Success())
 

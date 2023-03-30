@@ -468,47 +468,47 @@ export async function setupMongo(req) {
                 {$set: {deleted: true}}
             )
         },
-        getSiteRecords: async (userId, userSiteId, minDate, maxDate) => {
-            const filter = userSiteId === undefined ? {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                deleted: {$ne: true},
-            } : {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                userSiteId: new ObjectId(userSiteId),
-                deleted: {$ne: true},
+        getSiteRecords: async (userId, userSiteId, siteId, minDate, maxDate) => {
+            const filter = new Filter()
+            filter.userId(userId)
+                .createdAt(minDate, maxDate)
+                .notDeleted()
+            if (userSiteId !== undefined) {
+                filter.plug({userSiteId: new ObjectId(userSiteId)})
             }
-            return await collection.siteRecords.find(filter)
+            if (siteId !== undefined) {
+                filter.plug({siteId: new ObjectId(siteId)})
+            }
+            return await collection.siteRecords.find(filter.toFilter())
                 .sort({createdAt: -1})
                 .toArray()
         },
-        countSiteRecords: async (userId, userSiteId, minDate, maxDate) => {
-            const filter = userSiteId === undefined ? {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                deleted: {$ne: true},
-            } : {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                userSiteId: new ObjectId(userSiteId),
-                deleted: {$ne: true},
+        countSiteRecords: async (userId, userSiteId, siteId, minDate, maxDate) => {
+            const filter = new Filter()
+            filter.userId(userId)
+                .createdAt(minDate, maxDate)
+                .notDeleted()
+            if (userSiteId !== undefined) {
+                filter.plug({userSiteId: new ObjectId(userSiteId)})
+            }
+            if (siteId !== undefined) {
+                filter.plug({siteId: new ObjectId(siteId)})
             }
             return await collection.siteRecords
-                .countDocuments(filter)
+                .countDocuments(filter.toFilter())
         },
         addSiteRecord: async (record) => {
             const r = await collection.siteRecords.insertOne(record)
             return r.insertedId
         },
-        keepRecord: async (recordId, userId, userSiteId) => {
+        updateRecord: async (recordId, userId, userSiteId, update) => {
             await collection.siteRecords
                 .updateOne({
                     _id: new ObjectId(recordId),
                     userId: new ObjectId(userId),
                     userSiteId: new ObjectId(userSiteId)
                 }, {
-                    $set: {kept: true}
+                    $set: update
                 })
         },
         delSiteRecord: async (recordId, userId, userSiteId) => {

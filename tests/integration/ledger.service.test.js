@@ -486,13 +486,25 @@ describe("test site record", () => {
                 box.data.id1 = response.data.recordId
             }
         })
+        await runTest({
+            method: "POST",
+            path: `/v1/site/${box.data.siteId2}/record`,
+            body: {principle: 1000, commission: 2000},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.recordId).not.toBeUndefined()
+                box.data.id2 = response.data.recordId
+            }
+        })
     })
 
     test("get site record", async () => {
         await runTest({
             method: "GET",
             path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
-            query: {siteId: box.data.siteId1},
+            query: {userSiteId: box.data.siteId1},
             baseURL,
             userId: box.data.userId1,
             verify: response => {
@@ -512,6 +524,22 @@ describe("test site record", () => {
                 expect(record.account).toBe(box.data.site1.credential.account)
             }
         })
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {siteId: box.data.site1.site.id},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.total).toBe(2)
+                expect(response.data.rate).toBe(1000)
+                // check id only
+                const ids = response.data.list.map(x => x.id)
+                expect(ids.includes(box.data.id1)).toBe(true)
+                expect(ids.includes(box.data.id2)).toBe(true)
+            }
+        })
     })
 
     test("set site record", async () => {
@@ -525,13 +553,10 @@ describe("test site record", () => {
                 expect(response.status).toBe(200)
             }
         })
-    })
-
-    test("check record to be correctly updated", async () => {
         await runTest({
             method: "GET",
             path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
-            query: {siteId: box.data.siteId1},
+            query: {userSiteId: box.data.siteId1},
             baseURL,
             userId: box.data.userId1,
             verify: response => {
@@ -544,6 +569,31 @@ describe("test site record", () => {
                 expect(record.createdAt).toBeLessThanOrEqual(now())
                 expect(record.principle).toBe(100)
                 expect(record.commission).toBe(200)
+            }
+        })
+        await runTest({
+            method: "PUT",
+            path: `/v1/site/${box.data.siteId1}/record/${box.data.id1}`,
+            body: {empty: true},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                expect(response.status).toBe(200)
+            }
+        })
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {userSiteId: box.data.siteId1},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.total).toBe(1)
+                expect(response.data.rate).toBe(1000)
+                const record = response.data.list[0]
+                expect(record.id).toBe(box.data.id1)
+                expect(record.empty).toBe(true)
             }
         })
     })
@@ -573,7 +623,7 @@ describe("test site record", () => {
         await runTest({
             method: "GET",
             path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
-            query: {siteId: box.data.siteId1},
+            query: {userSiteId: box.data.siteId1},
             baseURL,
             userId: box.data.userId1,
             verify: response => {
@@ -600,7 +650,7 @@ describe("test site record", () => {
             verify: response => {
                 simpleVerification(response)
                 expect(response.data.recordId).not.toBeUndefined()
-                box.data.id2 = response.data.recordId
+                box.data.id3 = response.data.recordId
             }
         })
         await runTest({
@@ -610,12 +660,13 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
-                expect(response.data.total).toBe(2)
+                expect(response.data.total).toBe(3)
                 expect(response.data.rate).toBe(1000)
                 // check id only
                 const ids = response.data.list.map(x => x.id)
                 expect(ids.includes(box.data.id1)).toBe(true)
                 expect(ids.includes(box.data.id2)).toBe(true)
+                expect(ids.includes(box.data.id3)).toBe(true)
             }
         })
     })
@@ -629,15 +680,23 @@ describe("test site record", () => {
             verify: rsp => {
                 simpleVerification(rsp)
                 expect(rsp.data.sort((a, b) => {
-                    if (a.siteId > b.siteId) { return -1 }
-                    if (a.siteId < b.siteId) { return 1 }
+                    if (a.siteId > b.siteId) {
+                        return -1
+                    }
+                    if (a.siteId < b.siteId) {
+                        return 1
+                    }
                     return 0
                 })).toStrictEqual([
                     {siteId: `${box.data.siteId1}`, count: 1},
-                    {siteId: `${box.data.siteId2}`, count: 1},
+                    {siteId: `${box.data.siteId2}`, count: 2},
                 ].sort((a, b) => {
-                    if (a.siteId > b.siteId) { return -1 }
-                    if (a.siteId < b.siteId) { return 1 }
+                    if (a.siteId > b.siteId) {
+                        return -1
+                    }
+                    if (a.siteId < b.siteId) {
+                        return 1
+                    }
                     return 0
                 }))
             }

@@ -39,5 +39,5 @@ test("return db result", async () => {
     simpleCheckTKResponse(response, TKResponse.Success({
         data: [{siteId: `${siteId}`, count: 0}]
     }))
-    expect(countSitesRecords).toHaveBeenCalledWith(`${userId}`, now(), now() + 86400)
+    expect(countSitesRecords).toHaveBeenCalledWith(`${userId}`, now() - 86400, now() + 1)
 })

@@ -14,7 +14,7 @@ const runTest = async (
     {
         body,
         tkResponse,
-        keepRecord,
+        updateRecord,
         userId, userSiteId, recordId
     }
 ) => {
@@ -24,7 +24,7 @@ const runTest = async (
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        keepRecord
+                        updateRecord
                     }
                 }
                 next()
@@ -44,7 +44,7 @@ const runTest = async (
 describe.each([
     {body: {}},
     {body: {notSupportedKey: 1}}
-])("($#) body", ({body}) => {
+])("($#) invalid body", ({body}) => {
     test("should be checked", async () => {
         await runTest({
             body,
@@ -54,21 +54,21 @@ describe.each([
 })
 
 describe.each([
-    {kept: 1},
-    {empty: true}
+    {body: {kept: 1}, update: {kept: true}},
+    {body: {empty: true}, update: {empty: true}},
 ])
-("($#)", (body) => {
+("($#) body", ({body, update}) => {
     test("update record", async () => {
-        const keepRecord = jest.fn()
+        const updateRecord = jest.fn()
         const userSiteId = new ObjectId()
         const recordId = new ObjectId()
         const userId = new ObjectId()
         await runTest({
             body,
             tkResponse: TKResponse.Success(),
-            keepRecord,
+            updateRecord,
             userSiteId, recordId, userId
         })
-        expect(keepRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`)
+        expect(updateRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`, update)
     })
 })
