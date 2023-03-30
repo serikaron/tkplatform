@@ -19,7 +19,10 @@ export const routePostSiteRecord = (router) => {
             createdAt: now(),
             principle: req.body.principle,
             commission: req.body.commission,
-            kept: false
+            kept: false,
+            empty: false,
+            siteName: stubRsp.data.site.name,
+            account: stubRsp.data.credential.account
         })
         res.tkResponse(TKResponse.Success({ data: {recordId} }))
         next()

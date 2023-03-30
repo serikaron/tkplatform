@@ -505,6 +505,9 @@ describe("test site record", () => {
                 expect(record.kept).toBe(false)
                 expect(record.principle).toBe(100)
                 expect(record.commission).toBe(200)
+                expect(record.empty).toBe(false)
+                expect(record.userSiteId).toBe(box.data.site1.id)
+                expect(record.siteId).toBe(box.data.site1.site.id)
             }
         })
     })

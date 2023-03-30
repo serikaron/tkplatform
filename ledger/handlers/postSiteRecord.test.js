@@ -32,7 +32,11 @@ test("save site record to db", async () => {
         return TKResponse.Success({
             data: {
                 site: {
-                    id: `${siteId}`
+                    id: `${siteId}`,
+                    name: "site-name"
+                },
+                credential: {
+                    account: "13912345678"
                 }
             }
         })
@@ -76,7 +80,10 @@ test("save site record to db", async () => {
         kept: false,
         principle: 100,
         commission: 200,
-        createdAt: now()
+        createdAt: now(),
+        empty: false,
+        siteName: "site-name",
+        account: "13912345678"
     })
     expect(getUserSite).toHaveBeenCalledWith(`${userId}`, `${userSiteId}`)
 })
