@@ -21,8 +21,11 @@ export const routeGetDownLines = router => {
             for (const downLine of downLines) {
                 const info = await req.context.mongo.getDownLineInfo(downLine.id)
                 Object.assign(downLine, info)
-                if (downLine.alias === undefined) {
+                if (!downLine.hasOwnProperty("alias")) {
                     downLine.alias = ""
+                }
+                if (!downLine.hasOwnProperty("claimed")) {
+                    downLine.claimed = false
                 }
                 downLine.lastLoginAt = 0
             }

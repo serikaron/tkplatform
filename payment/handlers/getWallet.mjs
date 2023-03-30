@@ -19,7 +19,8 @@ export function routeGetWallet(router) {
 
         const tkWallet = {
             rice: getValue("rice"),
-            cash: getValue("cash")
+            cash: getValue("cash"),
+            invitePoint: getValue("invitePoint")
         }
         res.tkResponse(TKResponse.Success({
             data: tkWallet

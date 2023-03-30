@@ -66,6 +66,7 @@ test("get downlines", async () => {
                     name: "",
                     alias: "",
                     lastLoginAt: 0,
+                    claimed: false,
                 }
             })
         }

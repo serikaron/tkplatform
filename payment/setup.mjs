@@ -3,6 +3,7 @@
 import express from "express";
 import {routeGetItems} from "./handlers/getItems.mjs";
 import {routeGetWallet} from "./handlers/getWallet.mjs";
+import {routePostWallet} from "./handlers/postWallet.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -12,6 +13,7 @@ export function setup(app, {setup, teardown}) {
 
     routeGetItems(router)
     routeGetWallet(router)
+    routePostWallet(router)
 
     teardown(router)
 }

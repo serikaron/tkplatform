@@ -13,24 +13,28 @@ describe.each([
         dbWallet: {},
         tkWallet: {
             rice: 0,
-            cash: 0
+            cash: 0,
+            invitePoint: 0,
         }
     },
     {
         dbWallet: null,
         tkWallet: {
             rice: 0,
-            cash: 0
+            cash: 0,
+            invitePoint: 0,
         }
     },
     {
         dbWallet: {
             rice: 1000,
-            cash: 1000
+            cash: 2000,
+            invitePoint: 3000,
         },
         tkWallet: {
             rice: 1000,
-            cash: 1000
+            cash: 2000,
+            invitePoint: 3000,
         }
     },
 ])("($#) wallet scenario", ({dbWallet, tkWallet}) => {
