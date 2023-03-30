@@ -53,16 +53,22 @@ describe.each([
     })
 })
 
-test("keep record", async () => {
-    const keepRecord = jest.fn()
-    const userSiteId = new ObjectId()
-    const recordId = new ObjectId()
-    const userId = new ObjectId()
-    await runTest({
-        body: {kept: 1},
-        tkResponse: TKResponse.Success(),
-        keepRecord,
-        userSiteId, recordId, userId
+describe.each([
+    {kept: 1},
+    {empty: true}
+])
+("($#)", (body) => {
+    test("update record", async () => {
+        const keepRecord = jest.fn()
+        const userSiteId = new ObjectId()
+        const recordId = new ObjectId()
+        const userId = new ObjectId()
+        await runTest({
+            body,
+            tkResponse: TKResponse.Success(),
+            keepRecord,
+            userSiteId, recordId, userId
+        })
+        expect(keepRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`)
     })
-    expect(keepRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`)
 })
