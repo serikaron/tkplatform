@@ -592,6 +592,10 @@
  *                         type: boolean
  *                       empty:
  *                         type: boolean
+ *                       userSiteId:
+ *                         type: string
+ *                       siteId:
+ *                         type: string
  *
  */
 
