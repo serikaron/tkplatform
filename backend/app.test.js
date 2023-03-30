@@ -118,13 +118,13 @@ async function runTest(
 
 test.concurrent.each([
     {
-        url: '/v1/register',
+        url: '/backend/v1/register',
         method: "POST",
         needAuth: false,
         service: {baseURL: "http://user:8080", url: "/v1/backend/register"}
     },
     {
-        url: "/v1/login",
+        url: "/backend/v1/login",
         method: "POST",
         needAuth: false,
         service: {

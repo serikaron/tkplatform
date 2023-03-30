@@ -2,9 +2,6 @@
 
 import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from 'swagger-jsdoc'
-import './doc/user.mjs'
-import './doc/captcha.mjs'
-import './doc/sms.mjs'
 import routeInfo from "./routeInfo.mjs";
 import {dispatch} from "./dispatcher.mjs";
 import {checkToken} from "./middleware.mjs";
