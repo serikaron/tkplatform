@@ -436,6 +436,9 @@
  *                         type: string
  *                       alias:
  *                         type: string
+ *                       claimed:
+ *                         type: boolean
+ *                         example: 已获得
  *
  */
 
@@ -452,6 +455,14 @@
  *             properties:
  *               alias:
  *                 type: string
+ */
+
+/**
+ * @swagger
+ * /v1/user/downLine/:downLineUserId/claim(获取拉新值✅):
+ *   post:
+ *     tags: ["user(用户相关)"]
+ *
  */
 
 /**

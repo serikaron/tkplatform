@@ -222,6 +222,18 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/user/downLine/fake-down-line/claim",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/downLine/fake-down-line/claim'
+        }
+    },
+
+    // ---- user end ----
+
+    {
         url: "/v1/sites",
         method: "GET",
         needAuth: true,
