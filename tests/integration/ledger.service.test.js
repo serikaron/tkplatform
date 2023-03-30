@@ -508,6 +508,8 @@ describe("test site record", () => {
                 expect(record.empty).toBe(false)
                 expect(record.userSiteId).toBe(box.data.site1.id)
                 expect(record.siteId).toBe(box.data.site1.site.id)
+                expect(record.siteName).toBe(box.data.site1.site.name)
+                expect(record.account).toBe(box.data.site1.credential.account)
             }
         })
     })

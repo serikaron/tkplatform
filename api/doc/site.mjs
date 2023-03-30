@@ -596,6 +596,10 @@
  *                         type: string
  *                       siteId:
  *                         type: string
+ *                       siteName:
+ *                         type: string
+ *                       account:
+ *                         type: string
  *
  */
 
