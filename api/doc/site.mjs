@@ -561,6 +561,10 @@
  *       name: userSiteId
  *       schema:
  *         type: string
+ *     - in: path
+ *       name: siteId
+ *       schema:
+ *         type: string
  *     responses:
  *       200:
  *         description: 返回列表
