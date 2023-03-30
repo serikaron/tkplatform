@@ -321,15 +321,6 @@ test.concurrent.each([
         }
     },
     {
-        url: "/v1/site/fake-site-id/recommend",
-        method: "GET",
-        needAuth: true,
-        service: {
-            baseURL: "http://site:8080",
-            url: "/v1/site/fake-site-id/recommend",
-        }
-    },
-    {
         url: "/v1/sites/statistics",
         method: "GET",
         needAuth: true,
@@ -744,6 +735,15 @@ test.concurrent.each([
         service: {
             baseURL: "http://ledger:8080",
             url: "/v1/journal/entry/fake-entry-id",
+        }
+    },
+    {
+        url: "/v1/site/fake-site-id/recommend",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/fake-site-id/recommend",
         }
     },
 ])("$url should dispatch correctly", async (argument) => {

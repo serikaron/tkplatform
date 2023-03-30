@@ -33,7 +33,6 @@ const routeInfo = [
     {url: "/v1/user/site/:userSiteId/balance", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
-    {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/sites/statistics", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/site/:userSiteId/logs", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/site/:userSiteId/logs", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
@@ -123,6 +122,7 @@ const routeInfo = [
     {url: "/v1/ledger/analyse/overview/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 ]
 
 export default routeInfo
