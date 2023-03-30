@@ -590,6 +590,8 @@
  *                         example: 佣金
  *                       kept:
  *                         type: boolean
+ *                       empty:
+ *                         type: boolean
  *
  */
 
