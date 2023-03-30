@@ -29,15 +29,11 @@ function setupDoc(app) {
                 version: '1.0.0',
             },
         },
-        tags: [
-            {name: "user(用户相关)"},
-            {name: "captcha(图形码)"},
-        ],
-        apis: ['./api/doc/*.mjs']
+        apis: ['./backend/doc/*.mjs']
     }
 
     const swaggerSpec = swaggerJsdoc(jsdocOpt)
-    app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+    app.use("/backend-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
 }
 
 function useDispatcher(router) {
