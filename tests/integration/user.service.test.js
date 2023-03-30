@@ -250,7 +250,8 @@ describe("test user service", () => {
                                     // expiration: now() + 7 * 86400
                                 },
                                 name: "",
-                                alias: x.alias === undefined ? "" : x.alias
+                                alias: x.alias === undefined ? "" : x.alias,
+                                claimed: x.claimed === undefined ? false : x.claimed
                             }
                         })
                     )
@@ -303,6 +304,20 @@ describe("test user service", () => {
         })
 
         it("check after update", async () => {
+            await check()
+        })
+
+        it("claim first downLine", async () => {
+            await runTest({
+                method: "POST",
+                path: `/v1/user/downLine/${box.data.downLines[0].id}/claim`,
+                baseURL,
+                userId: box.data.inviter.id,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                    box.data.downLines[0].claimed = true
+                }
+            })
             await check()
         })
     })

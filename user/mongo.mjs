@@ -149,6 +149,13 @@ export async function setupMongo(req) {
         getBackendUser: async (username) => {
             return await collection.backendUsers
                 .findOne({username})
+        },
+        updateClaimed: async (upLine, downLine) => {
+            await collection.users
+                .updateOne(
+                    {_id: new ObjectId(upLine), "downLines.id": new ObjectId(downLine)},
+                    {$set: {"downLines.$.claimed": true}}
+                )
         }
     }
 }

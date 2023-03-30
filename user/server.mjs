@@ -13,6 +13,7 @@ import {routePutUserDownLine} from "./handlers/putDownLine.mjs";
 import {routeGetUserCentre} from "./handlers/getUserCentre.mjs";
 import {routeBackendLogin} from "./handlers/backendLogin.mjs";
 import {routeBackendRegister} from "./handlers/backendRegister.mjs";
+import {routeClaimDownLinePrice} from "./handlers/claimDownLinePrice.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -30,6 +31,7 @@ export function setup(app, {
     routeGetDownLines(router)
     routePutUserDownLine(router)
     routeGetUserCentre(router)
+    routeClaimDownLinePrice(router)
     teardown(router)
 
     const backendRouter = express.Router()
