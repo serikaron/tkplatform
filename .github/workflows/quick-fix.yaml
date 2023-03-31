@@ -5,7 +5,7 @@ on:
     branches: [ quick-fix ]
 
 jobs:
-  Automation:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
