@@ -668,5 +668,21 @@ describe("backend", () => {
             expect(box.data.sites.length).toBe(box.data.existsCount + 1)
             expect(box.data.sites[box.data.sites.length-1]).toEqual(box.data.newSite)
         })
+
+        it('update', async () => {
+            await runTest({
+                method: "PUT",
+                path: `/v1/site/${box.data.newSite.id}`,
+                body: {disable: true},
+                baseURL,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                    box.data.newSite.disable = true
+                }
+            })
+            await getSites(userId, box)
+            expect(box.data.sites[box.data.sites.length-1].disable).toBe(true)
+        })
+
     })
 })

@@ -199,6 +199,13 @@ export async function setupMongo(req) {
             const r = await collection.sites
                 .insertOne(site)
             return r.insertedId
+        },
+        updateSite: async (siteId, update) => {
+            await collection.sites
+                .updateOne(
+                    {_id: new ObjectId(siteId)},
+                    {$set: update}
+                )
         }
     }
 }

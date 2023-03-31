@@ -58,6 +58,8 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
+ *                       disable:
+ *                         type: boolean
  *
  */
 
@@ -72,8 +74,6 @@
  *             schema:
  *               type: object
  *               properties:
- *                       id:
- *                         type: string
  *                       name:
  *                         type: string
  *                         example: 站点1
@@ -96,5 +96,53 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
+ *                       disable:
+ *                         type: boolean
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
  *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/site/:siteId(更新站点):
+ *   put:
+ *     tags: ["site(站点)"]
+ *     requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                       name:
+ *                         type: string
+ *                         example: 站点1
+ *                       icon:
+ *                         type: string
+ *                         example: /static/sites/001.png
+ *                       status:
+ *                         type: number
+ *                         example: 1-运营中
+ *                       rates:
+ *                         type: object
+ *                         properties:
+ *                           hot:
+ *                             type: Number
+ *                             example: 4.4
+ *                           quality:
+ *                             type: Number
+ *                             example: 4.4
+ *                       isFree:
+ *                         type: boolean
+ *                       added:
+ *                         type: boolean
+ *                       disable:
+ *                         type: boolean
  */
