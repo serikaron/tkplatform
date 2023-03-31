@@ -58,6 +58,11 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
+ *
  *
  */
 
@@ -91,6 +96,10 @@
  *                       alias:
  *                         type: string
  *                         example: 备注名
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  *                   credential:
  *                     type: object
  *                     properties:
@@ -173,6 +182,10 @@
  *                       alias:
  *                         type: string
  *                         example: 备注名
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  *                   credential:
  *                     type: object
  *                     properties:

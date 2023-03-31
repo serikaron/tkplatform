@@ -60,6 +60,10 @@
  *                         type: boolean
  *                       disabled:
  *                         type: boolean
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  *
  */
 
@@ -98,6 +102,10 @@
  *                         type: boolean
  *                       disabled:
  *                         type: boolean
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  *     responses:
  *       200:
  *         content:
@@ -145,4 +153,8 @@
  *                         type: boolean
  *                       disabled:
  *                         type: boolean
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  */
