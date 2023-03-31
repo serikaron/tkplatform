@@ -5,7 +5,7 @@
 
 /**
  * @swagger
- * /v1/user/register(注册✅):
+ * /backend/v1/user/register(注册):
  *   post:
  *     tags: ["user(用户相关)"]
  *     description: 用户注册
@@ -49,7 +49,7 @@
 
 /**
  * @swagger
- * /v1/user/login(登录✅):
+ * /backend/v1/user/login(登录):
  *   post:
  *     tags: ["user(用户相关)"]
  *     description: 用户登录
