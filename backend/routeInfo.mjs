@@ -13,11 +13,26 @@ const routeInfo = [
         needAuth: false,
         service: {baseURL: "http://user:8080", url: "/v1/backend/login"}
     },
+    {
+        url: '/backend/v1/user/:userId', method: "GET", needAuth: true, service: {
+            baseURL: "http://user:8080",
+            url: (req) => {
+                return `/v1/backend/user/${req.params.userId}`
+            }
+        }
+    },
     // ------ user end -----
 
     {url: '/backend/v1/site', method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/site'}},
-    {url: '/backend/v1/site', method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/site'}},
-    {url: '/backend/v1/site', method: "PUT", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/site'}},
+    {url: '/backend/v1/sites', method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/sites'}},
+    {
+        url: "/backend/v1/site/:siteId", method: "PUT", needAuth: true, service: {
+            baseURL: "http://site:8080",
+            url: (req) => {
+                return `/v1/site/${req.params.siteId}`
+            }
+        }
+    },
 ]
 
 export default routeInfo

@@ -132,11 +132,17 @@ test.concurrent.each([
             url: "/v1/backend/login"
         }
     },
+    {
+        url: "/backend/v1/user/fake-user-id",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://user:8080", url: "/v1/backend/user/fake-user-id"}
+    },
     // ----- user end ----------
 
     {url: "/backend/v1/site", method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/site"}},
-    {url: "/backend/v1/site", method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/site"}},
-    {url: "/backend/v1/site", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/site"}},
+    {url: "/backend/v1/sites", method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/sites"}},
+    {url: "/backend/v1/site/fake-site-id", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/site/fake-site-id"}},
     // ----- site end -----
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)

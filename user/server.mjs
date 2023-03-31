@@ -14,6 +14,7 @@ import {routeGetUserCentre} from "./handlers/getUserCentre.mjs";
 import {routeBackendLogin} from "./handlers/backendLogin.mjs";
 import {routeBackendRegister} from "./handlers/backendRegister.mjs";
 import {routeClaimDownLinePrice} from "./handlers/claimDownLinePrice.mjs";
+import {routeBackendGetUser} from "./handlers/backendGetUser.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -39,5 +40,6 @@ export function setup(app, {
     setup(backendRouter)
     routeBackendLogin(backendRouter)
     routeBackendRegister(backendRouter)
+    routeBackendGetUser(backendRouter)
     teardown(backendRouter)
 }
