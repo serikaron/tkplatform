@@ -30,8 +30,8 @@ test("update db", async () => {
     const siteId = new ObjectId()
     const response = await supertest(app)
         .put(`/v1/site/${siteId}`)
-        .send({disable: true})
+        .send({disabled: true})
 
     simpleCheckTKResponse(response, TKResponse.Success())
-    expect(updateSite).toHaveBeenCalledWith(siteId.toString(), {disable: true})
+    expect(updateSite).toHaveBeenCalledWith(siteId.toString(), {disabled: true})
 })

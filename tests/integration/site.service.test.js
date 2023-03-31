@@ -666,22 +666,48 @@ describe("backend", () => {
         it("check", async () => {
             await getSites(userId, box)
             expect(box.data.sites.length).toBe(box.data.existsCount + 1)
-            expect(box.data.sites[box.data.sites.length-1]).toEqual(box.data.newSite)
+            expect(box.data.sites[box.data.sites.length - 1]).toEqual(box.data.newSite)
         })
 
         it('update', async () => {
             await runTest({
                 method: "PUT",
                 path: `/v1/site/${box.data.newSite.id}`,
-                body: {disable: true},
+                body: {disabled: true},
                 baseURL,
                 verify: rsp => {
                     expect(rsp.status).toBe(200)
-                    box.data.newSite.disable = true
+                    box.data.newSite.disabled = true
+                }
+            })
+            await runTest({
+                method: "GET",
+                path: '/v1/backend/sites',
+                baseURL,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    const site = rsp.data.filter(x => x.id === box.data.newSite.id)[0]
+                    expect(site.disabled).toBe(true)
+                    box.data.backendSites = rsp.data
                 }
             })
             await getSites(userId, box)
-            expect(box.data.sites[box.data.sites.length-1].disable).toBe(true)
+            const sortSite = (a, b) => {
+                if (a.id > b.id) {
+                    return 1
+                }
+                if (a.id < b.id) {
+                    return -1
+                }
+                return 0
+            }
+            expect(
+                box.data.sites.sort(sortSite)
+            ).toStrictEqual(
+                box.data.backendSites
+                    .filter(x => !x.hasOwnProperty("disabled") || !x.disabled)
+                    .sort(sortSite)
+            )
         })
 
     })

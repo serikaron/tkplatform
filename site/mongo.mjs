@@ -23,8 +23,12 @@ export async function setupMongo(req) {
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
-        getSites: async () => {
-            return await collection.sites.find().toArray()
+        getSites: async (option) => {
+            const filter = {}
+            if (option.hasOwnProperty("usingDisable") && option.usingDisable === 1) {
+                filter.disabled = {$ne: true}
+            }
+            return await collection.sites.find(filter).toArray()
         },
         getSite: async objectId => {
             return await collection.sites.findOne({_id: objectId})
