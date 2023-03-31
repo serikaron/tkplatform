@@ -37,7 +37,7 @@ jobs:
         run: sh scripts/start_for_integration.sh
       - name: wait
         run: |
-          until curl --output /dev/null --silent --head --fail http://localhost:8080; do
+          until curl --output /dev/null --silent --head --fail http://localhost:19000/alive-test; do
             echo "Waiting for the service to start..."
             sleep 5
           done
