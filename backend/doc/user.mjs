@@ -89,3 +89,43 @@
  *                       example: "96defd9f-1a54-4cb8-b501-9076d8709074"
  *
  */
+
+/**
+ * @swagger
+ * /backend/v1/user/:userId(查询用户):
+ *   get:
+ *     tags: ["user(用户相关)"]
+ *     responses:
+ *       200:
+ *         description: 登录成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 phone:
+ *                   type: string
+ *                 member:
+ *                   type: object
+ *                   properties:
+ *                     expiration:
+ *                       type: number
+ *                       example: 会员过期时间
+ *                 registeredAt:
+ *                   type: string
+ *                   example: 注册时间
+ *                 upLine:
+ *                   type: string
+ *                   example: 上线uid
+ *                 downLines:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *
+ *
+ */
