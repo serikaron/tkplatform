@@ -2,9 +2,9 @@
 
 import {TKResponse} from "../../common/TKResponse.mjs";
 
-export function routeGetWallet(router) {
-    router.get("/wallet", async (req, res, next) => {
-        const dbWallet = await req.context.mongo.getWallet(req.headers.id)
+function route(router, path, getUserId) {
+    router.get(path, async (req, res, next) => {
+        const dbWallet = await req.context.mongo.getWallet(getUserId(req))
 
         const getValue = (field) => {
             if (dbWallet === null) {
@@ -26,5 +26,14 @@ export function routeGetWallet(router) {
             data: tkWallet
         }))
         next()
+    })
+}
+
+export function routeGetWallet(router) {
+    route(router, '/wallet', (req) => {
+        return req.headers.id
+    });
+    route(router, '/backend/user/:userId/wallet', (req) => {
+        return req.params.userId
     })
 }

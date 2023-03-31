@@ -97,7 +97,6 @@
  *     tags: ["user(用户相关)"]
  *     responses:
  *       200:
- *         description: 登录成功
  *         content:
  *           application/json:
  *             schema:
@@ -126,6 +125,32 @@
  *                     properties:
  *                       id:
  *                         type: string
+ *
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/user/:userId/wallet("余额信息"):
+ *   get:
+ *     tags: ["user(用户相关)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *                   type: object
+ *                   properties:
+ *                     cash:
+ *                       type: number
+ *                       example: 现金
+ *                     rice:
+ *                       type: number
+ *                       example: 米粒
+ *                     invitePoint:
+ *                       type: number
+ *                       example: 拉新值
+ *
  *
  *
  */

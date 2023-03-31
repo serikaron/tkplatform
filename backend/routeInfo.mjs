@@ -33,6 +33,16 @@ const routeInfo = [
             }
         }
     },
+    // ----- site end -----
+
+    {
+        url: "/backend/v1/user/:userId/wallet/", method: "GET", needAuth: true, service: {
+            baseURL: "http://payment:8080",
+            url: (req) => {
+                return `/v1/backend/user/${req.params.userId}/wallet`
+            }
+        }
+    }
 ]
 
 export default routeInfo

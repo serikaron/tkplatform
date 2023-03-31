@@ -594,7 +594,12 @@
  *                   properties:
  *                     cash:
  *                       type: number
+ *                       example: 现金
  *                     rice:
  *                       type: number
+ *                       example: 米粒
+ *                     invitePoint:
+ *                       type: number
+ *                       example: 拉新值
  *
  */
