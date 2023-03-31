@@ -155,7 +155,9 @@ test.concurrent.each([
             baseURL: "http://payment:8080",
             url: '/v1/backend/user/fake-user-id/wallet'
         }
-    }
+    },
+    {url: "/backend/v1/system/settings", method: "GET", needAuth: true, service: {baseURL: "http://system:8080"}},
+    {url: "/backend/v1/system/setting", method: "PUT", needAuth: true, service: {baseURL: "http://system:8080"}},
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

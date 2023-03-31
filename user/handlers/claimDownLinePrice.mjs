@@ -31,7 +31,8 @@ const getConfig = async (req) => {
         throw new InternalError()
     }
 
-    req.config = configRsp.data
+    const price = Number(configRsp.data)
+    req.price = isNaN(price) ? 10 : price
 }
 
 const updateClaimed = async (req) => {
@@ -39,8 +40,7 @@ const updateClaimed = async (req) => {
 }
 
 const updateWallet = async (req) => {
-    const price =  req.config.hasOwnProperty("pointsForInvite") ? req.config.pointsForInvite : 10
-    const r = await req.context.stubs.payment.updateWallet(req.headers.id, {invitePoint: price})
+    const r = await req.context.stubs.payment.updateWallet(req.headers.id, {invitePoint: req.price})
     if (r.isError()) {
         throw new InternalError()
     }

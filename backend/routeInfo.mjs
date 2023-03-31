@@ -42,7 +42,9 @@ const routeInfo = [
                 return `/v1/backend/user/${req.params.userId}/wallet`
             }
         }
-    }
+    },
+    {url: '/backend/v1/system/settings', method: 'GET', needAuth: true, service: {baseURL: 'http://system:8080'}},
+    {url: '/backend/v1/system/setting', method: 'PUT', needAuth: true, service: {baseURL: 'http://system:8080'}},
 ]
 
 export default routeInfo

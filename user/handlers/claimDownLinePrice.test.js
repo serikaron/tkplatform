@@ -16,7 +16,7 @@ const runTest = async (
             return null
         },
         getConfig = async () => {
-            return {invitePrice: 10}
+            return 10
         },
         updateWallet = async () => {
             return TKResponse.Success()
@@ -92,7 +92,7 @@ describe.each([
         invitePrice: 10,
     },
     {
-        config: {pointsForInvite: 20},
+        config: 20,
         invitePrice: 20
     }
 ])

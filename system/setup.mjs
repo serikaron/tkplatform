@@ -22,6 +22,14 @@ export function setup(app, {setup, teardown}) {
         next()
     })
 
+    router.get('/settings', async (req, res, next) => {
+        const dbRes = await req.context.mongo.getAll()
+        res.response({
+            data: dbRes === null ? {} : dbRes
+        })
+        next()
+    })
+
     teardown(router)
 }
 

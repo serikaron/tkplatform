@@ -154,3 +154,42 @@
  *
  *
  */
+
+/**
+ * @swagger
+ * /backend/v1/system/settings("配置查询"):
+ *   get:
+ *     tags: ['系统配置']
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   key:
+ *                     type: string
+ *                   value:
+ *                     type: any
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/system/setting("更新配置"):
+ *   put:
+ *     tags: ['系统配置']
+ *     requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *                 type: object
+ *                 properties:
+ *                   key:
+ *                     type: string
+ *                   value:
+ *                     type: any
+ *
+ */
