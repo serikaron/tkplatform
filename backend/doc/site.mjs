@@ -58,7 +58,7 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
- *                       disable:
+ *                       disabled:
  *                         type: boolean
  *
  */
@@ -96,7 +96,7 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
- *                       disable:
+ *                       disabled:
  *                         type: boolean
  *     responses:
  *       200:
@@ -143,6 +143,6 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
- *                       disable:
+ *                       disabled:
  *                         type: boolean
  */
