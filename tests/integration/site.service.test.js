@@ -632,4 +632,41 @@ describe("test site service", () => {
             })
         })
     })
+
+})
+
+describe("backend", () => {
+    describe("test add site", () => {
+        const box = new Box()
+        const userId = new ObjectId().toString()
+
+        it("exists sites", async () => {
+            await getSites(userId, box)
+            box.data.existsCount = box.data.sites.length
+        })
+
+        it('add', async () => {
+            box.data.newSite = {
+                name: `name-${now()}`,
+                url: `url-${now()}`
+            }
+            await runTest({
+                method: "POST",
+                path: "/v1/site",
+                body: box.data.newSite,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    box.data.newSite.id = rsp.data.id
+                }
+            })
+        })
+
+        it("check", async () => {
+            await getSites(userId, box)
+            expect(box.data.sites.length).toBe(box.data.existsCount + 1)
+            expect(box.data.sites[box.data.sites.length-1]).toEqual(box.data.newSite)
+        })
+    })
 })

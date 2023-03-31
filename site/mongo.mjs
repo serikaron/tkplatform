@@ -194,6 +194,11 @@ export async function setupMongo(req) {
                     userId: new ObjectId(userId)
                 })
                 .toArray()
+        },
+        addSite: async (site) => {
+            const r = await collection.sites
+                .insertOne(site)
+            return r.insertedId
         }
     }
 }
