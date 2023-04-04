@@ -231,12 +231,39 @@ test.concurrent.each([
         }
     },
     {
-        url: "/v1/user/report/types",
+        url: "/v1/report/types",
         method: "GET",
         needAuth: true,
         service: {
             baseURL: "http://user:8080",
-            url: '/v1/user/report/types'
+            url: '/v1/report/types'
+        }
+    },
+    {
+        url: "/v1/user/report",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/report'
+        }
+    },
+    {
+        url: "/v1/user/reports",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/reports'
+        }
+    },
+    {
+        url: "/v1/user/report/report-id",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/report/report-id'
         }
     },
 
