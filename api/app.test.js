@@ -758,6 +758,24 @@ test.concurrent.each([
             url: "/v1/site/fake-site-id/recommend",
         }
     },
+    {
+        url: "/v1/store/member/items",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/store/member/items",
+        }
+    },
+    {
+        url: "/v1/store/rice/items",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/store/rice/items",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

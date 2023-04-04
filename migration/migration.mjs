@@ -4,7 +4,7 @@
 import fs from 'fs'
 import path from 'path'
 import * as dotenv from 'dotenv'
-import {connectLedger, connectSite, connectSystem, connectUser} from "../common/mongo.mjs";
+import {connectLedger, connectPayment, connectSite, connectSystem, connectUser} from "../common/mongo.mjs";
 
 dotenv.config()
 
@@ -69,6 +69,7 @@ const mongoClient = {
     system: await connectSystem(),
     site: await connectSite(),
     ledger: await connectLedger(),
+    payment: await connectPayment(),
 }
 
 await callFiles(mongoClient)

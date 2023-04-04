@@ -48,3 +48,22 @@ test("test invite point", async () => {
         invitePoint: 110
     })
 })
+
+test("member items", async () => {
+    const userId = `${new ObjectId()}`
+    const check = async (path) => {
+        await runTest({
+            method: "GET",
+            path,
+            baseURL,
+            userId,
+            verify: rsp => {
+                simpleVerification(rsp)
+                expect(rsp.data.length).toBeGreaterThan(0)
+            }
+        })
+    }
+
+    await check("/v1/store/member/items")
+    await check("/v1/store/rice/items")
+})

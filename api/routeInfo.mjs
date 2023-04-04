@@ -124,6 +124,9 @@ const routeInfo = [
     {url: "/v1/ledger/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+
+    {url: "/v1/store/member/items", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
+    {url: "/v1/store/rice/items", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
 ]
 
 export default routeInfo
