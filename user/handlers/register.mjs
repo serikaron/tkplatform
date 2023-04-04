@@ -150,7 +150,7 @@ async function genToken(req, res) {
 }
 
 export function route(router) {
-    router.post('/register', ...makeMiddleware([
+    router.post('/user/register', ...makeMiddleware([
         checkInput,
         checkUserExist,
         getInviter,

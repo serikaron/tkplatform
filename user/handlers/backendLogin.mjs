@@ -5,7 +5,7 @@ import {PasswordNotMatch} from "../../common/errors/10000-user.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 export const routeBackendLogin = backendRouter => {
-    backendRouter.post("/login", async (req, res, next) => {
+    backendRouter.post("/backend/login", async (req, res, next) => {
         const user = await req.context.mongo.getBackendUser(req.body.username)
         if (user === null) {
             throw new NotFound()

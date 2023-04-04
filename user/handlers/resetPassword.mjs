@@ -72,7 +72,7 @@ function success(req, res) {
 }
 
 export function route(router) {
-    router.post('/password', ...makeMiddleware([
+    router.post('/user/password', ...makeMiddleware([
         checkInput,
         checkUser,
         checkPassword,

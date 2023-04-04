@@ -4,7 +4,7 @@ import {flattenObject} from "../../common/utils.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 export const routePutUserOverview = router => {
-    router.put("/overview", async (req, res, next) => {
+    router.put("/user/overview", async (req, res, next) => {
         const update = flattenObject(req.body)
         const legalKeys = [
             "name",

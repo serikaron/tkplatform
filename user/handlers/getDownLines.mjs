@@ -3,7 +3,7 @@
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 export const routeGetDownLines = router => {
-    router.get("/downLines", async (req, res, next) => {
+    router.get("/user/downLines", async (req, res, next) => {
         const downLines = await req.context.mongo.getDownLines(req.headers.id)
         // console.log(`downlines: ${JSON.stringify(downLines)}`)
         if (downLines === null

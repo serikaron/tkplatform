@@ -4,7 +4,7 @@ import {InternalError} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 export const routeBackendRegister = backendRouter => {
-    backendRouter.post('/register', async (req, res, next) => {
+    backendRouter.post('/backend/register', async (req, res, next) => {
         const encoded = await req.context.password.encode(req.body.password)
         const userId = await req.context.mongo.addBackendUser({
             username: req.body.username,

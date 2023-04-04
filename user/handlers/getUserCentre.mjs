@@ -3,7 +3,7 @@
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 export const routeGetUserCentre = router => {
-    router.get('/centre', async (req, res, next) => {
+    router.get('/user/centre', async (req, res, next) => {
         const centre = await req.context.mongo.getUserCentre(req.headers.id)
         const idStr = centre._id.toString()
         centre.id = idStr.substring(idStr.length - 8)

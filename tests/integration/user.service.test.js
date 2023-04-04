@@ -466,10 +466,61 @@ describe("test user service", () => {
         test("report types", async () => {
             await runTest({
                 method: "GET",
-                path: '/v1/user/report/types',
+                path: '/v1/report/types',
                 baseURL,
                 userId,
                 verify: simpleVerification
+            })
+        })
+
+        const addReport = async (report) => {
+            await runTest({
+                method: "POST",
+                path: '/v1/user/report',
+                body: report,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    report.id = rsp.data.id
+                }
+            })
+        }
+
+        const reports = []
+        test("add", async () => {
+            for (let i = 0; i < 2; ++i) {
+                const report = {
+                    msg: `report body ${i}`
+                }
+                await addReport(report)
+                reports.push(report)
+            }
+        })
+
+        test("get all", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/user/reports',
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual(reports)
+                }
+            })
+        })
+
+        test("get one", async () => {
+            await runTest({
+                method: "GET",
+                path: `/v1/user/report/${reports[0].id}`,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toEqual(reports[0])
+                }
             })
         })
     })
