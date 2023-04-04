@@ -15,6 +15,7 @@ const routeInfo = [
     {url: "/v1/user/downLines", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
     {url: "/v1/user/centre", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
     {url: "/v1/user/downLine/:downLine/claim", method: "POST", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/report/types", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
 
     // site
     {

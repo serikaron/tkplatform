@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import {now} from "../../common/utils.mjs";
 import {genPhone} from "../common/utils.mjs";
+import {ObjectId} from "mongodb";
 
 dotenv.config()
 
@@ -456,6 +457,19 @@ describe("test user service", () => {
                 verify: rsp => {
                     expect(rsp.status).toBe(200)
                 }
+            })
+        })
+    })
+
+    describe("test report", () => {
+        const userId = `${new ObjectId()}`
+        test("report types", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/user/report/types',
+                baseURL,
+                userId,
+                verify: simpleVerification
             })
         })
     })

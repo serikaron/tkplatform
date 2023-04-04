@@ -467,6 +467,23 @@
 
 /**
  * @swagger
+ * /v1/user/report/types(问题反馈类型✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *                 example: 平台问题
+ *
+ */
+
+/**
+ * @swagger
  * /v1/user/report(问题反馈):
  *   post:
  *     tags: ["user(用户相关)","个人中心"]

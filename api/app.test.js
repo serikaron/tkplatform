@@ -230,6 +230,15 @@ test.concurrent.each([
             url: '/v1/user/downLine/fake-down-line/claim'
         }
     },
+    {
+        url: "/v1/user/report/types",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/report/types'
+        }
+    },
 
     // ---- user end ----
 
