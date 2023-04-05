@@ -2,7 +2,7 @@
 
 /**
  * @swagger
- * /v1/member/items(会员直充):
+ * /v1/member/items(会员直充✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 会员直充
@@ -37,7 +37,7 @@
 
 /**
  * @swagger
- * /v1/rice/items(米粒购买):
+ * /v1/rice/items(米粒购买✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 米粒购买
@@ -72,7 +72,7 @@
 
 /**
  * @swagger
- * /v1/wallet(用户钱包):
+ * /v1/wallet(用户钱包✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 用户钱包
@@ -91,7 +91,7 @@
 
 /**
  * @swagger
- * /v1/wallet/detail(资金明细):
+ * /v1/wallet/detail(资金明细✅):
  *   get:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     parameters:
@@ -142,7 +142,7 @@
 
 /**
  * @swagger
- * /v1/wallet/overview(资金总览):
+ * /v1/wallet/overview(资金总览✅):
  *   get:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     responses:
@@ -164,7 +164,7 @@
 
 /**
  * @swagger
- * /v1/wallet/withdraw/records(提现管理):
+ * /v1/wallet/withdraw/records(提现管理✅):
  *   get:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     parameters:

@@ -812,6 +812,42 @@ test.concurrent.each([
             url: "/v1/store/rice/items",
         }
     },
+    {
+        url: "/v1/wallet",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet",
+        }
+    },
+    {
+        url: "/v1/wallet/detail",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet/detail",
+        }
+    },
+    {
+        url: "/v1/wallet/overview",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet/overview",
+        }
+    },
+    {
+        url: "/v1/wallet/withdraw/records",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet/withdraw/records",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

@@ -264,7 +264,7 @@
  * @swagger
  * /v1/user/overview(查询帐号总览✅):
  *   get:
- *     tags: ["user(用户相关)","个人中心","已实现"]
+ *     tags: ["user(用户相关)","个人中心"]
  *     parameters:
  *     - in: path
  *       name: id
@@ -352,7 +352,7 @@
  * @swagger
  * /v1/user/overview(更新帐号总览✅):
  *   put:
- *     tags: ["user(用户相关)","个人中心","已实现"]
+ *     tags: ["user(用户相关)","个人中心"]
  *     requestBody:
  *         content:
  *           application/json:
