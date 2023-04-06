@@ -679,3 +679,60 @@
  *                       example: 拉新值
  *
  */
+
+/**
+ * @swagger
+ * /v1/search/external/account(查号):
+ *   get:
+ *     tags: ["user(用户相关)","site(站点)"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *               wang_wang_account:
+ *               type: string
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *                 buyerGoodNum:
+ *                   type: string
+ *                 gender:
+ *                   type: string
+ *                 fox:
+ *                   type: string
+ *                 wwcreatedStr:
+ *                   type: string
+ *                 weekCount:
+ *                   type: number
+ *                 countBefore:
+ *                   type: number
+ *                 taoling:
+ *                   type: number
+ *                 purchaseRecords:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                 jiangNum:
+ *                   type: number
+ *                 sentRate:
+ *                   type: string
+ *                 weekCreditAverage:
+ *                   type: number
+ *                 receivedRate:
+ *                   type: string
+ *                 yunBlack:
+ *                   type: number
+ *                 renZheng:
+ *                   type: string
+ *                 sellerTotalNum:
+ *                   type: string
+ *                 badTotal:
+ *                   type: string
+ *
+ *
+ */
