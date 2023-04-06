@@ -682,8 +682,8 @@
 
 /**
  * @swagger
- * /v1/search/external/account(查号):
- *   get:
+ * /v1/search/external/account(查号✅):
+ *   post:
  *     tags: ["user(用户相关)","site(站点)"]
  *     requestBody:
  *       content:
