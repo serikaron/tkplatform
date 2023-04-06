@@ -690,14 +690,16 @@
  *         application/json:
  *           schema:
  *             type: object
+ *             properties:
  *               wang_wang_account:
- *               type: string
+ *                 type: string
  *     responses:
  *       200:
  *         content:
  *           application/json:
  *             schema:
  *               type: object
+ *               properties:
  *                 buyerGoodNum:
  *                   type: string
  *                   example: 买家信誉
