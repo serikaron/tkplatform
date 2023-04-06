@@ -3,7 +3,7 @@ group default {
 }
 
 group push {
-  targets = ["api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "migration"]
+  targets = ["api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "migration", "apid"]
 }
 
 variable "GITHUB_SHA" {
