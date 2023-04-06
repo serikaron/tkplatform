@@ -506,6 +506,10 @@ describe("test user service", () => {
                 userId,
                 verify: rsp => {
                     simpleVerification(rsp)
+                    rsp.data.forEach(x => {
+                        expect(x.reportedAt).toBeGreaterThanOrEqual(now() - 1)
+                    })
+                    rsp.data.forEach(x => delete x.reportedAt)
                     expect(rsp.data).toStrictEqual(reports)
                 }
             })
@@ -519,6 +523,8 @@ describe("test user service", () => {
                 userId,
                 verify: rsp => {
                     simpleVerification(rsp)
+                    expect(rsp.data.reportedAt).toBeGreaterThanOrEqual(now() - 1)
+                    delete rsp.data.reportedAt
                     expect(rsp.data).toEqual(reports[0])
                 }
             })

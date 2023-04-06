@@ -4,6 +4,7 @@ import {MongoServerError, ObjectId} from 'mongodb'
 import * as dotenv from 'dotenv'
 import {UserExists} from "../common/errors/10000-user.mjs";
 import {connectUser} from "../common/mongo.mjs";
+import {now} from "../common/utils.mjs";
 
 dotenv.config()
 
@@ -160,6 +161,7 @@ export async function setupMongo(req) {
         },
         addReport: async (userId, report) => {
             report.userId = new ObjectId(userId)
+            report.reportedAt = now()
             const r = await collection.userReports
                 .insertOne(report)
             return r.insertedId
