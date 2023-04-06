@@ -140,15 +140,53 @@
  *                      withdraw:
  *                        type: object
  *                        properties:
+ *                          amount:
+ *                            type: number
+ *                            example: number 提现金额
+ *                          balance:
+ *                            type: number
+ *                            example: number 余额
+ *                          createdAt:
+ *                            type: number
  *                      downLine:
  *                        type: object
  *                        properties:
+ *                          title:
+ *                            type: string
+ *                            example: 13513626429购买vip季卡抽成
+ *                          amount:
+ *                            type: number
+ *                            example: number 返利
+ *                          balance:
+ *                            type: number
+ *                            example: number 余额
+ *                          createdAt:
+ *                            type: number
  *                      activity:
  *                        type: object
  *                        properties:
+ *                          title:
+ *                            type: string
+ *                            example: 13513626429购买vip季卡抽成
+ *                          amount:
+ *                            type: number
+ *                            example: number 返利
+ *                          balance:
+ *                            type: number
+ *                            example: number 余额
+ *                          createdAt:
  *                      rice:
  *                        type: object
  *                        properties:
+ *                          itemName:
+ *                            type: string
+ *                            example: 30天米粒
+ *                          price:
+ *                            type: number
+ *                          createdAt:
+ *                            type: number
+ *                          remainDays:
+ *                            type: number
  *
  */
 
