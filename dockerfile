@@ -18,7 +18,7 @@ ARG name
 COPY common /app/common
 COPY ${name} /app/${name}
 
-FROM golang:1.18-alpine as builder
+FROM golang:1.18-alpine as tk-go
 
 # 设置必要的环境变量
 ENV GO111MODULE=on \
@@ -31,6 +31,8 @@ RUN set -ex \
     && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
     && apk --no-cache add ca-certificates
 
+FROM tk-go as tk-go-build
+
 # 移动到工作目录：/build
 WORKDIR /data
 
@@ -40,21 +42,21 @@ COPY service .
 RUN go mod download && go mod tidy -v && go build -o apid apid.go
 
 # 运行阶段指定scratch作为基础镜像
-FROM alpine as apid
+FROM alpine as go-service
 
 WORKDIR /app
 
 # 拷贝二进制可执行文件
-COPY --from=builder /data/apid /app/apid
+COPY --from=tk-go-build /data/apid /app/apid
 
 # 下载时区包
-COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=tk-go-build /usr/share/zoneinfo /usr/share/zoneinfo
 
 # 设置当前时区
-COPY --from=builder /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+COPY --from=tk-go-build /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 
 # https ssl证书
-COPY --from=builder /data/config/config.json /app/config/config.json
+COPY --from=tk-go-build /data/config/config.json /app/config/config.json
 
 # 需要运行的命令
 ENTRYPOINT ["./apid"]

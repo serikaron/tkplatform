@@ -191,8 +191,33 @@ target "payment" {
   cache-to   = ["type=gha,mode=max,scope=payment"]
 }
 
-target "apid" {
+target "tk-go" {
+  target = "tk-go"
   cache-from = ["type=gha,scope=tk-go"]
   cache-to   = ["type=gha,mode=max,scope=tk-go"]
+  tags = [
+    "tk-go"
+  ]
+}
+
+target "tk-go-build" {
+  target = "tk-go-build"
+  contexts = {
+    tk-go = "target:tk-go"
+  }
+  cache-from = ["type=gha,scope=tk-go-build"]
+  cache-to   = ["type=gha,mode=max,scope=tk-go-build"]
+  tags = [
+    "tk-go-build"
+  ]
+}
+
+target "apid" {
+  target = "go-service"
+  contexts = {
+    tk-go-build = "target:tk-go-build"
+  }
+  cache-from = ["type=gha,scope=go-service"]
+  cache-to   = ["type=gha,mode=max,scope=go-service"]
   tags       = [tag_name("apid")]
 }
