@@ -51,7 +51,7 @@ const send = async (req, res) => {
 }
 
 export const routeClaimDownLinePrice = router => {
-    router.post('/downLine/:downLine/claim', makeMiddleware([
+    router.post('/user/downLine/:downLine/claim', makeMiddleware([
         checkDownLine,
         getConfig,
         updateClaimed,

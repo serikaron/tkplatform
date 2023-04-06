@@ -6,7 +6,7 @@
   "storage_root": "../file/",
   "storage_tmp": "../tmp/",
   "db_name": "mongo",
-  "db_source": "localhost:27017",
+  "db_source": "user_db:27017",
   "logger_level": 0,
   "mongo_user": "tkuser",
   "mongo_password": "tkuser",

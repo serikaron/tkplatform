@@ -58,7 +58,7 @@ async function genToken(req, res) {
 }
 
 export function route(router) {
-    router.post("/login", ...makeMiddleware([
+    router.post("/user/login", ...makeMiddleware([
         checkInput,
         getUser,
         checkPassword,

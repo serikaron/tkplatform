@@ -15,6 +15,10 @@ const routeInfo = [
     {url: "/v1/user/downLines", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
     {url: "/v1/user/centre", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
     {url: "/v1/user/downLine/:downLine/claim", method: "POST", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/report/types", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/report", method: "POST", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/reports", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/report/:reportId", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
 
     // site
     {
@@ -124,6 +128,13 @@ const routeInfo = [
     {url: "/v1/ledger/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+
+    {url: "/v1/store/member/items", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
+    {url: "/v1/store/rice/items", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
+    {url: "/v1/wallet", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
+    {url: "/v1/wallet/detail", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
+    {url: "/v1/wallet/overview", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
+    {url: "/v1/wallet/withdraw/records", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
 ]
 
 export default routeInfo

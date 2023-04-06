@@ -264,7 +264,7 @@
  * @swagger
  * /v1/user/overview(查询帐号总览✅):
  *   get:
- *     tags: ["user(用户相关)","个人中心","已实现"]
+ *     tags: ["user(用户相关)","个人中心"]
  *     parameters:
  *     - in: path
  *       name: id
@@ -352,7 +352,7 @@
  * @swagger
  * /v1/user/overview(更新帐号总览✅):
  *   put:
- *     tags: ["user(用户相关)","个人中心","已实现"]
+ *     tags: ["user(用户相关)","个人中心"]
  *     requestBody:
  *         content:
  *           application/json:
@@ -467,7 +467,24 @@
 
 /**
  * @swagger
- * /v1/user/report(问题反馈):
+ * /v1/user/report/types(问题反馈类型✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: string
+ *                 example: 平台问题
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/report(问题反馈✅):
  *   post:
  *     tags: ["user(用户相关)","个人中心"]
  *     requestBody:
@@ -495,23 +512,24 @@
  *               video:
  *                 type: string
  *                 example: 上传后的地址
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               parameters:
+ *                 id:
+ *                   type: string
+ *
  *
  */
 
 /**
  * @swagger
- * /v1/user/reports(反馈历史):
+ * /v1/user/reports(反馈历史-问题列表✅):
  *   get:
  *     tags: ["user(用户相关)","个人中心"]
- *     parameters:
- *     - in: path
- *       name: offset
- *       schema:
- *         type: number
- *     - in: path
- *       name: limit
- *       schema:
- *         type: number
  *     responses:
  *       200:
  *         content:
@@ -523,8 +541,66 @@
  *                 properties:
  *                   id:
  *                     type: string
- *                   其余字段:
- *                     type: 参考提交的接口
+ *                   type:
+ *                     type: string
+ *                   site:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                   detail:
+ *                     type: string
+ *                   screenshot:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                       example: 上传后的地址
+ *                   video:
+ *                     type: string
+ *                     example: 上传后的地址
+ *                   reportedAt:
+ *                     type: number
+ *                     example: timestamp
+ */
+
+/**
+ * @swagger
+ * /v1/user/report/:reportId(问题详情✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: string
+ *                 type:
+ *                   type: string
+ *                 site:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                     name:
+ *                       type: string
+ *                 detail:
+ *                   type: string
+ *                 screenshot:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                     example: 上传后的地址
+ *                 video:
+ *                   type: string
+ *                   example: 上传后的地址
+ *                 reportedAt:
+ *                    type: number
+ *                    example: timestamp
  *
  */
 

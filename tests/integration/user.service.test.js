@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import {now} from "../../common/utils.mjs";
 import {genPhone} from "../common/utils.mjs";
+import {ObjectId} from "mongodb";
 
 dotenv.config()
 
@@ -455,6 +456,76 @@ describe("test user service", () => {
                 baseURL,
                 verify: rsp => {
                     expect(rsp.status).toBe(200)
+                }
+            })
+        })
+    })
+
+    describe("test report", () => {
+        const userId = `${new ObjectId()}`
+        test("report types", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/report/types',
+                baseURL,
+                userId,
+                verify: simpleVerification
+            })
+        })
+
+        const addReport = async (report) => {
+            await runTest({
+                method: "POST",
+                path: '/v1/user/report',
+                body: report,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    report.id = rsp.data.id
+                }
+            })
+        }
+
+        const reports = []
+        test("add", async () => {
+            for (let i = 0; i < 2; ++i) {
+                const report = {
+                    msg: `report body ${i}`
+                }
+                await addReport(report)
+                reports.push(report)
+            }
+        })
+
+        test("get all", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/user/reports',
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    rsp.data.forEach(x => {
+                        expect(x.reportedAt).toBeGreaterThanOrEqual(now() - 1)
+                    })
+                    rsp.data.forEach(x => delete x.reportedAt)
+                    expect(rsp.data).toStrictEqual(reports)
+                }
+            })
+        })
+
+        test("get one", async () => {
+            await runTest({
+                method: "GET",
+                path: `/v1/user/report/${reports[0].id}`,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data.reportedAt).toBeGreaterThanOrEqual(now() - 1)
+                    delete rsp.data.reportedAt
+                    expect(rsp.data).toEqual(reports[0])
                 }
             })
         })

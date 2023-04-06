@@ -1,5 +1,5 @@
 group default {
-  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "migration"]
+  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "migration", "apid"]
 }
 
 group push {
@@ -178,4 +178,10 @@ target "payment" {
   ]
   cache-from = ["type=gha,scope=payment"]
   cache-to   = ["type=gha,mode=max,scope=payment"]
+}
+
+target "apid" {
+  cache-from = ["type=gha,scope=tk-go"]
+  cache-to   = ["type=gha,mode=max,scope=tk-go"]
+  tags       = [tag_name("apid")]
 }

@@ -230,6 +230,42 @@ test.concurrent.each([
             url: '/v1/user/downLine/fake-down-line/claim'
         }
     },
+    {
+        url: "/v1/report/types",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/report/types'
+        }
+    },
+    {
+        url: "/v1/user/report",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/report'
+        }
+    },
+    {
+        url: "/v1/user/reports",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/reports'
+        }
+    },
+    {
+        url: "/v1/user/report/report-id",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/report/report-id'
+        }
+    },
 
     // ---- user end ----
 
@@ -756,6 +792,60 @@ test.concurrent.each([
         service: {
             baseURL: "http://ledger:8080",
             url: "/v1/site/fake-site-id/recommend",
+        }
+    },
+    {
+        url: "/v1/store/member/items",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/store/member/items",
+        }
+    },
+    {
+        url: "/v1/store/rice/items",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/store/rice/items",
+        }
+    },
+    {
+        url: "/v1/wallet",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet",
+        }
+    },
+    {
+        url: "/v1/wallet/detail",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet/detail",
+        }
+    },
+    {
+        url: "/v1/wallet/overview",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet/overview",
+        }
+    },
+    {
+        url: "/v1/wallet/withdraw/records",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: "/v1/wallet/withdraw/records",
         }
     },
 ])("$url should dispatch correctly", async (argument) => {

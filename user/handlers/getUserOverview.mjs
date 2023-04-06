@@ -55,7 +55,7 @@ const response = (req, res) => {
 }
 
 export const routeGetUserOverview = router => {
-    router.get("/overview", ...makeMiddleware([
+    router.get("/user/overview", ...makeMiddleware([
         getUsingId,
         getOverview,
         getSites,

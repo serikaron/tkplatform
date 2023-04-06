@@ -89,7 +89,7 @@ async function onSuccess(req, res) {
 }
 
 export function route(router) {
-    router.post("/account", ...makeMiddleware([
+    router.post("/user/account", ...makeMiddleware([
         checkInput,
         checkUser,
         checkCode,

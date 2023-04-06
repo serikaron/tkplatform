@@ -2,7 +2,7 @@
 
 /**
  * @swagger
- * /v1/member/items(会员直充):
+ * /v1/store/member/items(会员直充✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 会员直充
@@ -37,7 +37,7 @@
 
 /**
  * @swagger
- * /v1/rice/items(米粒购买):
+ * /v1/store/rice/items(米粒购买✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 米粒购买
@@ -72,7 +72,7 @@
 
 /**
  * @swagger
- * /v1/wallet(用户钱包):
+ * /v1/wallet(用户钱包✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 用户钱包
@@ -91,7 +91,7 @@
 
 /**
  * @swagger
- * /v1/wallet/detail(资金明细):
+ * /v1/wallet/detail(资金明细✅):
  *   get:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     parameters:
@@ -125,6 +125,9 @@
  *                    properties:
  *                      id:
  *                        type: string
+ *                      type:
+ *                        type: number
+ *                        example: 1-member 2-withdraw 3-downLine 4-activity 5-rice
  *                      member:
  *                        type: object
  *                        properties:
@@ -137,12 +140,62 @@
  *                            type: number
  *                          remainDays:
  *                            type: number
+ *                      withdraw:
+ *                        type: object
+ *                        properties:
+ *                          amount:
+ *                            type: number
+ *                            example: number 提现金额
+ *                          balance:
+ *                            type: number
+ *                            example: number 余额
+ *                          createdAt:
+ *                            type: number
+ *                      downLine:
+ *                        type: object
+ *                        properties:
+ *                          title:
+ *                            type: string
+ *                            example: 13513626429购买vip季卡抽成
+ *                          amount:
+ *                            type: number
+ *                            example: number 返利
+ *                          balance:
+ *                            type: number
+ *                            example: number 余额
+ *                          createdAt:
+ *                            type: number
+ *                      activity:
+ *                        type: object
+ *                        properties:
+ *                          title:
+ *                            type: string
+ *                            example: 13513626429购买vip季卡抽成
+ *                          amount:
+ *                            type: number
+ *                            example: number 返利
+ *                          balance:
+ *                            type: number
+ *                            example: number 余额
+ *                          createdAt:
+ *                      rice:
+ *                        type: object
+ *                        properties:
+ *                          itemName:
+ *                            type: string
+ *                            example: 30天米粒
+ *                          price:
+ *                            type: number
+ *                          createdAt:
+ *                            type: number
+ *                          remainDays:
+ *                            type: number
  *
  */
 
 /**
  * @swagger
- * /v1/wallet/overview(资金总览):
+ * /v1/wallet/overview(资金总览✅):
  *   get:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     responses:
@@ -164,7 +217,7 @@
 
 /**
  * @swagger
- * /v1/wallet/withdraw/records(提现管理):
+ * /v1/wallet/withdraw/records(提现管理✅):
  *   get:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     parameters:

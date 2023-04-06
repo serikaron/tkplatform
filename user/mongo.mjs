@@ -4,6 +4,7 @@ import {MongoServerError, ObjectId} from 'mongodb'
 import * as dotenv from 'dotenv'
 import {UserExists} from "../common/errors/10000-user.mjs";
 import {connectUser} from "../common/mongo.mjs";
+import {now} from "../common/utils.mjs";
 
 dotenv.config()
 
@@ -15,7 +16,8 @@ export async function setupMongo(req) {
     const user = await connectUser()
     const collection = {
         users: user.db.collection("users"),
-        backendUsers: user.db.collection("backendUsers")
+        backendUsers: user.db.collection("backendUsers"),
+        userReports: user.db.collection('userReports'),
     }
     req.context.mongo = {
         client: user.client, db: user.db, collection,
@@ -156,6 +158,25 @@ export async function setupMongo(req) {
                     {_id: new ObjectId(upLine), "downLines.id": new ObjectId(downLine)},
                     {$set: {"downLines.$.claimed": true}}
                 )
+        },
+        addReport: async (userId, report) => {
+            report.userId = new ObjectId(userId)
+            report.reportedAt = now()
+            const r = await collection.userReports
+                .insertOne(report)
+            return r.insertedId
+        },
+        getReports: async (userId) => {
+            return await collection.userReports
+                .find({userId: new ObjectId(userId)})
+                .toArray()
+        },
+        getReport: async (reportId, userId) => {
+            return await collection.userReports
+                .findOne({
+                    _id: new ObjectId(reportId),
+                    userId: new ObjectId(userId)
+                })
         }
     }
 }

@@ -15,12 +15,16 @@ import {routeBackendLogin} from "./handlers/backendLogin.mjs";
 import {routeBackendRegister} from "./handlers/backendRegister.mjs";
 import {routeClaimDownLinePrice} from "./handlers/claimDownLinePrice.mjs";
 import {routeBackendGetUser} from "./handlers/backendGetUser.mjs";
+import {routeGetReportTypes} from "./handlers/getReportTypes.mjs";
+import {routePostReport} from "./handlers/postReport.mjs";
+import {routeGetReports} from "./handlers/getReports.mjs";
+import {routeGetReport} from "./handlers/getReport.mjs";
 
 export function setup(app, {
     setup, teardown
 } = {}) {
     const router = express.Router()
-    app.use('/v1/user', router)
+    app.use('/v1', router)
     setup(router)
     routeRegister(router)
     routeLogin(router)
@@ -33,13 +37,14 @@ export function setup(app, {
     routePutUserDownLine(router)
     routeGetUserCentre(router)
     routeClaimDownLinePrice(router)
-    teardown(router)
+    routeGetReportTypes(router)
+    routePostReport(router)
+    routeGetReports(router)
+    routeGetReport(router)
 
-    const backendRouter = express.Router()
-    app.use('/v1/backend', backendRouter)
-    setup(backendRouter)
-    routeBackendLogin(backendRouter)
-    routeBackendRegister(backendRouter)
-    routeBackendGetUser(backendRouter)
-    teardown(backendRouter)
+    routeBackendLogin(router)
+    routeBackendRegister(router)
+    routeBackendGetUser(router)
+
+    teardown(router)
 }
