@@ -65,7 +65,7 @@ services:
     depends_on:
       - user_db
     ports:
-      - "9010:8080"
+      - "9010:9010"
 
   token:
     image: car.daoyi365.com:5000/tk-token

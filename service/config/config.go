@@ -19,7 +19,7 @@ type config struct {
 	EnableHttpLog bool   `json:"enable_http_log"`
 	BindPort      uint16 `json:"bind_port"`
 	BindAddr      string `json:"bind_addr"`
-	MongoUser     string `json:"mongo_addr"`
+	MongoUser     string `json:"mongo_user"`
 	MongoPassword string `json:"mongo_password"`
 }
 
