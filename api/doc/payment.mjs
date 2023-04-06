@@ -125,6 +125,9 @@
  *                    properties:
  *                      id:
  *                        type: string
+ *                      type:
+ *                        type: number
+ *                        example: 1-member 2-withdraw 3-downLine 4-activity 5-rice
  *                      member:
  *                        type: object
  *                        properties:

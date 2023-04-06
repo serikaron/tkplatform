@@ -560,6 +560,9 @@
  *                   video:
  *                     type: string
  *                     example: 上传后的地址
+ *                   reportedAt:
+ *                     type: number
+ *                     example: timestamp
  */
 
 /**
@@ -595,6 +598,9 @@
  *                 video:
  *                   type: string
  *                   example: 上传后的地址
+ *                 reportedAt:
+ *                    type: number
+ *                    example: timestamp
  *
  */
 
