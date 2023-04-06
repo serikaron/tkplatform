@@ -61,7 +61,7 @@ services:
   apid:
     image: car.daoyi365.com:5000/tk-apid
     restart: always
-    entrypoint: ./apid config/config.json
+    entrypoint: ./apid
     depends_on:
       - user_db
     ports:
