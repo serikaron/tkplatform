@@ -2,7 +2,7 @@
 
 /**
  * @swagger
- * /v1/member/items(会员直充✅):
+ * /v1/store/member/items(会员直充✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 会员直充
@@ -37,7 +37,7 @@
 
 /**
  * @swagger
- * /v1/rice/items(米粒购买✅):
+ * /v1/store/rice/items(米粒购买✅):
  *   get:
  *     tags: ["payment(支付/商城)"]
  *     description: 米粒购买
@@ -137,6 +137,18 @@
  *                            type: number
  *                          remainDays:
  *                            type: number
+ *                      withdraw:
+ *                        type: object
+ *                        properties:
+ *                      downLine:
+ *                        type: object
+ *                        properties:
+ *                      activity:
+ *                        type: object
+ *                        properties:
+ *                      rice:
+ *                        type: object
+ *                        properties:
  *
  */
 
