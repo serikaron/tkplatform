@@ -6,6 +6,7 @@ services:
     restart: always
     volumes:
       - ./nginx/proxy.conf:/etc/nginx/nginx.conf
+      - ./ignore/res:/res
     ports:
       - "9000:9000"
 
