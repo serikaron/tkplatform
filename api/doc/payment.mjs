@@ -131,9 +131,9 @@
  *                      member:
  *                        type: object
  *                        properties:
- *                          itemName:
+ *                          title:
  *                            type: string
- *                            example: vip月卡
+ *                            example: 购买《vip月卡》
  *                          price:
  *                            type: number
  *                          createdAt:
@@ -143,6 +143,8 @@
  *                      withdraw:
  *                        type: object
  *                        properties:
+ *                          title:
+ *                            type: string
  *                          amount:
  *                            type: number
  *                            example: number 提现金额
@@ -170,7 +172,6 @@
  *                        properties:
  *                          title:
  *                            type: string
- *                            example: 13513626429购买vip季卡抽成
  *                          amount:
  *                            type: number
  *                            example: number 返利
@@ -181,9 +182,9 @@
  *                      rice:
  *                        type: object
  *                        properties:
- *                          itemName:
+ *                          title:
  *                            type: string
- *                            example: 30天米粒
+ *                            example: 购买《30天米粒》
  *                          price:
  *                            type: number
  *                          createdAt:

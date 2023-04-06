@@ -848,6 +848,16 @@ test.concurrent.each([
             url: "/v1/wallet/withdraw/records",
         }
     },
+
+    {
+        url: "/v1/search/external/account",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: "/v1/api/check",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
