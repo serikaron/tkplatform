@@ -137,6 +137,7 @@ const routeInfo = [
     {url: "/v1/wallet/withdraw/records", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080"}},
 
     {url: "/v1/search/external/account", method: "POST", needAuth: true, service: {baseURL: "http://apid:9010", url: '/v1/api/check'}},
+    {url: "/v1/file", method: "POST", needAuth: true, service: {baseURL: "http://file:8080", url: '/v1/file'}},
 ]
 
 export default routeInfo

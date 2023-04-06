@@ -858,6 +858,15 @@ test.concurrent.each([
             url: "/v1/api/check",
         }
     },
+    {
+        url: "/v1/file",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://file:8080",
+            url: "/v1/file",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
