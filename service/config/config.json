@@ -1,0 +1,17 @@
+{
+  "production_env": false,
+  "web_root": "../",
+  "bind_port": 9010,
+  "bind_addr": "http://localhost:9010",
+  "storage_root": "../file/",
+  "storage_tmp": "../tmp/",
+  "db_name": "mongo",
+  "db_source": "localhost:27017",
+  "logger_level": 0,
+  "mongo_user": "tkuser",
+  "mongo_password": "tkuser",
+  "enable_orm_log": true,
+  "enable_http_log": true
+}
+
+
