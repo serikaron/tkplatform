@@ -24,6 +24,11 @@ export async function setupMongo(req) {
             return await collection.settings
                 .updateOne({key}, {$set: {value}})
         },
+        getAll: async () => {
+            return await collection.settings
+                .find()
+                .toArray()
+        }
     }
 }
 

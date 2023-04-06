@@ -522,4 +522,193 @@ describe("test site service", () => {
             })
         })
     })
+
+    describe("test sync settings", () => {
+        const box = new Box()
+        const userId = `${new ObjectId()}`
+
+        it("prepare", async () => {
+            await getSites(userId, box)
+            box.data.userSite1 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite1)
+            box.data.userSite2 = box.getEmptyUserSite()
+            await addUserSite(box.data.sites[0].id, userId, box.data.userSite2)
+
+            await setUserSite(box.data.userSite1, userId, {
+                setting: {
+                    interval: {
+                        min: 999,
+                        max: 1999,
+                    },
+                    schedule: [
+                        {from: "30:00", to: "40:00", activated: false},
+                        {from: "20:00", to: "50:00", activated: true}
+                    ]
+                }
+            })
+        })
+
+        it("sync", async () => {
+            await runTest({
+                method: "PUT",
+                path: `/v1/user/site/${box.data.userSite1.id}/setting/sync`,
+                body: {interval: {sync: 1}, schedule: [{sync: 1}, {sync: 2}]},
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        it("check", async () => {
+            box.data.userSite2.setting = {
+                interval: {min: 999, max: 1999},
+                schedule: [
+                    {from: "30:00", to: "40:00", activated: false},
+                    {from: "20:00", to: "50:00", activated: false}
+                ]
+            }
+            await checkUserSites(userId, [box.data.userSite1, box.data.userSite2])
+        })
+    })
+
+    test("test add report", async () => {
+        await runTest({
+            method: "POST",
+            path: `/v1/user/site/${new ObjectId()}/report`,
+            body: {problem: "i have sth to say"},
+            baseURL,
+            userId: `${new ObjectId()}`,
+            verify: rsp => {
+                expect(rsp.status).toBe(200)
+            }
+        })
+
+        await runTest({
+            method: "GET",
+            path: '/v1/site/problem/templates',
+            baseURL,
+            userId: `${new ObjectId()}`,
+            verify: simpleVerification
+        })
+    })
+
+    describe("test missing site", () => {
+        const userId = `${new ObjectId()}`
+        test("add", async () => {
+            await runTest({
+                method: "POST",
+                path: '/v1/missing/site',
+                body: {name: "missing site name"},
+                baseURL,
+                userId,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                }
+            })
+        })
+
+        test("get", async () => {
+            await runTest({
+                method: "GET",
+                path: '/v1/missing/sites',
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    expect(rsp.data).toStrictEqual({
+                        total: 1,
+                        list: [
+                            {
+                                name: "missing site name",
+                                status: 0,
+                                comment: "",
+                                thumb: false
+                            }
+                        ]
+                    })
+                }
+            })
+        })
+    })
+
+})
+
+describe("backend", () => {
+    describe("test add site", () => {
+        const box = new Box()
+        const userId = new ObjectId().toString()
+
+        it("exists sites", async () => {
+            await getSites(userId, box)
+            box.data.existsCount = box.data.sites.length
+        })
+
+        it('add', async () => {
+            box.data.newSite = {
+                name: `name-${now()}`,
+                url: `url-${now()}`
+            }
+            await runTest({
+                method: "POST",
+                path: "/v1/site",
+                body: box.data.newSite,
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    box.data.newSite.id = rsp.data.id
+                }
+            })
+        })
+
+        it("check", async () => {
+            await getSites(userId, box)
+            expect(box.data.sites.length).toBe(box.data.existsCount + 1)
+            expect(box.data.sites[box.data.sites.length - 1]).toEqual(box.data.newSite)
+        })
+
+        it('update', async () => {
+            await runTest({
+                method: "PUT",
+                path: `/v1/site/${box.data.newSite.id}`,
+                body: {disabled: true},
+                baseURL,
+                verify: rsp => {
+                    expect(rsp.status).toBe(200)
+                    box.data.newSite.disabled = true
+                }
+            })
+            await runTest({
+                method: "GET",
+                path: '/v1/backend/sites',
+                baseURL,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    const site = rsp.data.filter(x => x.id === box.data.newSite.id)[0]
+                    expect(site.disabled).toBe(true)
+                    box.data.backendSites = rsp.data
+                }
+            })
+            await getSites(userId, box)
+            const sortSite = (a, b) => {
+                if (a.id > b.id) {
+                    return 1
+                }
+                if (a.id < b.id) {
+                    return -1
+                }
+                return 0
+            }
+            expect(
+                box.data.sites.sort(sortSite)
+            ).toStrictEqual(
+                box.data.backendSites
+                    .filter(x => !x.hasOwnProperty("disabled") || !x.disabled)
+                    .sort(sortSite)
+            )
+        })
+
+    })
 })

@@ -14,6 +14,7 @@ const routeInfo = [
     {url: "/v1/user/downLine/:downLineUserId", method: "PUT", needAuth: true, service: {baseURL: "http://user:8080"}},
     {url: "/v1/user/downLines", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
     {url: "/v1/user/centre", method: "GET", needAuth: true, service: {baseURL: "http://user:8080"}},
+    {url: "/v1/user/downLine/:downLine/claim", method: "POST", needAuth: true, service: {baseURL: "http://user:8080"}},
 
     // site
     {
@@ -33,10 +34,14 @@ const routeInfo = [
     {url: "/v1/user/site/:userSiteId/balance", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/journal/entries", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/user/site/:userSiteId/journal/entry", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
-    {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/sites/statistics", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/site/:userSiteId/logs", method: "GET", needAuth: true, service: {baseURL: "http://site:8080"}},
     {url: "/v1/site/:userSiteId/logs", method: "POST", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: "/v1/user/site/:userSiteId/setting/sync", method: "PUT", needAuth: true, service: {baseURL: "http://site:8080"}},
+    {url: '/v1/user/site/:userSiteId/report', method: "POST", needAuth: true, service: {baseURL: 'http://site:8080'}},
+    {url: '/v1/site/problem/templates', method: "GET", needAuth: true, service: {baseURL: 'http://site:8080'}},
+    {url: '/v1/missing/sites', method: "GET", needAuth: true, service: {baseURL: 'http://site:8080'}},
+    {url: '/v1/missing/site', method: "POST", needAuth: true, service: {baseURL: 'http://site:8080'}},
     // site end
 
     // ledger
@@ -118,6 +123,7 @@ const routeInfo = [
     {url: "/v1/ledger/analyse/overview/:minDate/:maxDate", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/ledger/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/journal/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
+    {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 ]
 
 export default routeInfo

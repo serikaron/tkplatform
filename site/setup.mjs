@@ -12,10 +12,16 @@ import {routePostUserSiteJournalEntry} from "./handlers/postUserSiteJournalEntry
 import {routeGetUserSiteJournalEntries} from "./handlers/getUserSiteJournalEntries.mjs";
 import {routeCountUserSites} from "./handlers/countUserSites.mjs";
 import {routeDelUserSite} from "./handlers/delUserSite.mjs";
-import {routeGetRecommend} from "./handlers/getRecommend.mjs";
 import {routeGetSitesStatistics} from "./handlers/getSitesStatistics.mjs";
 import {routeGetSiteLogs} from "./handlers/getSiteLogs.mjs";
 import {routePostSiteLogs} from "./handlers/postSiteLogs.mjs";
+import {routeSyncSettings} from "./handlers/syncSettings.mjs";
+import {routeAddReport} from "./handlers/addReport.mjs";
+import {routeGetProblemTemplates} from "./handlers/getProblemTemplates.mjs";
+import {routeAddMissing} from "./handlers/addMissing.mjs";
+import {routeGetMissing} from "./handlers/getMissing.mjs";
+import {routeAddSite} from "./handlers/addSite.mjs";
+import {routePutSite} from "./handlers/putSite.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -34,10 +40,16 @@ export function setup(app, {setup, teardown}) {
     routeGetUserSiteJournalEntries(router)
     routeCountUserSites(router)
     routeDelUserSite(router)
-    routeGetRecommend(router)
     routeGetSitesStatistics(router)
     routeGetSiteLogs(router)
     routePostSiteLogs(router)
+    routeSyncSettings(router)
+    routeAddReport(router)
+    routeGetProblemTemplates(router)
+    routeAddMissing(router)
+    routeGetMissing(router)
+    routeAddSite(router)
+    routePutSite(router)
 
     teardown(router)
 }

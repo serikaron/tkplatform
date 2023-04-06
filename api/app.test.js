@@ -222,6 +222,18 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/user/downLine/fake-down-line/claim",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/user/downLine/fake-down-line/claim'
+        }
+    },
+
+    // ---- user end ----
+
+    {
         url: "/v1/sites",
         method: "GET",
         needAuth: true,
@@ -321,15 +333,6 @@ test.concurrent.each([
         }
     },
     {
-        url: "/v1/site/fake-site-id/recommend",
-        method: "GET",
-        needAuth: true,
-        service: {
-            baseURL: "http://site:8080",
-            url: "/v1/site/fake-site-id/recommend",
-        }
-    },
-    {
         url: "/v1/sites/statistics",
         method: "GET",
         needAuth: true,
@@ -354,6 +357,51 @@ test.concurrent.each([
         service: {
             baseURL: "http://site:8080",
             url: "/v1/site/fake-site-id/logs",
+        }
+    },
+    {
+        url: '/v1/user/site/fake-site-id/setting/sync',
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: '/v1/user/site/fake-site-id/setting/sync',
+        }
+    },
+    {
+        url: '/v1/user/site/fake-site-id/report',
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/user/site/fake-site-id/report'
+        }
+    },
+    {
+        url: '/v1/site/problem/templates',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/site/problem/templates',
+        }
+    },
+    {
+        url: '/v1/missing/sites',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/missing/sites'
+        }
+    },
+    {
+        url: '/v1/missing/site',
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: 'http://site:8080',
+            url: '/v1/missing/site'
         }
     },
 
@@ -699,6 +747,15 @@ test.concurrent.each([
         service: {
             baseURL: "http://ledger:8080",
             url: "/v1/journal/entry/fake-entry-id",
+        }
+    },
+    {
+        url: "/v1/site/fake-site-id/recommend",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://ledger:8080",
+            url: "/v1/site/fake-site-id/recommend",
         }
     },
 ])("$url should dispatch correctly", async (argument) => {

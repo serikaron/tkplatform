@@ -6,8 +6,8 @@ import {dateRange} from "../../common/utils.mjs";
 export const routeGetSiteRecords = router => {
     router.get("/site/records/:minDate/:maxDate", async (req, res, next) => {
         const r = dateRange(req.params.minDate, req.params.maxDate)
-        const records = await req.context.mongo.getSiteRecords(req.headers.id, req.query.siteId, r.minDate, r.maxDate);
-        const count = await req.context.mongo.countSiteRecords(req.headers.id, req.query.siteId, r.minDate, r.maxDate)
+        const records = await req.context.mongo.getSiteRecords(req.headers.id, req.query.userSiteId, req.query.siteId, r.minDate, r.maxDate);
+        const count = await req.context.mongo.countSiteRecords(req.headers.id, req.query.userSiteId, req.query.siteId, r.minDate, r.maxDate)
         res.tkResponse(TKResponse.Success({
             data: {
                 total: count,

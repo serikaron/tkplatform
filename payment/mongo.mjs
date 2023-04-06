@@ -26,9 +26,17 @@ export async function setupMongo(req) {
             return await collection.riceItems.find().toArray()
         },
         getWallet: async (userId) => {
-            return await getWallet(collection, userId)
+            return await collection.wallets.findOne({userId: new ObjectId(userId)})
         },
-        payWithRices: async (userId, price) => {
+        // payWithRices: async (userId, price) => {
+        // },
+        updateWallet: async (userId, update) => {
+            await collection.wallets
+                .updateOne(
+                    {userId: new ObjectId(userId)},
+                    {$inc: update},
+                    {upsert: true}
+                )
         }
     }
 }
@@ -37,14 +45,7 @@ export async function cleanMongo(req) {
     await req.context.mongo.client.close()
 }
 
-async function getWallet(collection, userId) {
-    const wallet = await collection.wallets.findOne({userId: new ObjectId(userId)})
-    return wallet !== null ? wallet : {
-        rice: 0
-    }
-}
-
-async function payWithRices(client, collection, userId, price) {
+// async function payWithRices(client, collection, userId, price) {
     // const session = client.startSession()
     // session.startTransaction()
     // try {
@@ -61,4 +62,4 @@ async function payWithRices(client, collection, userId, price) {
     // } finally {
     //     await session.endSession()
     // }
-}
+// }

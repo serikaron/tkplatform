@@ -10,6 +10,7 @@ import {dispatch} from "./dispatcher.mjs";
 import {checkToken} from "./middleware.mjs";
 
 export function setup(app, {setup, teardown}) {
+    route(app)
     setupDoc(app)
 
     setup(app)
@@ -38,6 +39,12 @@ function setupDoc(app) {
 
     const swaggerSpec = swaggerJsdoc(jsdocOpt)
     app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec))
+}
+
+function route(app) {
+    app.get('/alive-test', (req, res) => {
+        res.json({msg: "OK"})
+    })
 }
 
 function useDispatcher(router) {

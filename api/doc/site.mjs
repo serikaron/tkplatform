@@ -58,6 +58,11 @@
  *                         type: boolean
  *                       added:
  *                         type: boolean
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
+ *
  *
  */
 
@@ -91,6 +96,10 @@
  *                       alias:
  *                         type: string
  *                         example: 备注名
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  *                   credential:
  *                     type: object
  *                     properties:
@@ -173,6 +182,10 @@
  *                       alias:
  *                         type: string
  *                         example: 备注名
+ *                       url:
+ *                         type: string
+ *                       downloadURL:
+ *                         type: string
  *                   credential:
  *                     type: object
  *                     properties:
@@ -386,35 +399,14 @@
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId(删除站点):
+ * /v1/user/site/:userSiteId(删除站点✅):
  *   delete:
  *     tags: ["site(站点)"]
  */
 
 /**
  * @swagger
- * /v1/user/site/:userSiteId/recommend/times(时段推荐):
- *   get:
- *     tags: ["site(站点)"]
- *     description: 时段推荐
- *     requestBody:
- *       content:
- *         application/json:
- *           schema:
- *                 type: array
- *                 items:
- *                   type: object
- *                   properties:
- *                     hour:
- *                       type: Number
- *                     rate:
- *                       type: Number
- *                       example: 0.5
- */
-
-/**
- * @swagger
- * /v1/user/site/:userSiteId/setting/sync(同步设置):
+ * /v1/user/site/:userSiteId/setting/sync(同步设置✅):
  *   put:
  *     tags: ["site(站点)"]
  *     description: 同步设置
@@ -442,7 +434,7 @@
 
 /**
  * @swagger
- * /v1/user/site/:useSiteId/report(情况上报):
+ * /v1/user/site/:useSiteId/report(情况上报✅):
  *   post:
  *     tags: ["site(站点)"]
  *     description: 同步设置
@@ -460,7 +452,7 @@
 
 /**
  * @swagger
- * /v1/site/problem/templates(问题上报模板):
+ * /v1/site/problem/templates(问题上报模板✅):
  *   get:
  *     tags: ["site(站点)"]
  *     description: 问题上报模板
@@ -476,7 +468,7 @@
 
 /**
  * @swagger
- * /v1/missing/site(缺失上报):
+ * /v1/missing/site(缺失上报✅):
  *   post:
  *     tags: ["site(站点)"]
  *     description: 查询站点
@@ -531,7 +523,7 @@
 
 /**
  * @swagger
- * /v1/missing/sites(缺失上报-待添加):
+ * /v1/missing/sites(缺失上报-待添加✅):
  *   get:
  *     tags: ["site(站点)"]
  *     parameters:
@@ -582,6 +574,10 @@
  *       name: userSiteId
  *       schema:
  *         type: string
+ *     - in: path
+ *       name: siteId
+ *       schema:
+ *         type: string
  *     responses:
  *       200:
  *         description: 返回列表
@@ -611,6 +607,16 @@
  *                         example: 佣金
  *                       kept:
  *                         type: boolean
+ *                       empty:
+ *                         type: boolean
+ *                       userSiteId:
+ *                         type: string
+ *                       siteId:
+ *                         type: string
+ *                       siteName:
+ *                         type: string
+ *                       account:
+ *                         type: string
  *
  */
 
@@ -659,6 +665,9 @@
  *                       kept:
  *                         type: number
  *                         example: 1-记帐
+ *                       empty:
+ *                         type: boolean
+ *                         example: 是否为空单
  *
  */
 
@@ -755,7 +764,7 @@
  *                 properties:
  *                   loggedAt:
  *                     type: number
- *                     example: timestamp
+ *                     example: Number timestamp
  *                   content:
  *                     type: string
  */
@@ -776,7 +785,7 @@
  *                 properties:
  *                   loggedAt:
  *                     type: number
- *                     example: timestamp
+ *                     example: Number timestamp
  *                   content:
  *                     type: string
  *

@@ -14,8 +14,8 @@ const runTest = async (
     {
         body,
         tkResponse,
-        keepRecord,
-        userId, siteId, recordId
+        updateRecord,
+        userId, userSiteId, recordId
     }
 ) => {
     const app = createApp()
@@ -24,7 +24,7 @@ const runTest = async (
             (req, res, next) => {
                 req.context = {
                     mongo: {
-                        keepRecord
+                        updateRecord
                     }
                 }
                 next()
@@ -33,9 +33,9 @@ const runTest = async (
         teardown: testDIContainer.teardown([])
     })
 
-    console.log(`/v1/site/${siteId}/record/${recordId}`)
+    console.log(`/v1/site/${userSiteId}/record/${recordId}`)
     const response = await supertest(app)
-        .put(`/v1/site/${siteId}/record/${recordId}`)
+        .put(`/v1/site/${userSiteId}/record/${recordId}`)
         .send(body)
         .set({id: `${userId}`})
     simpleCheckTKResponse(response, tkResponse)
@@ -44,7 +44,7 @@ const runTest = async (
 describe.each([
     {body: {}},
     {body: {notSupportedKey: 1}}
-])("($#) body", ({body}) => {
+])("($#) invalid body", ({body}) => {
     test("should be checked", async () => {
         await runTest({
             body,
@@ -53,16 +53,22 @@ describe.each([
     })
 })
 
-test("keep record", async () => {
-    const keepRecord = jest.fn()
-    const siteId = new ObjectId()
-    const recordId = new ObjectId()
-    const userId = new ObjectId()
-    await runTest({
-        body: {kept: 1},
-        tkResponse: TKResponse.Success(),
-        keepRecord,
-        siteId, recordId, userId
+describe.each([
+    {body: {kept: 1}, update: {kept: true}},
+    {body: {empty: true}, update: {empty: true}},
+])
+("($#) body", ({body, update}) => {
+    test("update record", async () => {
+        const updateRecord = jest.fn()
+        const userSiteId = new ObjectId()
+        const recordId = new ObjectId()
+        const userId = new ObjectId()
+        await runTest({
+            body,
+            tkResponse: TKResponse.Success(),
+            updateRecord,
+            userSiteId, recordId, userId
+        })
+        expect(updateRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`, update)
     })
-    expect(keepRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${siteId}`)
 })

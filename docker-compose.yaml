@@ -1,15 +1,36 @@
 version: '3.8'
 
 services:
+  proxy:
+    image: nginx:latest
+    restart: always
+    volumes:
+      - ./nginx/proxy.conf:/etc/nginx/nginx.conf
+    ports:
+      - "9000:9000"
+
   api:
     image: car.daoyi365.com:5000/tk-api
     restart: always
     entrypoint: node /app/api/app.mjs
-#    depends_on:
-#      - user
-#      - token
+    depends_on:
+      - user
+      - site
+      - ledger
+      - system
     ports:
-      - "9000:8080"
+      - "19000:8080"
+    volumes:
+      - .env:/app/.env
+
+  backend:
+    image: car.daoyi365.com:5000/tk-backend
+    restart: always
+    entrypoint: node /app/backend/app.mjs
+    depends_on:
+      - user
+    ports:
+      - "19001:8080"
     volumes:
       - .env:/app/.env
 
@@ -19,6 +40,9 @@ services:
     entrypoint: node /app/user/app.mjs
     depends_on:
       - user_db
+      - token
+      - captcha
+      - sms
     ports:
       - "9001:8080"
     volumes:

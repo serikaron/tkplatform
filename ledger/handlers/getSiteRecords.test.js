@@ -14,11 +14,13 @@ import dotenv from "dotenv";
 dotenv.config()
 
 describe.each([
+    // filter with userSite
+    {userSiteId: `${new ObjectId()}`},
     // filter with site
     {siteId: `${new ObjectId()}`},
     // all
     {}
-])("with siteId: $siteId", ({siteId}) => {
+])("scenario ($#)", ({userSiteId, siteId}) => {
     test("get site record from db", async () => {
         const minDate = now() - 86400
         const maxDate = now()
@@ -49,7 +51,7 @@ describe.each([
 
         const response = await supertest(app)
             .get(`/v1/site/records/${minDate}/${maxDate}`)
-            .query({siteId})
+            .query({userSiteId, siteId})
             .set({id: "a fake user id"})
         simpleCheckTKResponse(response, TKResponse.Success({
             data: {
@@ -61,7 +63,7 @@ describe.each([
                 }]
             }
         }))
-        expect(getSiteRecords).toHaveBeenCalledWith("a fake user id", siteId, minDate, maxDate)
-        expect(countSiteRecords).toHaveBeenCalledWith("a fake user id", siteId, minDate, maxDate)
+        expect(getSiteRecords).toHaveBeenCalledWith("a fake user id", userSiteId, siteId, minDate, maxDate)
+        expect(countSiteRecords).toHaveBeenCalledWith("a fake user id", userSiteId, siteId, minDate, maxDate)
     })
 })

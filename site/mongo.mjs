@@ -18,11 +18,17 @@ export async function setupMongo(req) {
         userSites: site.db.collection("userSites"),
         withdrawJournalEntries: site.db.collection("withdrawJournalEntries"),
         siteLogs: site.db.collection('siteLogs'),
+        reports: site.db.collection('reports'),
+        missingSites: site.db.collection("missingSites"),
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
-        getSites: async () => {
-            return await collection.sites.find().toArray()
+        getSites: async (option) => {
+            const filter = {}
+            if (option.hasOwnProperty("usingDisable") && option.usingDisable === 1) {
+                filter.disabled = {$ne: true}
+            }
+            return await collection.sites.find(filter).toArray()
         },
         getSite: async objectId => {
             return await collection.sites.findOne({_id: objectId})
@@ -162,6 +168,48 @@ export async function setupMongo(req) {
                 )
                 .sort({loggedAt: 1})
                 .toArray()
+        },
+        syncSettings: async (userId, siteId, update) => {
+            await collection.userSites
+                .updateMany({
+                    userId: new ObjectId(userId),
+                    "site.id": siteId,
+                    deleted: {$ne: true}
+                },{
+                    $set: update
+                })
+        },
+        addReport: async (userId, userSiteId, report) => {
+            await collection.reports
+                .insertOne({
+                    userId: new ObjectId(userId),
+                    userSiteId: new ObjectId(userSiteId),
+                    report,
+                })
+        },
+        addMissing: async (userId, missing) => {
+            missing.userId = new ObjectId(userId)
+            await collection.missingSites
+                .insertOne(missing)
+        },
+        getMissing: async (userId) => {
+            return await collection.missingSites
+                .find({
+                    userId: new ObjectId(userId)
+                })
+                .toArray()
+        },
+        addSite: async (site) => {
+            const r = await collection.sites
+                .insertOne(site)
+            return r.insertedId
+        },
+        updateSite: async (siteId, update) => {
+            await collection.sites
+                .updateOne(
+                    {_id: new ObjectId(siteId)},
+                    {$set: update}
+                )
         }
     }
 }

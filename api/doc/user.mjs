@@ -436,6 +436,9 @@
  *                         type: string
  *                       alias:
  *                         type: string
+ *                       claimed:
+ *                         type: boolean
+ *                         example: 已获得
  *
  */
 
@@ -452,6 +455,14 @@
  *             properties:
  *               alias:
  *                 type: string
+ */
+
+/**
+ * @swagger
+ * /v1/user/downLine/:downLineUserId/claim(获取拉新值✅):
+ *   post:
+ *     tags: ["user(用户相关)"]
+ *
  */
 
 /**
@@ -583,7 +594,12 @@
  *                   properties:
  *                     cash:
  *                       type: number
+ *                       example: 现金
  *                     rice:
  *                       type: number
+ *                       example: 米粒
+ *                     invitePoint:
+ *                       type: number
+ *                       example: 拉新值
  *
  */

@@ -27,13 +27,13 @@ test("call db correctly", async () => {
         teardown: testDIContainer.teardown([])
     })
 
-    const siteId = new ObjectId()
+    const userSiteId = new ObjectId()
     const userId = new ObjectId()
     const recordId = new ObjectId()
     const response = await supertest(app)
-        .del(`/v1/site/${siteId}/record/${recordId}`)
+        .del(`/v1/site/${userSiteId}/record/${recordId}`)
         .set({id: `${userId}`})
 
     simpleCheckTKResponse(response, TKResponse.Success())
-    expect(delSiteRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${siteId}`)
+    expect(delSiteRecord).toHaveBeenCalledWith(`${recordId}`, `${userId}`, `${userSiteId}`)
 })

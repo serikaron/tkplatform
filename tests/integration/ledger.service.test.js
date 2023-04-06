@@ -2,10 +2,11 @@
 
 import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
-import {dateToTimestamp, mergeObjects, now, today} from "../../common/utils.mjs";
+import {copy, dateToTimestamp, mergeObjects, now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
 
 const baseURL = "http://localhost:9007"
+const siteBaseURL = "http://localhost:9006"
 
 const newEntry = () => {
     return {
@@ -21,6 +22,38 @@ const entryFromDate = (date) => {
     return out
 }
 
+const getEmptyUserSite = (site) => {
+    return {
+        site: copy(site),
+        "credential": {
+            "account": "",
+            "password": ""
+        },
+        "verified": false,
+        "account": {
+            "list": []
+        },
+        "setting": {
+            "interval": {
+                "min": 200,
+                "max": 300,
+            },
+            "schedule": [
+                {
+                    "from": "",
+                    "to": "",
+                    activated: false
+                },
+                {
+                    "from": "",
+                    "to": "",
+                    activated: false
+                },
+            ]
+        }
+    }
+}
+
 class Box {
     constructor() {
         this._data = {}
@@ -29,6 +62,38 @@ class Box {
     get data() {
         return this._data
     }
+}
+
+const addUserSite = async (siteId, userId, userSite) => {
+    await runTest({
+        method: "POST",
+        path: "/v1/user/site",
+        body: {siteId},
+        baseURL: siteBaseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(response.data.id).not.toBeUndefined()
+            userSite.id = response.data.id
+            expect(response.data).toStrictEqual(userSite)
+        }
+    })
+}
+
+const getSites = async (userId, box) => {
+    await runTest({
+        method: "GET",
+        path: "/v1/sites",
+        baseURL: siteBaseURL,
+        userId,
+        verify: response => {
+            simpleVerification(response)
+            expect(Array.isArray(response.data)).toBe(true)
+            expect(response.data.length).toBeGreaterThan(0)
+            box.data.site = response.data[0]
+            box.data.sites = response.data
+        }
+    })
 }
 
 const addEntry = async (key, entry, userId) => {
@@ -395,10 +460,18 @@ describe.each([
 
 describe("test site record", () => {
     const box = new Box()
-    box.data.siteId1 = `${new ObjectId()}`
     box.data.userId1 = `${new ObjectId()}`
-    box.data.siteId2 = `${new ObjectId()}`
     box.data.userId2 = `${new ObjectId()}`
+
+    test("prepare site", async () => {
+        await getSites(box.data.userId1, box)
+        box.data.site1 = getEmptyUserSite(box.data.sites[0])
+        await addUserSite(box.data.sites[0].id, box.data.userId1, box.data.site1)
+        box.data.siteId1 = box.data.site1.id
+        box.data.site2 = getEmptyUserSite(box.data.sites[0])
+        await addUserSite(box.data.sites[0].id, box.data.userId1, box.data.site2)
+        box.data.siteId2 = box.data.site2.id
+    })
 
     test("add site record", async () => {
         await runTest({
@@ -413,13 +486,25 @@ describe("test site record", () => {
                 box.data.id1 = response.data.recordId
             }
         })
+        await runTest({
+            method: "POST",
+            path: `/v1/site/${box.data.siteId2}/record`,
+            body: {principle: 1000, commission: 2000},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.recordId).not.toBeUndefined()
+                box.data.id2 = response.data.recordId
+            }
+        })
     })
 
     test("get site record", async () => {
         await runTest({
             method: "GET",
             path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
-            query: {siteId: box.data.siteId1},
+            query: {userSiteId: box.data.siteId1},
             baseURL,
             userId: box.data.userId1,
             verify: response => {
@@ -432,6 +517,27 @@ describe("test site record", () => {
                 expect(record.kept).toBe(false)
                 expect(record.principle).toBe(100)
                 expect(record.commission).toBe(200)
+                expect(record.empty).toBe(false)
+                expect(record.userSiteId).toBe(box.data.site1.id)
+                expect(record.siteId).toBe(box.data.site1.site.id)
+                expect(record.siteName).toBe(box.data.site1.site.name)
+                expect(record.account).toBe(box.data.site1.credential.account)
+            }
+        })
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {siteId: box.data.site1.site.id},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.total).toBe(2)
+                expect(response.data.rate).toBe(1000)
+                // check id only
+                const ids = response.data.list.map(x => x.id)
+                expect(ids.includes(box.data.id1)).toBe(true)
+                expect(ids.includes(box.data.id2)).toBe(true)
             }
         })
     })
@@ -447,13 +553,10 @@ describe("test site record", () => {
                 expect(response.status).toBe(200)
             }
         })
-    })
-
-    test("check record to be correctly updated", async () => {
         await runTest({
             method: "GET",
             path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
-            query: {siteId: box.data.siteId1},
+            query: {userSiteId: box.data.siteId1},
             baseURL,
             userId: box.data.userId1,
             verify: response => {
@@ -466,6 +569,31 @@ describe("test site record", () => {
                 expect(record.createdAt).toBeLessThanOrEqual(now())
                 expect(record.principle).toBe(100)
                 expect(record.commission).toBe(200)
+            }
+        })
+        await runTest({
+            method: "PUT",
+            path: `/v1/site/${box.data.siteId1}/record/${box.data.id1}`,
+            body: {empty: true},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                expect(response.status).toBe(200)
+            }
+        })
+        await runTest({
+            method: "GET",
+            path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
+            query: {userSiteId: box.data.siteId1},
+            baseURL,
+            userId: box.data.userId1,
+            verify: response => {
+                simpleVerification(response)
+                expect(response.data.total).toBe(1)
+                expect(response.data.rate).toBe(1000)
+                const record = response.data.list[0]
+                expect(record.id).toBe(box.data.id1)
+                expect(record.empty).toBe(true)
             }
         })
     })
@@ -495,7 +623,7 @@ describe("test site record", () => {
         await runTest({
             method: "GET",
             path: `/v1/site/records/${now() - 86400}/${now() + 100}`,
-            query: {siteId: box.data.siteId1},
+            query: {userSiteId: box.data.siteId1},
             baseURL,
             userId: box.data.userId1,
             verify: response => {
@@ -522,7 +650,7 @@ describe("test site record", () => {
             verify: response => {
                 simpleVerification(response)
                 expect(response.data.recordId).not.toBeUndefined()
-                box.data.id2 = response.data.recordId
+                box.data.id3 = response.data.recordId
             }
         })
         await runTest({
@@ -532,12 +660,13 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: response => {
                 simpleVerification(response)
-                expect(response.data.total).toBe(2)
+                expect(response.data.total).toBe(3)
                 expect(response.data.rate).toBe(1000)
                 // check id only
                 const ids = response.data.list.map(x => x.id)
                 expect(ids.includes(box.data.id1)).toBe(true)
                 expect(ids.includes(box.data.id2)).toBe(true)
+                expect(ids.includes(box.data.id3)).toBe(true)
             }
         })
     })
@@ -550,13 +679,53 @@ describe("test site record", () => {
             userId: box.data.userId1,
             verify: rsp => {
                 simpleVerification(rsp)
-                expect(rsp.data).toStrictEqual([
+                expect(rsp.data.sort((a, b) => {
+                    if (a.siteId > b.siteId) {
+                        return -1
+                    }
+                    if (a.siteId < b.siteId) {
+                        return 1
+                    }
+                    return 0
+                })).toStrictEqual([
                     {siteId: `${box.data.siteId1}`, count: 1},
-                    {siteId: `${box.data.siteId2}`, count: 1},
-                ])
+                    {siteId: `${box.data.siteId2}`, count: 2},
+                ].sort((a, b) => {
+                    if (a.siteId > b.siteId) {
+                        return -1
+                    }
+                    if (a.siteId < b.siteId) {
+                        return 1
+                    }
+                    return 0
+                }))
             }
         })
     })
+
+    test("get recommend", async () => {
+        await runTest({
+            method: "GET",
+            path: `/v1/site/${box.data.siteId1}/recommend`,
+            baseURL,
+            userId: box.data.userId1,
+            verify: rsp => {
+                simpleVerification(rsp)
+                const item = rsp.data.find(x => x.weight > 0)
+                expect(item).not.toBeUndefined()
+                // const r = []
+                // for (let i = 0; i < 24; ++i) {
+                //     if (i === currentHour) {
+                //         r.push({hour: i, weight: 100})
+                //     } else {
+                //         r.push({hour: i, weight: 0})
+                //     }
+                // }
+                // expect(rsp.data).toStrictEqual(r)
+            }
+        })
+    })
+
     // test("check search with timestamp", async () => {
     //     await runTest({
     //         method: "POST",
@@ -1745,3 +1914,5 @@ describe("test journal entries filter", () => {
         })
     })
 })
+
+

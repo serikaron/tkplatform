@@ -14,7 +14,8 @@ export async function setupMongo(req) {
 
     const user = await connectUser()
     const collection = {
-        users: user.db.collection("users")
+        users: user.db.collection("users"),
+        backendUsers: user.db.collection("backendUsers")
     }
     req.context.mongo = {
         client: user.client, db: user.db, collection,
@@ -138,6 +139,22 @@ export async function setupMongo(req) {
                 .findOne(
                     {_id: new ObjectId(userId)},
                     {projection: {phone: 1, member: 1}}
+                )
+        },
+        addBackendUser: async (user) => {
+            const r = await collection.backendUsers
+                .insertOne(user)
+            return r.insertedId
+        },
+        getBackendUser: async (username) => {
+            return await collection.backendUsers
+                .findOne({username})
+        },
+        updateClaimed: async (upLine, downLine) => {
+            await collection.users
+                .updateOne(
+                    {_id: new ObjectId(upLine), "downLines.id": new ObjectId(downLine)},
+                    {$set: {"downLines.$.claimed": true}}
                 )
         }
     }

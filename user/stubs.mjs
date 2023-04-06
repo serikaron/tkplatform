@@ -71,6 +71,15 @@ export function setupStub(req) {
                     method: "GET",
                     headers: {id: userId}
                 })
+            },
+            updateWallet: async (userId, update) => {
+                return await axiosCall({
+                    url: "/v1/wallet",
+                    baseURL: "http://payment:8080",
+                    method: "POST",
+                    headers: {id: userId},
+                    body: update
+                })
             }
         }
     }

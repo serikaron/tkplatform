@@ -468,55 +468,55 @@ export async function setupMongo(req) {
                 {$set: {deleted: true}}
             )
         },
-        getSiteRecords: async (userId, siteId, minDate, maxDate) => {
-            const filter = siteId === undefined ? {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                deleted: {$ne: true},
-            } : {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                siteId: new ObjectId(siteId),
-                deleted: {$ne: true},
+        getSiteRecords: async (userId, userSiteId, siteId, minDate, maxDate) => {
+            const filter = new Filter()
+            filter.userId(userId)
+                .createdAt(minDate, maxDate)
+                .notDeleted()
+            if (userSiteId !== undefined) {
+                filter.plug({userSiteId: new ObjectId(userSiteId)})
             }
-            return await collection.siteRecords.find(filter)
-                .sort({creaatedAt: -1})
+            if (siteId !== undefined) {
+                filter.plug({siteId: new ObjectId(siteId)})
+            }
+            return await collection.siteRecords.find(filter.toFilter())
+                .sort({createdAt: -1})
                 .toArray()
         },
-        countSiteRecords: async (userId, siteId, minDate, maxDate) => {
-            const filter = siteId === undefined ? {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                deleted: {$ne: true},
-            } : {
-                userId: new ObjectId(userId),
-                createdAt: {$gte: minDate, $lt: maxDate},
-                siteId: new ObjectId(siteId),
-                deleted: {$ne: true},
+        countSiteRecords: async (userId, userSiteId, siteId, minDate, maxDate) => {
+            const filter = new Filter()
+            filter.userId(userId)
+                .createdAt(minDate, maxDate)
+                .notDeleted()
+            if (userSiteId !== undefined) {
+                filter.plug({userSiteId: new ObjectId(userSiteId)})
+            }
+            if (siteId !== undefined) {
+                filter.plug({siteId: new ObjectId(siteId)})
             }
             return await collection.siteRecords
-                .countDocuments(filter)
+                .countDocuments(filter.toFilter())
         },
         addSiteRecord: async (record) => {
             const r = await collection.siteRecords.insertOne(record)
             return r.insertedId
         },
-        keepRecord: async (recordId, userId, siteId) => {
+        updateRecord: async (recordId, userId, userSiteId, update) => {
             await collection.siteRecords
                 .updateOne({
                     _id: new ObjectId(recordId),
                     userId: new ObjectId(userId),
-                    siteId: new ObjectId(siteId)
+                    userSiteId: new ObjectId(userSiteId)
                 }, {
-                    $set: {kept: true}
+                    $set: update
                 })
         },
-        delSiteRecord: async (recordId, userId, siteId) => {
+        delSiteRecord: async (recordId, userId, userSiteId) => {
             await collection.siteRecords
                 .updateOne({
                     _id: new ObjectId(recordId),
                     userId: new ObjectId(userId),
-                    siteId: new ObjectId(siteId)
+                    userSiteId: new ObjectId(userSiteId)
                 }, {
                     $set: {deleted: true}
                 })
@@ -527,7 +527,7 @@ export async function setupMongo(req) {
                     Filter.generalFilter(userId, minDate, maxDate).toMatch(),
                     {
                         $group: {
-                            _id: "$siteId",
+                            _id: "$userSiteId",
                             count: {$sum: 1}
                         }
                     },
@@ -778,8 +778,8 @@ export async function setupMongo(req) {
                 ])
                 .toArray()
 
-            console.log(`overview, ledger: ${JSON.stringify(ledger)}`)
-            console.log(`overview, ledger: ${JSON.stringify(journal)}`)
+            // console.log(`overview, ledger: ${JSON.stringify(ledger)}`)
+            // console.log(`overview, ledger: ${JSON.stringify(journal)}`)
             return {
                 overview: ledger.length !== 0 ? ledger[0].overview : {
                     commission: 0,
@@ -821,6 +821,31 @@ export async function setupMongo(req) {
             //     commission: {},
             //     creditDetail: {},
             // }
+        },
+        getRecommend: async (siteId) => {
+            return await collection.siteRecords
+                .aggregate([
+                    {$match: {siteId: new ObjectId(siteId)}},
+                    {
+                        $group: {
+                            _id: {
+                                $hour: {
+                                    date: {$toDate: {$multiply: ["$createdAt", 1000]}},
+                                    timezone: "+0800"
+                                },
+                            },
+                            weight: {$sum: 1}
+                        }
+                    },
+                    {
+                        $project: {
+                            _id: 0,
+                            hour: "$_id",
+                            weight: 1
+                        }
+                    }
+                ])
+                .toArray()
         }
     }
 }

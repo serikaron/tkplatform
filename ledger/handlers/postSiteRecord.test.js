@@ -14,7 +14,9 @@ import {now} from "../../common/utils.mjs";
 const RealDate = Date.now
 
 beforeAll(() => {
-    global.Date.now = () => { return 0 }
+    global.Date.now = () => {
+        return 0
+    }
 })
 
 afterAll(() => {
@@ -25,6 +27,20 @@ test("save site record to db", async () => {
     const addSiteRecord = jest.fn(async () => {
         return "a fake record id"
     })
+    const siteId = new ObjectId()
+    const getUserSite = jest.fn(async () => {
+        return TKResponse.Success({
+            data: {
+                site: {
+                    id: `${siteId}`,
+                    name: "site-name"
+                },
+                credential: {
+                    account: "13912345678"
+                }
+            }
+        })
+    })
 
     const app = createApp()
     setup(app, {
@@ -33,6 +49,11 @@ test("save site record to db", async () => {
                 req.context = {
                     mongo: {
                         addSiteRecord
+                    },
+                    stubs: {
+                        site: {
+                            getUserSite,
+                        }
                     }
                 }
                 next()
@@ -41,11 +62,11 @@ test("save site record to db", async () => {
         teardown: testDIContainer.teardown([])
     })
 
-    const siteId = new ObjectId()
+    const userSiteId = new ObjectId()
     const userId = new ObjectId()
 
     const response = await supertest(app)
-        .post(`/v1/site/${siteId}/record`)
+        .post(`/v1/site/${userSiteId}/record`)
         .send({principle: 100, commission: 200})
         .set({id: `${userId}`})
     simpleCheckTKResponse(response, TKResponse.Success({
@@ -54,10 +75,15 @@ test("save site record to db", async () => {
 
     expect(addSiteRecord).toHaveBeenCalledWith({
         userId,
-        siteId,
+        userSiteId: userSiteId,
+        siteId: siteId,
         kept: false,
         principle: 100,
         commission: 200,
-        createdAt: now()
+        createdAt: now(),
+        empty: false,
+        siteName: "site-name",
+        account: "13912345678"
     })
+    expect(getUserSite).toHaveBeenCalledWith(`${userId}`, `${userSiteId}`)
 })
