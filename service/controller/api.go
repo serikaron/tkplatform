@@ -7,6 +7,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"net/http"
+	"service/config"
 	"service/constant"
 	"service/logger"
 	"service/third"
@@ -22,8 +23,6 @@ const (
 // @Description: 查号接口
 func CheckWangHandler(c *gin.Context) {
 	type param struct {
-		ClientId        string `json:"client_id" binding:"required"`
-		ClientSecret    string `json:"client_secret" binding:"required"`
 		WangWangAccount string `json:"wang_wang_account" binding:"required"`
 		UserId          string `json:"user_id"`
 	}
@@ -36,7 +35,7 @@ func CheckWangHandler(c *gin.Context) {
 	}
 	logger.Debug("api param:", p)
 
-	if p.ClientId != ClientId || p.ClientSecret != ClientSecret {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
 		constant.ErrMsg(c, constant.BadParameter, "client error")
 		return
 	}
@@ -45,11 +44,13 @@ func CheckWangHandler(c *gin.Context) {
 		constant.ErrMsg(c, constant.BadParameter, "旺旺账号不能为空")
 		return
 	}
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
 
 	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
-	userCount := CountUserCheckDaily(mongoDb, p.UserId)
+	userCount := CountUserCheckDaily(mongoDb, userId)
 	if userCount >= 3 {
 		constant.ErrMsg(c, constant.CheckAccountTooMuch)
 		return
@@ -62,7 +63,7 @@ func CheckWangHandler(c *gin.Context) {
 		return
 	}
 
-	err = AddUserCheckRecord(mongoDb, p.UserId, p.WangWangAccount)
+	err = AddUserCheckRecord(mongoDb, userId, p.WangWangAccount)
 	if err != nil {
 		logger.Error(err)
 		return

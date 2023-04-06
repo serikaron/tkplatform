@@ -10,6 +10,8 @@
   "logger_level": 0,
   "mongo_user": "tkuser",
   "mongo_password": "tkuser",
+  "client_id": "tkplatform",
+  "client_secret": "mkl23sml8sx9k02DxQkd5M32LkB6ux",
   "enable_orm_log": true,
   "enable_http_log": true
 }

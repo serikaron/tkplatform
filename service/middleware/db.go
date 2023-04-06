@@ -72,6 +72,7 @@ func MongoDbPrepareHandler(c *gin.Context) {
 			//uri := "mongodb://tkuser:tkuser@10.168.4.61:27017"
 			uri = "mongodb://" + config.GetMongoUser() + ":" + config.GetMongoPassword() + "@" + config.GetDBSource()
 		}
+		logger.Debug("uri:", uri)
 
 		timeout := time.Duration(10) // 链接超时时间
 		// 设置连接超时时间
