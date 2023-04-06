@@ -27,6 +27,7 @@ target "tk-node" {
 }
 
 target "api" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -41,6 +42,7 @@ target "api" {
 }
 
 target "backend" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -55,6 +57,7 @@ target "backend" {
 }
 
 target "user" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -69,6 +72,7 @@ target "user" {
 }
 
 target "token" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -83,6 +87,7 @@ target "token" {
 }
 
 target "sms" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -97,6 +102,7 @@ target "sms" {
 }
 
 target "captcha" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -111,6 +117,7 @@ target "captcha" {
 }
 
 target "system" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -125,6 +132,7 @@ target "system" {
 }
 
 target "migration" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -139,6 +147,7 @@ target "migration" {
 }
 
 target "site" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -153,6 +162,7 @@ target "site" {
 }
 
 target "ledger" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -167,6 +177,7 @@ target "ledger" {
 }
 
 target "payment" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }

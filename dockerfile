@@ -11,7 +11,7 @@ COPY ["package.json", "package-lock.json*", "./"]
 
 RUN npm install --omit=dev
 
-FROM tk-node as service
+FROM tk-node as node-service
 
 ARG name
 
