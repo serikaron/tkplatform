@@ -21,6 +21,8 @@ type config struct {
 	BindAddr      string `json:"bind_addr"`
 	MongoUser     string `json:"mongo_user"`
 	MongoPassword string `json:"mongo_password"`
+	ClientId      string `json:"client_id"`
+	ClientSecret  string `json:"client_secret"`
 }
 
 var c config
@@ -111,4 +113,12 @@ func GetBindPort() string {
 
 func GetBindAddr() string {
 	return c.BindAddr
+}
+
+func GetClientId() string {
+	return c.ClientId
+}
+
+func GetClientSecret() string {
+	return c.ClientSecret
 }
