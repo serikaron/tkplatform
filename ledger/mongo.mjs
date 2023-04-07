@@ -238,6 +238,16 @@ export async function setupMongo(req) {
                     {$set: {deleted: true}}
                 )
         },
+        delImportEntries: async (userId) => {
+            await ledger.db.collection('ledgerEntries')
+                .updateMany(
+                    {
+                        userId: new ObjectId(userId),
+                        import: true,
+                    },
+                    {$set: {deleted: true}}
+                )
+        },
         getEntry: async (collectionName, entryId, userId) => {
             return await ledger.db.collection(collectionName)
                 .findOne({

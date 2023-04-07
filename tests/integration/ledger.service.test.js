@@ -298,9 +298,14 @@ describe.each([
 
         describe("delete entries", () => {
             const deleteEntry = async (userId, year, month) => {
+                const query = {year}
+                if (month !== undefined) {
+                    query.month = month
+                }
                 await runTest({
                     method: "DELETE",
-                    path: `/v1/${key}/entries/${year}/${month}`,
+                    path: `/v1/${key}/entries`,
+                    query,
                     baseURL,
                     userId,
                     verify: rsp => {
@@ -419,6 +424,38 @@ describe.each([
                     desired: {total: 1, items: [entry2]}
                 })
                 await checkEntry404(key, userId, entry1.id)
+            })
+
+            test("delete import", async () => {
+                if (key !== 'ledger') {
+                    return
+                }
+
+                const userId = new ObjectId().toString()
+                const entry1 = newEntry()
+                await addEntry(key, entry1, userId)
+                const entry2 = newEntry()
+                entry2.import = true
+                await addEntry(key, entry2, userId)
+                await checkEntries({
+                    key, userId,
+                    desired: {total: 2, items: [entry1, entry2]}
+                })
+                await runTest({
+                    method: "DELETE",
+                    path: `/v1/${key}/entries`,
+                    query: {import: 1},
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                    }
+                })
+                await checkEntries({
+                    key, userId,
+                    desired: {total: 1, items: [entry1]}
+                })
+                await checkEntry404(key, userId, entry2.id)
             })
         })
 

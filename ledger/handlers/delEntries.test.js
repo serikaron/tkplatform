@@ -15,6 +15,13 @@ describe.each([
     {key: "ledger", collectionName: "ledgerEntries"},
     {key: "journal", collectionName: "withdrawJournalEntries"}
 ])("testing $key", ({key, collectionName}) => {
+    const path = (key, year, month) => {
+        const query = {year}
+        if (month !== undefined) {
+            query.month = month
+        }
+        return `/v1/${key}/entries?${new URLSearchParams(query)}`
+    }
     describe("year is required, and month should be an array", () => {
         describe.each([
             {year: "2023", month: "abc"},
@@ -31,10 +38,8 @@ describe.each([
                     teardown: testDIContainer.teardown([])
                 })
 
-                const path = `/v1/${key}/entries/${year}/${month}`
-                console.log(path)
                 const response = await supertest(app)
-                    .del(path)
+                    .del(path(key, year, month))
 
                 simpleCheckTKResponse(response, TKResponse.fromError(new InvalidArgument()))
             })
@@ -73,6 +78,12 @@ describe.each([
                 from: dateToTimestamp(2023, 12, 1),
                 to: dateToTimestamp(2024, 1, 1)
             }]
+        }, {
+            year: "2023",
+            dbArguments: [{
+                from: dateToTimestamp(2023, 1, 1),
+                to: dateToTimestamp(2024, 1, 1)
+            }]
         }
     ])("input from query ($#)", ({year, month, dbArguments}) => {
         describe("delete entries from db", () => {
@@ -94,10 +105,9 @@ describe.each([
                     teardown: testDIContainer.teardown([])
                 })
 
-                const path = `/v1/${key}/entries/${year}/${month}`
                 const userId = new ObjectId()
                 const response = await supertest(app)
-                    .del(path)
+                    .del(path(key, year, month))
                     .set({id: `${userId}`})
 
                 simpleCheckTKResponse(response, TKResponse.Success())
@@ -106,5 +116,70 @@ describe.each([
                 })
             })
         })
+    })
+})
+
+describe('clear import should ignore year and month', () => {
+    const query = {
+        import: 1,
+        month: 1
+    }
+
+    test("clear import entries", async () => {
+        const delImportEntries = jest.fn()
+
+        const app = createApp()
+        setup(app, {
+            setup: testDIContainer.setup([
+                (req, res, next) => {
+                    req.context = {
+                        mongo: {
+                            delImportEntries
+                        }
+                    }
+                    next()
+                }
+            ]),
+            teardown: testDIContainer.teardown([])
+        })
+
+        const userId = new ObjectId()
+        const response = await supertest(app)
+            .del(`/v1/ledger/entries?import=${query.import}&month=${query.month}`)
+            .set({id: userId.toString()})
+
+        simpleCheckTKResponse(response, TKResponse.Success())
+        expect(delImportEntries).toHaveBeenCalledWith(userId.toString())
+    })
+})
+
+describe.each([
+    {
+        key: "ledger",
+        query: {month: "1"}
+    },
+    {
+        key: "journal",
+        query: {month: "1"}
+    },
+    {
+        key: "journal",
+        query: {import: "1", month: "1"}
+    }
+])
+("($#) error input", ({key, query}) => {
+    test("should return error", async () => {
+        const app = createApp()
+        setup(app, {
+            setup: testDIContainer.setup([]),
+            teardown: testDIContainer.teardown([])
+        })
+
+        const userId = new ObjectId()
+        const response = await supertest(app)
+            .del(`/v1/${key}/entries?${new URLSearchParams(query).toString()}`)
+            .set({id: userId.toString()})
+
+        simpleCheckTKResponse(response, TKResponse.fromError(new InvalidArgument()))
     })
 })

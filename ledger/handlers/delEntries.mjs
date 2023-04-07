@@ -6,12 +6,11 @@ import {makeMiddleware} from "../../common/flow.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 const pickYear = (req) => {
-    console.log(JSON.stringify(req.query))
-    if (isBadFieldString(req.params.year)) {
+    if (isBadFieldString(req.query.year)) {
         throw new InvalidArgument()
     }
 
-    const year = Number(req.params.year)
+    const year = Number(req.query.year)
     if (isNaN(year)) {
         throw new InvalidArgument()
     }
@@ -20,8 +19,11 @@ const pickYear = (req) => {
 }
 
 const pickMonth = (req) => {
-    console.log(JSON.stringify(req.params))
-    const monthList = req.params.month.split(",")
+    if (!req.query.hasOwnProperty("month")) {
+        return
+    }
+
+    const monthList = req.query.month.split(",")
     if (monthList.length === 12) {
         return
     }
@@ -30,20 +32,12 @@ const pickMonth = (req) => {
         return isNaN(m) || m <= 0 || m > 12
     }
 
-    // if (Array.isArray(month)) {
-        const l = monthList.map(Number)
-        const invalid = l.filter(isInvalidMonth).length > 0
-        if (invalid) {
-            throw new InvalidArgument()
-        }
-        req.input.month = l
-    // } else {
-    //     const m = Number(month)
-    //     if (isInvalidMonth(m)) {
-    //         throw new InvalidArgument()
-    //     }
-    //     req.input.month = [m]
-    // }
+    const l = monthList.map(Number)
+    const invalid = l.filter(isInvalidMonth).length > 0
+    if (invalid) {
+        throw new InvalidArgument()
+    }
+    req.input.month = l
 }
 
 const convertDate = (req) => {
@@ -77,17 +71,32 @@ const response = (req, res) => {
     res.tkResponse(TKResponse.Success())
 }
 
-const route = (router, key, collectionName) => {
-    router.delete(`/${key}/entries/:year/:month`, ...makeMiddleware([
-        pickYear,
-        pickMonth,
-        convertDate,
-        updateDb(collectionName),
-        response,
-    ]))
+const deleteYearMonth = async (req, res, collectionName) => {
+    await pickYear(req)
+    await pickMonth(req)
+    await convertDate(req)
+    const f = updateDb(collectionName)
+    await f(req)
+    await response(req, res)
+}
+
+const deleteImport = async (req, res) => {
+    await req.context.mongo.delImportEntries(req.headers.id)
+    await response(req, res)
 }
 
 export const routeDelEntries = router => {
-    route(router, "ledger", "ledgerEntries")
-    route(router, "journal", "withdrawJournalEntries")
+    router.delete('/ledger/entries', async (req, res, next) => {
+        if (req.query.hasOwnProperty("import")) {
+            await deleteImport(req, res)
+        } else {
+            await deleteYearMonth(req, res, "ledgerEntries")
+        }
+        next()
+    })
+
+    router.delete('/journal/entries', async (req, res, next) => {
+        await deleteYearMonth(req, res, "withdrawJournalEntries")
+        next()
+    })
 }
