@@ -1,5 +1,5 @@
 group default {
-  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "migration"]
+  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "migration", "apid"]
 }
 
 group push {
