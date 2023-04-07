@@ -2,9 +2,9 @@
 
 /**
  * @swagger
- * /v1/file(上传文件):
+ * /v1/file(上传文件✅):
  *   post:
- *     tags: ["user(用户相关)","个人中心"]
+ *     tags: ["其它"]
  *     parameters:
  *     - in: formData
  *       name: image

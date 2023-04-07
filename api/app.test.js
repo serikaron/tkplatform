@@ -867,6 +867,24 @@ test.concurrent.each([
             url: "/v1/file",
         }
     },
+    {
+        url: "/v1/system/questions",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://system:8080",
+            url: "/v1/system/questions",
+        }
+    },
+    {
+        url: "/v1/system/question/q-id/answer",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://system:8080",
+            url: "/v1/system/question/q-id/answer",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
