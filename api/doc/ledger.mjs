@@ -527,6 +527,8 @@
  *                       comment:
  *                         type: string
  *                         example: 备注
+ *                       import:
+ *                         type: boolean
  */
 
 /**
@@ -657,6 +659,8 @@
  *                       comment:
  *                         type: string
  *                         example: 备注
+ *                       import:
+ *                         type: boolean
  */
 
 /**
@@ -783,6 +787,8 @@
  *                       comment:
  *                         type: string
  *                         example: 备注
+ *                       import:
+ *                         type: boolean
  *     responses:
  *       200:
  *         description: 返回entryId
@@ -1090,6 +1096,10 @@
  *       name: month
  *       schema:
  *         type: array
+ *     - in: path
+ *       name: import
+ *       schema:
+ *         type: number
  *
  */
 
