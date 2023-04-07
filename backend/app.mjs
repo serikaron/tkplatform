@@ -5,8 +5,11 @@ import diContainer from "../common/dicontainer.mjs";
 import {checkSign, checkTime, tokenContext} from "./middleware.mjs";
 import {setup} from "./setup.mjs";
 import {dispatchContext} from "./dispatcher.mjs";
+import cors from 'cors'
 
 const app = createApp()
+
+app.use(cors({origin: "*"}))
 
 setup(app, {
     setup: diContainer.setup([
@@ -17,7 +20,6 @@ setup(app, {
     ]),
     teardown: diContainer.teardown([])
 })
-
 
 app.listen(8080, () => {
     console.log('api service started')

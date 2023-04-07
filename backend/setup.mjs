@@ -5,10 +5,8 @@ import swaggerJsdoc from 'swagger-jsdoc'
 import routeInfo from "./routeInfo.mjs";
 import {dispatch} from "./dispatcher.mjs";
 import {checkToken} from "./middleware.mjs";
-import cors from 'cors'
 
 export function setup(app, {setup, teardown}) {
-    app.use(cors)
 
     setupDoc(app)
 
