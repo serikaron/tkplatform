@@ -35,8 +35,6 @@ test('upload', async () => {
     const originalHash = await calculateMD5(filePath);
     const downloadedHash = await calculateMD5(downloadResponse.data);
 
-    const url1 = await upload(filePath, userId)
-
     expect(downloadedHash).toEqual(originalHash);
 })
 
