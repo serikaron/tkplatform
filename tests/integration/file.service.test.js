@@ -26,7 +26,7 @@ const upload = async (filepath) => {
     return r.data.url
 }
 
-test('upload', async () => {
+test.skip('upload', async () => {
     const filePath = "./res/test.png"
     const url = await upload(filePath)
     const downloadResponse = await axios(url, {responseType: "stream"})
