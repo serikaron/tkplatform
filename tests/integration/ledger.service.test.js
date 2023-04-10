@@ -457,6 +457,35 @@ describe.each([
                 })
                 await checkEntry404(key, userId, entry2.id)
             })
+
+            test("delete by date", async () => {
+                if (key !== 'ledger') {
+                    return
+                }
+
+                const userId = new ObjectId().toString()
+                const dateToKeep = dateToTimestamp(2022, 6, 1)
+                const entryToKeep = entryFromDate(dateToKeep)
+                await addEntry(key, entryToKeep, userId)
+                const dateToDelete = dateToTimestamp(2022, 6, 2)
+                const entryToDelete = entryFromDate(dateToDelete)
+                await addEntry(key, entryToDelete, userId)
+                await runTest({
+                    method: "DELETE",
+                    path: `/v1/${key}/entries`,
+                    query: {date: `${dateToDelete}`},
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                    }
+                })
+                await checkEntries({
+                    key, userId,
+                    dateRange: {minDate: dateToTimestamp(2022, 1, 1), maxDate: dateToTimestamp(2022, 12, 31)},
+                    desired: {total: 1, items: [entryToKeep]}
+                })
+            })
         })
 
         test("count entries", async () => {

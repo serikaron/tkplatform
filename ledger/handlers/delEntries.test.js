@@ -153,6 +153,40 @@ describe('clear import should ignore year and month', () => {
     })
 })
 
+describe("clear by date should ignore year and month", () => {
+    const query = {
+        date: "123",
+        month: "1"
+    }
+
+    test("clear entries by date", async () => {
+        const delEntriesByDate = jest.fn()
+
+        const app = createApp()
+        setup(app, {
+            setup: testDIContainer.setup([
+                (req, res, next) => {
+                    req.context = {
+                        mongo: {
+                            delEntriesByDate
+                        }
+                    }
+                    next()
+                }
+            ]),
+            teardown: testDIContainer.teardown([])
+        })
+
+        const userId = new ObjectId()
+        const response = await supertest(app)
+            .del(`/v1/ledger/entries?${new URLSearchParams(query)}`)
+            .set({id: userId.toString()})
+
+        simpleCheckTKResponse(response, TKResponse.Success())
+        expect(delEntriesByDate).toHaveBeenCalledWith(userId.toString(), "123")
+    })
+})
+
 describe.each([
     {
         key: "ledger",
@@ -165,6 +199,10 @@ describe.each([
     {
         key: "journal",
         query: {import: "1", month: "1"}
+    },
+    {
+        key: "journal",
+        query: {date: "123", month: "1"}
     }
 ])
 ("($#) error input", ({key, query}) => {

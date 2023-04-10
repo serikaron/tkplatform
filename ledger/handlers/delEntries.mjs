@@ -84,10 +84,21 @@ const deleteImport = async (req, res) => {
     await response(req, res)
 }
 
+const deleteByDate = async (req, res) => {
+    const date = Number(req.query.date)
+    if (isNaN(date)) {
+        throw new InvalidArgument()
+    }
+    await req.context.mongo.delEntriesByDate(req.headers.id, date)
+    await response(req, res)
+}
+
 export const routeDelEntries = router => {
     router.delete('/ledger/entries', async (req, res, next) => {
         if (req.query.hasOwnProperty("import")) {
             await deleteImport(req, res)
+        } else if (req.query.hasOwnProperty("date")) {
+            await deleteByDate(req, res)
         } else {
             await deleteYearMonth(req, res, "ledgerEntries")
         }
