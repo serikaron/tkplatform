@@ -1,22 +1,23 @@
 'use restrict'
 
 import axios from "axios";
-import {ObjectId} from "mongodb";
 import fs from "fs";
 import FormData from "form-data";
 import crypto from "crypto";
 
-const upload = async (filepath, userId) => {
+const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0MjJhZTVkNTZlZjBkOTZmZjM0MmVmNCIsInBob25lIjoiMTMzMzMzMzMzMzMiLCJpYXQiOjE2ODA4NTQ4NjIsImV4cCI6MTY4MDg1NTc2Mn0.EEBLcj3E3HFjjQEhL8SKSPFW_VIYgbJKidcf93BEf2w'
+
+const upload = async (filepath) => {
     const formData = new FormData()
     const file = await fs.createReadStream(filepath)
     formData.append('image', file, "test.png")
     const r = await axios.post(
-        'http://localhost:9009/v1/file',
+        'http://localhost:9000/v1/file',
         formData,
         {
             headers: {
                 ...formData.getHeaders(),
-                id: userId,
+                authentication: token,
             }
         })
 
@@ -26,9 +27,8 @@ const upload = async (filepath, userId) => {
 }
 
 test('upload', async () => {
-    const userId = new ObjectId().toString()
     const filePath = "./res/test.png"
-    const url = await upload(filePath, userId)
+    const url = await upload(filePath)
     const downloadResponse = await axios(url, {responseType: "stream"})
     expect(downloadResponse.status).toBe(200)
 
