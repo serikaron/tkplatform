@@ -29,6 +29,10 @@
  *               properties:
  *                 total:
  *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
  *                 items:
  *                   type: array
  *                   items:

@@ -111,29 +111,40 @@
  *             schema:
  *               type: object
  *               properties:
- *                 id:
- *                   type: string
- *                 phone:
- *                   type: string
- *                 member:
- *                   type: object
- *                   properties:
- *                     expiration:
- *                       type: number
- *                       example: 会员过期时间
- *                 registeredAt:
- *                   type: string
- *                   example: 注册时间
- *                 upLine:
- *                   type: string
- *                   example: 上线uid
- *                 downLines:
+ *                 total:
+ *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 items:
  *                   type: array
  *                   items:
  *                     type: object
  *                     properties:
  *                       id:
  *                         type: string
+ *                       phone:
+ *                         type: string
+ *                       member:
+ *                         type: object
+ *                         properties:
+ *                           expiration:
+ *                             type: number
+ *                             example: 会员过期时间
+ *                       registeredAt:
+ *                         type: string
+ *                         example: 注册时间
+ *                       upLine:
+ *                         type: string
+ *                         example: 上线uid
+ *                       downLines:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             id:
+ *                               type: string
  *
  */
 

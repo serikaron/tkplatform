@@ -26,7 +26,7 @@ const checkDownLine = async (req) => {
 }
 
 const getConfig = async (req) => {
-    const configRsp = await req.context.stubs.system.settings.get()
+    const configRsp = await req.context.stubs.system.settings.get("claimDownLinePrice")
     if (configRsp.isError()) {
         throw new InternalError()
     }

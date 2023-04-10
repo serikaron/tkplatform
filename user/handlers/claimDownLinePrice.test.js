@@ -128,7 +128,7 @@ describe.each([
             tkResponse: TKResponse.Success()
         })
 
-        expect(getConfig).toHaveBeenCalled()
+        expect(getConfig).toHaveBeenCalledWith("claimDownLinePrice")
         expect(getUserById).toHaveBeenCalledWith(upLine.toString())
         expect(updateClaimed).toHaveBeenCalledWith(upLine.toString(), downLine.toString())
         expect(updateWallet).toHaveBeenCalledWith(upLine.toString(), {invitePoint: invitePrice})
