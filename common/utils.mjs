@@ -84,27 +84,40 @@ export function copy(obj) {
 }
 
 export function flattenObject(obj, prefix = "") {
-  return Object.keys(obj).reduce((acc, key) => {
-    const pre = prefix.length ? prefix + "." : "";
-    if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
-      Object.assign(acc, flattenObject(obj[key], pre + key));
-    } else {
-      acc[pre + key] = obj[key];
-    }
-    return acc;
-  }, {});
+    return Object.keys(obj).reduce((acc, key) => {
+        const pre = prefix.length ? prefix + "." : "";
+        if (typeof obj[key] === "object" && !Array.isArray(obj[key])) {
+            Object.assign(acc, flattenObject(obj[key], pre + key));
+        } else {
+            acc[pre + key] = obj[key];
+        }
+        return acc;
+    }, {});
 }
 
 export function mergeObjects(base, update) {
-  for (const key in update) {
-    if (typeof update[key] === "object" && update[key] !== null) {
-      if (!(key in base)) {
-        base[key] = {};
-      }
-      mergeObjects(base[key], update[key]);
-    } else {
-      base[key] = update[key];
+    for (const key in update) {
+        if (typeof update[key] === "object" && update[key] !== null) {
+            if (!(key in base)) {
+                base[key] = {};
+            }
+            mergeObjects(base[key], update[key]);
+        } else {
+            base[key] = update[key];
+        }
     }
-  }
-  return base;
+    return base;
+}
+
+export const getValueNumber = (dict, key, def) => {
+    if (!dict.hasOwnProperty(key)) {
+        return def
+    }
+
+    const out = Number(dict[key])
+    return isNaN(out) ? def : out
+}
+
+export const getValueString = (dict, key, def) => {
+    return dict.hasOwnProperty(key) ? dict[key] : def
 }

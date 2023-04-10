@@ -1,21 +1,12 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {replaceId} from "../../common/utils.mjs";
-
-const parse = (dict, key, def) => {
-    if (!dict.hasOwnProperty(key)) {
-        return def
-    }
-
-    const out = Number(dict[key])
-    return isNaN(out) ? def : out
-}
+import {getValueNumber, replaceId} from "../../common/utils.mjs";
 
 export const routeBackendGetUsers = router => {
     router.get('/backend/users', async (req, res, next) => {
-        const offset = parse(req.query, "offset", 0)
-        const limit = Math.min(parse(req.query, "limit", 50), 50)
+        const offset = getValueNumber(req.query, "offset", 0)
+        const limit = Math.min(getValueNumber(req.query, "limit", 50), 50)
 
         const r = await req.context.mongo.getUsers(offset, limit)
 

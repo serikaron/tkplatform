@@ -23,15 +23,29 @@ export async function setupMongo(req) {
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
-        getSites: async (option) => {
-            const filter = {}
-            if (option.hasOwnProperty("usingDisable") && option.usingDisable === 1) {
-                filter.disabled = {$ne: true}
+        getSites: async (offset, limit, keyword) => {
+            const filter = {disabled: {$ne: true}}
+            if (keyword !== undefined && keyword !== null) {
+                const regex = `.*${keyword}.*`
+                filter.name = {$regex: regex}
             }
-            return await collection.sites.find(filter).toArray()
+            return await collection.sites.find(filter)
+                .skip(offset)
+                .limit(limit)
+                .toArray()
         },
         getSite: async objectId => {
             return await collection.sites.findOne({_id: objectId})
+        },
+        getSitesForBackend: async (offset, limit) => {
+            return await collection.sites.find()
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+        },
+        countSitesForBackend: async () => {
+            return await collection.sites
+                .countDocuments()
         },
         addUserSite: async (userSite) => {
             const r = await collection.userSites.insertOne(userSite)
@@ -175,7 +189,7 @@ export async function setupMongo(req) {
                     userId: new ObjectId(userId),
                     "site.id": siteId,
                     deleted: {$ne: true}
-                },{
+                }, {
                     $set: update
                 })
         },

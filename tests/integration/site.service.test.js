@@ -640,9 +640,32 @@ describe("backend", () => {
         const box = new Box()
         const userId = new ObjectId().toString()
 
+        const sortSite = (a, b) => {
+            if (a.id > b.id) {
+                return 1
+            }
+            if (a.id < b.id) {
+                return -1
+            }
+            return 0
+        }
+
+        const getBackendSite = async () => {
+            let out = undefined
+            await runTest({
+                method: "GET",
+                path: '/v1/backend/sites?limit=10000',
+                baseURL,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    out = rsp.data
+                }
+            })
+            return out
+        }
+
         it("exists sites", async () => {
-            await getSites(userId, box)
-            box.data.existsCount = box.data.sites.length
+            box.data.backendRsp = await getBackendSite()
         })
 
         it('add', async () => {
@@ -664,9 +687,14 @@ describe("backend", () => {
         })
 
         it("check", async () => {
-            await getSites(userId, box)
-            expect(box.data.sites.length).toBe(box.data.existsCount + 1)
-            expect(box.data.sites[box.data.sites.length - 1]).toEqual(box.data.newSite)
+            const rsp = await getBackendSite(userId, box)
+            rsp.items.sort(sortSite)
+            expect(rsp).toStrictEqual({
+                total: box.data.backendRsp.total + 1,
+                offset: 0,
+                limit: 10000,
+                items: [...box.data.backendRsp.items, box.data.newSite].sort(sortSite)
+            })
         })
 
         it('update', async () => {
@@ -680,35 +708,26 @@ describe("backend", () => {
                     box.data.newSite.disabled = true
                 }
             })
-            await runTest({
-                method: "GET",
-                path: '/v1/backend/sites',
-                baseURL,
-                verify: rsp => {
-                    simpleVerification(rsp)
-                    const site = rsp.data.filter(x => x.id === box.data.newSite.id)[0]
-                    expect(site.disabled).toBe(true)
-                    box.data.backendSites = rsp.data
-                }
+            const rsp = await getBackendSite(userId, box)
+            rsp.items.sort(sortSite)
+            expect(rsp).toStrictEqual({
+                total: box.data.backendRsp.total + 1,
+                offset: 0,
+                limit: 10000,
+                items: [...box.data.backendRsp.items, box.data.newSite].sort(sortSite)
             })
+        })
+
+        it('check user site', async () => {
+            const rsp = await getBackendSite(userId, box)
             await getSites(userId, box)
-            const sortSite = (a, b) => {
-                if (a.id > b.id) {
-                    return 1
-                }
-                if (a.id < b.id) {
-                    return -1
-                }
-                return 0
-            }
             expect(
                 box.data.sites.sort(sortSite)
             ).toStrictEqual(
-                box.data.backendSites
+                rsp.items
                     .filter(x => !x.hasOwnProperty("disabled") || !x.disabled)
                     .sort(sortSite)
             )
         })
-
     })
 })
