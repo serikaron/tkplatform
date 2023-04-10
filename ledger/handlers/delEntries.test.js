@@ -183,7 +183,7 @@ describe("clear by date should ignore year and month", () => {
             .set({id: userId.toString()})
 
         simpleCheckTKResponse(response, TKResponse.Success())
-        expect(delEntriesByDate).toHaveBeenCalledWith(userId.toString(), "123")
+        expect(delEntriesByDate).toHaveBeenCalledWith(userId.toString(), 123)
     })
 })
 
