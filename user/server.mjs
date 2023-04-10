@@ -19,6 +19,7 @@ import {routeGetReportTypes} from "./handlers/getReportTypes.mjs";
 import {routePostReport} from "./handlers/postReport.mjs";
 import {routeGetReports} from "./handlers/getReports.mjs";
 import {routeGetReport} from "./handlers/getReport.mjs";
+import {routeBackendGetUsers} from "./handlers/backendGetUsers.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -45,6 +46,7 @@ export function setup(app, {
     routeBackendLogin(router)
     routeBackendRegister(router)
     routeBackendGetUser(router)
+    routeBackendGetUsers(router)
 
     teardown(router)
 }

@@ -21,6 +21,12 @@ const routeInfo = [
             }
         }
     },
+    {
+        url: "/backend/v1/users",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://user:8080", url: "/v1/backend/users"}
+    },
     // ------ user end -----
 
     {url: '/backend/v1/site', method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/site'}},
@@ -43,8 +49,18 @@ const routeInfo = [
             }
         }
     },
-    {url: '/backend/v1/system/settings', method: 'GET', needAuth: true, service: {baseURL: 'http://system:8080'}},
-    {url: '/backend/v1/system/setting', method: 'PUT', needAuth: true, service: {baseURL: 'http://system:8080'}},
+    {
+        url: '/backend/v1/system/settings',
+        method: 'GET',
+        needAuth: true,
+        service: {baseURL: 'http://system:8080', url: "/v1/system/settings"}
+    },
+    {
+        url: '/backend/v1/system/setting',
+        method: 'PUT',
+        needAuth: true,
+        service: {baseURL: 'http://system:8080', url: '/v1/system/setting'}
+    },
 ]
 
 export default routeInfo
