@@ -1,6 +1,7 @@
 cat << EOF > .env
 COMPOSE_PROJECT_NAME=tk
 REGISTRY=car.daoyi365.com:5000/
+HOST_NAME=http://localhost:9000
 
 MONGO_USER_HOST=user_db
 MONGO_USER_DB=tkuser

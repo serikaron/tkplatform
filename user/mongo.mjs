@@ -177,7 +177,7 @@ export async function setupMongo(req) {
                     _id: new ObjectId(reportId),
                     userId: new ObjectId(userId)
                 })
-        }
+        },
     }
 }
 

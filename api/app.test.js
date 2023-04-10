@@ -848,6 +848,43 @@ test.concurrent.each([
             url: "/v1/wallet/withdraw/records",
         }
     },
+
+    {
+        url: "/v1/search/external/account",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: "/v1/api/check",
+        }
+    },
+    {
+        url: "/v1/file",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://file:8080",
+            url: "/v1/file",
+        }
+    },
+    {
+        url: "/v1/system/questions",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://system:8080",
+            url: "/v1/system/questions",
+        }
+    },
+    {
+        url: "/v1/system/question/q-id/answer",
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://system:8080",
+            url: "/v1/system/question/q-id/answer",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

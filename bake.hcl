@@ -1,9 +1,9 @@
 group default {
-  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "migration", "apid"]
+  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "migration", "apid"]
 }
 
 group push {
-  targets = ["api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "migration"]
+  targets = ["api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "migration", "apid"]
 }
 
 variable "GITHUB_SHA" {
@@ -27,6 +27,7 @@ target "tk-node" {
 }
 
 target "api" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -41,6 +42,7 @@ target "api" {
 }
 
 target "backend" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -55,6 +57,7 @@ target "backend" {
 }
 
 target "user" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -69,6 +72,7 @@ target "user" {
 }
 
 target "token" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -83,6 +87,7 @@ target "token" {
 }
 
 target "sms" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -97,6 +102,7 @@ target "sms" {
 }
 
 target "captcha" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -111,6 +117,7 @@ target "captcha" {
 }
 
 target "system" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -125,6 +132,7 @@ target "system" {
 }
 
 target "migration" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -139,6 +147,7 @@ target "migration" {
 }
 
 target "site" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -153,6 +162,7 @@ target "site" {
 }
 
 target "ledger" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -167,6 +177,7 @@ target "ledger" {
 }
 
 target "payment" {
+  target = "node-service"
   contexts = {
     tk-node = "target:tk-node",
   }
@@ -180,8 +191,48 @@ target "payment" {
   cache-to   = ["type=gha,mode=max,scope=payment"]
 }
 
-target "apid" {
+target "file" {
+  target = "node-service"
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "file"
+  }
+  tags = [
+    tag_name("file"),
+  ]
+  cache-from = ["type=gha,scope=file"]
+  cache-to   = ["type=gha,mode=max,scope=file"]
+}
+
+target "tk-go" {
+  target = "tk-go"
   cache-from = ["type=gha,scope=tk-go"]
   cache-to   = ["type=gha,mode=max,scope=tk-go"]
+  tags = [
+    "tk-go"
+  ]
+}
+
+target "tk-go-build" {
+  target = "tk-go-build"
+  contexts = {
+    tk-go = "target:tk-go"
+  }
+  cache-from = ["type=gha,scope=tk-go-build"]
+  cache-to   = ["type=gha,mode=max,scope=tk-go-build"]
+  tags = [
+    "tk-go-build"
+  ]
+}
+
+target "apid" {
+  target = "go-service"
+  contexts = {
+    tk-go-build = "target:tk-go-build"
+  }
+  cache-from = ["type=gha,scope=go-service"]
+  cache-to   = ["type=gha,mode=max,scope=go-service"]
   tags       = [tag_name("apid")]
 }

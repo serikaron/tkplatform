@@ -6,6 +6,7 @@ services:
     restart: always
     volumes:
       - ./nginx/proxy.conf:/etc/nginx/nginx.conf
+      - ./res:/res/file
     ports:
       - "9000:9000"
 
@@ -201,4 +202,14 @@ services:
       - system_db
       - user_db
     volumes:
+      - .env:/app/.env
+
+  file:
+    image: car.daoyi365.com:5000/tk-file
+    restart: always
+    entrypoint: node /app/file/app.mjs
+    ports:
+      - "9009:8080"
+    volumes:
+      - ./res:/res
       - .env:/app/.env

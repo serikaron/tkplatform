@@ -7,6 +7,7 @@ import {dispatch} from "./dispatcher.mjs";
 import {checkToken} from "./middleware.mjs";
 
 export function setup(app, {setup, teardown}) {
+
     setupDoc(app)
 
     setup(app)
