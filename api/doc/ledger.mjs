@@ -1091,7 +1091,7 @@
  *       name: year
  *       schema:
  *         type: number
- *         example: year为必填参数
+ *         example: 如果按年月清数据，year为必填参数
  *     - in: path
  *       name: month
  *       schema:
@@ -1100,6 +1100,11 @@
  *       name: import
  *       schema:
  *         type: number
+ *     - in: path
+ *       name: date
+ *       schema:
+ *         type: number
+ *         example: 按日期清数据，填timestamp
  *
  */
 
