@@ -9,9 +9,14 @@ export const routeBackendGetUsers = router => {
         const limit = Math.min(getValueNumber(req.query, "limit", 50), 50)
 
         const r = await req.context.mongo.getUsers(offset, limit)
+        const c = await req.context.mongo.countUsers()
 
         res.tkResponse(TKResponse.Success({
-            data: r.map(replaceId)
+            data: {
+                total: c,
+                offset, limit,
+                items: r.map(replaceId)
+            }
         }))
 
         next()

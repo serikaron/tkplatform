@@ -36,6 +36,10 @@ export async function setupMongo(req) {
                 .limit(limit)
                 .toArray()
         },
+        countUsers: async () => {
+            return await collection.users
+                .countDocuments()
+        },
         getInviter: async (userId) => {
             return await collection.users
                 .findOne(

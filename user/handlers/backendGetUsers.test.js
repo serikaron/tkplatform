@@ -38,6 +38,9 @@ describe.each([
                 _id: userId,
             }]
         })
+        const countUsers = jest.fn(async () => {
+            return 100
+        })
 
         const app = createApp()
         setup(app, {
@@ -45,7 +48,8 @@ describe.each([
                 (req, res, next) => {
                     req.context = {
                         mongo: {
-                            getUsers
+                            getUsers,
+                            countUsers
                         }
                     }
                     next()
@@ -61,8 +65,14 @@ describe.each([
             .set({id: adminId.toString()})
 
         simpleCheckTKResponse(response, TKResponse.Success({
-            data: [{id: userId.toString()}]
+            data: {
+                total: 100,
+                offset: dbParams.offset,
+                limit: dbParams.limit,
+                items: [{id: userId.toString()}]
+            }
         }))
         expect(getUsers).toHaveBeenCalledWith(dbParams.offset, dbParams.limit)
+        expect(countUsers).toHaveBeenCalled()
     })
 })
