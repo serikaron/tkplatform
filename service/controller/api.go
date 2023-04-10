@@ -1,17 +1,15 @@
 package controller
 
 import (
-	"context"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 	"net/http"
 	"service/config"
 	"service/constant"
+	"service/dao"
 	"service/logger"
+	"service/model"
 	"service/third"
-	"time"
 )
 
 const (
@@ -50,7 +48,7 @@ func CheckWangHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
-	userCount := CountUserCheckDaily(mongoDb, userId)
+	userCount := dao.CountUserCheckDaily(mongoDb, userId)
 	if userCount >= 3 {
 		constant.ErrMsg(c, constant.CheckAccountTooMuch)
 		return
@@ -63,50 +61,273 @@ func CheckWangHandler(c *gin.Context) {
 		return
 	}
 
-	err = AddUserCheckRecord(mongoDb, userId, p.WangWangAccount)
+	err = dao.AddUserCheckRecord(mongoDb, userId, p.WangWangAccount)
 	if err != nil {
 		logger.Error(err)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"err_code": constant.Success, "data": res})
-}
-
-func CountUserCheckDaily(db *mongo.Database, userId string) int64 {
-	now := time.Now()
-	today := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.Local)
-	tomorrow := time.Date(now.Year(), now.Month(), now.Day()+1, 0, 0, 0, 0, time.Local)
-	collection := db.Collection("userCheckRecord")
-	count, err := collection.CountDocuments(context.Background(), bson.M{"userId": userId, "createdAt": bson.M{
-		"$gt": today.Unix(),
-		"$lt": tomorrow.Unix(),
-	}})
-	if err != nil {
-		logger.Error(err)
-		return 0
-	}
-	log.Println("collection.CountDocuments:", count)
-	return count
-}
-
-func AddUserCheckRecord(db *mongo.Database, userId, checkAccount string) error {
-	// 数据结构体
-	type UserCheckRecord struct {
-		UserId       string `bson:"userId"`
-		CheckAccount string `bson:"checkAccount"`
-		CreatedAt    int64  `bson:"createdAt"`
-	}
-
-	collection := db.Collection("userCheckRecord")
-	objId, err := collection.InsertOne(context.TODO(), &UserCheckRecord{
-		UserId:       userId,
-		CheckAccount: checkAccount,
-		CreatedAt:    time.Now().Unix(),
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": res,
 	})
-	if err != nil {
-		logger.Error(err)
-		return err
+}
+
+// @Route: [POST] /v1/api/user/wallet
+// @Description: 用户钱包
+func UserWalletHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
 	}
-	log.Println("录入数据成功，objId:", objId)
-	return nil
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	wallet := dao.GetUserWallet(mongoDb, userId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"rice": wallet.Rice,
+		},
+	})
+}
+
+// @Route: [POST] /v1/api/user/wallet/overview
+// @Description: 用户钱包总览
+func UserWalletOverviewHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	wallet := dao.GetUserWallet(mongoDb, userId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"income":   wallet.Income,
+			"withdraw": wallet.Withdraw,
+			"recharge": wallet.Recharge,
+		},
+	})
+}
+
+// @Route: [GET] /v1/api/user/wallet/records
+// @Description: 用户钱包资金明细
+func UserWalletRecordsHandler(c *gin.Context) {
+	type param struct {
+		Type   int   `form:"type"`
+		Limit  int64 `form:"limit"`
+		Offset int64 `form:"offset"`
+	}
+
+	var p param
+	var err error
+	if err = c.Bind(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	records := dao.GetUserWalletRecords(mongoDb, userId, p.Offset, p.Limit, p.Type)
+
+	total := dao.CountUserWalletRecords(mongoDb, userId, p.Type)
+
+	var list []*model.UserWalletRecordResp
+	for _, record := range records {
+		list = append(list, &model.UserWalletRecordResp{
+			Id:   record.Id,
+			Type: record.Type,
+			Member: &model.MemberPo{
+				Title:      record.Member.Title,
+				Price:      record.Member.Price,
+				RemainDays: record.Member.RemainDays,
+				CreatedAt:  record.Member.CreatedAt,
+			},
+			Withdraw: &model.WithdrawPo{
+				Title:     record.Withdraw.Title,
+				Amount:    record.Withdraw.Amount,
+				Balance:   record.Withdraw.Balance,
+				CreatedAt: record.Withdraw.CreatedAt,
+			},
+			DownLine: &model.DownLinePo{
+				Title:     record.DownLine.Title,
+				Amount:    record.DownLine.Amount,
+				Balance:   record.DownLine.Balance,
+				CreatedAt: record.DownLine.CreatedAt,
+			},
+			Activity: &model.ActivityPo{
+				Title:     record.Activity.Title,
+				Amount:    record.Activity.Amount,
+				Balance:   record.Activity.Balance,
+				CreatedAt: record.Activity.CreatedAt,
+			},
+			Rice: &model.RicePo{
+				Title:      record.Member.Title,
+				Price:      record.Member.Price,
+				RemainDays: record.Member.RemainDays,
+				CreatedAt:  record.Member.CreatedAt,
+			},
+			CreatedAt: record.CreatedAt,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"total": total,
+			"items": list,
+		},
+	})
+}
+
+// @Route: [POST] /v1/api/user/wallet/withdraw/records
+// @Description: 用户钱包提现管理
+func UserWalletWithdrawRecordsHandler(c *gin.Context) {
+	type param struct {
+		Limit  int64 `form:"limit"`
+		Offset int64 `form:"offset"`
+	}
+
+	var p param
+	var err error
+	if err = c.Bind(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit)
+	total := dao.CountUserWalletWithdrawRecords(mongoDb, userId)
+	sumAmount := dao.SumUserWalletWithdrawRecordsAmount(mongoDb, userId)
+
+	var list []*model.UserWalletWithdrawRecordResp
+	for _, record := range records {
+		list = append(list, &model.UserWalletWithdrawRecordResp{
+			Id:        record.Id,
+			Comment:   record.Comment,
+			Amount:    record.Amount,
+			Fee:       record.Fee,
+			Status:    record.Status,
+			CreatedAt: record.CreatedAt,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"total": gin.H{
+				"count":  total,
+				"amount": sumAmount,
+			},
+			"items": list,
+		},
+	})
+}
+
+// @Route: [POST] /v1/api/store/member/items
+// @Description: 会员充值套餐
+func StoreMemberItemsHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	items := dao.GetMemberItems(mongoDb)
+
+	var list []*model.MemberItemResp
+	for _, item := range items {
+		list = append(list, &model.MemberItemResp{
+			Id:            item.Id,
+			Name:          item.Name,
+			Days:          item.Days,
+			Price:         item.Price,
+			OriginalPrice: item.OriginalPrice,
+			Promotion:     item.Promotion,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": list,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/items
+// @Description: 米粒购买套餐
+func StoreRiceItemsHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	items := dao.GetRiceItems(mongoDb)
+
+	var list []*model.RiceItemResp
+	for _, item := range items {
+		list = append(list, &model.RiceItemResp{
+			Id:            item.Id,
+			Name:          item.Name,
+			Rice:          item.Rice,
+			Price:         item.Price,
+			OriginalPrice: item.OriginalPrice,
+			Promotion:     item.Promotion,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": list,
+	})
 }

@@ -36,7 +36,14 @@ func main() {
 	//系统API
 	apiGroup.Use(middleware.MongoDbPrepareHandler)
 	{
-		apiGroup.POST("/check", controller.CheckWangHandler)
+		apiGroup.POST("/check", controller.CheckWangHandler)                                       //查号接口
+		apiGroup.GET("/user/wallet", controller.UserWalletHandler)                                 //用户钱包
+		apiGroup.GET("/user/wallet/overview", controller.UserWalletOverviewHandler)                //用户钱包资金总览
+		apiGroup.GET("/user/wallet/records", controller.UserWalletRecordsHandler)                  //用户钱包资金明细
+		apiGroup.GET("/user/wallet/withdraw/records", controller.UserWalletWithdrawRecordsHandler) //用户钱包提现管理
+
+		apiGroup.GET("/store/member/items", controller.StoreMemberItemsHandler) //会员充值套餐
+		apiGroup.GET("/store/rice/items", controller.StoreRiceItemsHandler)     //米粒购买套餐
 	}
 
 	r.Run(":" + config.GetBindPort())
