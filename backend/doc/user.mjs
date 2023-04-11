@@ -251,3 +251,23 @@
  *                     type: any
  *
  */
+
+/**
+ * @swagger
+ * /backend/v1/user/message(发送用户消息):
+ *   post:
+ *     tags: ["user(用户相关)"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               content:
+ *                 type: string
+ *               userId:
+ *                 type: string
+ *
+ */

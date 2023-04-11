@@ -679,3 +679,88 @@
  *                       example: 拉新值
  *
  */
+
+/**
+ * @swagger
+ * /v1/user/messages(查询消息✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     parameters:
+ *     - in path:
+ *       name: offset
+ *       type: number
+ *     - in path:
+ *       name: limit
+ *       type: number
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object:
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       title:
+ *                         type: string
+ *                       content:
+ *                         type: string
+ *                       createdAt:
+ *                         type: number
+ *
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/messages(全部设为已读):
+ *   put:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               read:
+ *                 type: boolean
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/messages(删除已读消息):
+ *   delete:
+ *     tags: ["user(用户相关)","个人中心"]
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/message/:messageId(更新消息):
+ *   put:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *              read:
+ *                type: boolean
+ *
+ */
+
+/**
+ * @swagger
+ * /v1/user/message/:messageId(删除消息):
+ *   delete:
+ *     tags: ["user(用户相关)","个人中心"]
+ */

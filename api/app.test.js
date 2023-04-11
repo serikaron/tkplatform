@@ -266,6 +266,36 @@ test.concurrent.each([
             url: '/v1/user/report/report-id'
         }
     },
+    {
+        url: '/v1/user/messages',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/messages'}
+    },
+    {
+        url: '/v1/user/messages',
+        method: "PUT",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/messages'}
+    },
+    {
+        url: '/v1/user/messages',
+        method: "DELETE",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/messages'}
+    },
+    {
+        url: '/v1/user/message/fake-id',
+        method: "DELETE",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/message/fake-id'}
+    },
+    {
+        url: '/v1/user/message/fake-id',
+        method: "PUT",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/message/fake-id'}
+    },
 
     // ---- user end ----
 
