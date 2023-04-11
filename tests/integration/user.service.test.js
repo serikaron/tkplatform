@@ -633,7 +633,7 @@ describe("test user service", () => {
             test('delete by id', async () => {
                 await runTest({
                     method: "DELETE",
-                    path: `/v1/user/message/${messages[1]}`,
+                    path: `/v1/user/message/${messages[1].id}`,
                     baseURL,
                     userId,
                     verify: rsp => {

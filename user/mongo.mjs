@@ -181,6 +181,7 @@ export async function setupMongo(req) {
         getReports: async (userId) => {
             return await collection.userReports
                 .find({userId: new ObjectId(userId)})
+                .sort({reportedAt: -1})
                 .toArray()
         },
         getReport: async (reportId, userId) => {
