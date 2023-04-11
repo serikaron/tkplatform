@@ -31,7 +31,7 @@ const getLatestVersion = (router) => {
             throw new NotFound()
         }
 
-        const v = l === null || l.length === 0 ? {} : l[0]
+        const v = l[0]
         res.tkResponse(TKResponse.Success({
             data: v
         }))
