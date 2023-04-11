@@ -18,6 +18,7 @@ export async function setupMongo(req) {
         users: user.db.collection("users"),
         backendUsers: user.db.collection("backendUsers"),
         userReports: user.db.collection('userReports'),
+        userMessages: user.db.collection('userMessages'),
     }
     req.context.mongo = {
         client: user.client, db: user.db, collection,
@@ -189,6 +190,22 @@ export async function setupMongo(req) {
                     userId: new ObjectId(userId)
                 })
         },
+        getMessages: async (userId, offset, limit) => {
+            return await collection.userMessages
+                .find({userId: new ObjectId(userId)})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+        },
+        countMessages: async (userId) => {
+            return await collection.userMessages
+                .countDocuments({userId: new ObjectId(userId)})
+        },
+        addMessage: async (message) => {
+            const r = await collection.userMessages
+                .insertOne(message)
+            return r.insertedId
+        }
     }
 }
 

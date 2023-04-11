@@ -67,8 +67,8 @@ describe.each([
         simpleCheckTKResponse(response, TKResponse.Success({
             data: {
                 total: 100,
-                offset: dbParams.offset,
-                limit: dbParams.limit,
+                offset: params === undefined ? undefined : params.offset,
+                limit: params === undefined ? undefined : params.limit,
                 items: [{id: userId.toString()}]
             }
         }))

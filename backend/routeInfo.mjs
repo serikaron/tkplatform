@@ -30,7 +30,7 @@ const routeInfo = [
     // ------ user end -----
 
     {url: '/backend/v1/site', method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/site'}},
-    {url: '/backend/v1/sites', method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/sites'}},
+    {url: '/backend/v1/sites', method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/backend/sites'}},
     {
         url: "/backend/v1/site/:siteId", method: "PUT", needAuth: true, service: {
             baseURL: "http://site:8080",
