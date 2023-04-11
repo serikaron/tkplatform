@@ -36,7 +36,12 @@ const routeInfo = [
     // ------ user end -----
 
     {url: '/backend/v1/site', method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/site'}},
-    {url: '/backend/v1/sites', method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: '/v1/backend/sites'}},
+    {
+        url: '/backend/v1/sites',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://site:8080", url: '/v1/backend/sites'}
+    },
     {
         url: "/backend/v1/site/:siteId", method: "PUT", needAuth: true, service: {
             baseURL: "http://site:8080",
@@ -66,6 +71,30 @@ const routeInfo = [
         method: 'PUT',
         needAuth: true,
         service: {baseURL: 'http://system:8080', url: '/v1/system/setting'}
+    },
+
+    {
+        url: '/backend/v1/system/versions',
+        method: 'GET',
+        needAuth: true,
+        service: {baseURL: 'http://system:8080', url: '/v1/system/versions/all'}
+    },
+    {
+        url: '/backend/v1/system/version',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://system:8080', url: '/v1/system/version'}
+    },
+    {
+        url: '/backend/v1/system/version/:versionId',
+        method: 'DELETE',
+        needAuth: true,
+        service: {
+            baseURL: 'http://system:8080',
+            url: (req) => {
+                return `/v1/system/version/${req.params.versionId}`
+            }
+        }
     },
 ]
 

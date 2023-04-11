@@ -3,6 +3,7 @@
 import express from "express";
 import {TKResponse} from "../common/TKResponse.mjs";
 import {replaceId} from "../common/utils.mjs";
+import {routeVersion} from "./versions.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -47,6 +48,8 @@ export function setup(app, {setup, teardown}) {
         }))
         next()
     })
+
+    routeVersion(router)
 
     teardown(router)
 }

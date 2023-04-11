@@ -180,6 +180,24 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: "http://system:8080", url: '/v1/system/setting'}
     },
+    {
+        url: "/backend/v1/system/versions",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/versions/all'}
+    },
+    {
+        url: "/backend/v1/system/version",
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/version'}
+    },
+    {
+        url: "/backend/v1/system/version/fake-id",
+        method: "DELETE",
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/version/fake-id'}
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

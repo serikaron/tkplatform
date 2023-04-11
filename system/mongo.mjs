@@ -15,6 +15,7 @@ export async function setupMongo(req) {
     const collection = {
         settings: system.db.collection("settings"),
         questions: system.db.collection("questions"),
+        versions: system.db.collection("versions"),
     }
     req.context.mongo = {
         client: system.client, db: system.db, collection,
@@ -41,7 +42,21 @@ export async function setupMongo(req) {
         getAnswer: async (id) => {
             return await collection.questions
                 .findOne({_id: new ObjectId(id)})
-        }
+        },
+        getVersions: async () => {
+            return await collection.versions
+                .find()
+                .sort({version: -1})
+                .toArray()
+        },
+        addVersion: async (version) => {
+            await collection.versions
+                .insertOne(version)
+        },
+        delVersion: async (id) => {
+            await collection.versions
+                .deleteOne({_id: new ObjectId(id)})
+        },
     }
 }
 

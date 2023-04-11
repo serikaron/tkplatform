@@ -915,6 +915,24 @@ test.concurrent.each([
             url: "/v1/system/question/q-id/answer",
         }
     },
+    {
+        url: "/v1/system/versions",
+        method: "GET",
+        needAuth: false,
+        service: {
+            baseURL: "http://system:8080",
+            url: "/v1/system/versions/history",
+        }
+    },
+    {
+        url: "/v1/system/version/latest",
+        method: "GET",
+        needAuth: false,
+        service: {
+            baseURL: "http://system:8080",
+            url: "/v1/system/version/latest",
+        }
+    },
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

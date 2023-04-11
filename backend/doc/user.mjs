@@ -271,3 +271,71 @@
  *                 type: string
  *
  */
+
+/**
+ * @swagger
+ * /backend/v1/system/versions(版本列表):
+ *   get:
+ *     tags: ['系统配置']
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   version:
+ *                     type: string
+ *                   url:
+ *                     type: string
+ *                     example: 下载地址
+ *                   size:
+ *                     type: number
+ *                     example: 字节大小
+ *                   updateLog:
+ *                     type: string
+ *                     example: 版本公告
+ *                   constraint:
+ *                     type: boolean
+ *                     example: 强制更新
+ */
+
+/**
+ * @swagger
+ * /backend/v1/system/version(添加版本):
+ *   post:
+ *     tags: ['系统配置']
+ *     requestBody:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   version:
+ *                     type: string
+ *                   url:
+ *                     type: string
+ *                     example: 下载地址
+ *                   size:
+ *                     type: number
+ *                     example: 字节大小
+ *                   updateLog:
+ *                     type: string
+ *                     example: 版本公告
+ *                   constraint:
+ *                     type: boolean
+ *                     example: 强制更新
+ */
+
+/**
+ * @swagger
+ * /backend/v1/system/version/:versionId(删除版本):
+ *   post:
+ *     tags: ['系统配置']
+ */

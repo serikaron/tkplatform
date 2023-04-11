@@ -697,7 +697,7 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object:
+ *               type: object
  *               properties:
  *                 total:
  *                   type: number
@@ -765,4 +765,60 @@
  * /v1/user/message/:messageId(删除消息✅):
  *   delete:
  *     tags: ["user(用户相关)","个人中心"]
+ */
+
+/**
+ * @swagger
+ * /v1/system/versions(历史版本✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   version:
+ *                     type: string
+ *                   url:
+ *                     type: string
+ *                     example: 下载地址
+ *                   size:
+ *                     type: number
+ *                     example: 字节大小
+ *                   updateLog:
+ *                     type: string
+ *                     example: 版本公告
+ *                   constraint:
+ *                     type: boolean
+ */
+
+/**
+ * @swagger
+ * /v1/system/version/latest(检查更新✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *                 type: object
+ *                 properties:
+ *                   version:
+ *                     type: string
+ *                   url:
+ *                     type: string
+ *                     example: 下载地址
+ *                   size:
+ *                     type: number
+ *                     example: 字节大小
+ *                   updateLog:
+ *                     type: string
+ *                     example: 版本公告
+ *                   constraint:
+ *                     type: boolean
  */
