@@ -36,7 +36,14 @@ func main() {
 	//系统API
 	apiGroup.Use(middleware.MongoDbPrepareHandler)
 	{
-		apiGroup.POST("/check", controller.CheckWangHandler)                                       //查号接口
+		apiGroup.GET("/check/daily/balance", controller.CheckDailyBalanceHandler)           //每天查号剩余次数
+		apiGroup.POST("/check", controller.CheckWangHandler)                                //查号接口
+		apiGroup.GET("/check/records/recently", controller.CheckWangRecordsRecentlyHandler) //最近查询账号以及最近最近查询结果
+
+		apiGroup.GET("/user/check/account/list", controller.UserCheckAccountListHandler)      //批量查询账号列表
+		apiGroup.POST("/user/check/account/add", controller.UserCheckAccountAddHandler)       //批量查询账号添加
+		apiGroup.POST("/user/check/account/delete", controller.UserCheckAccountDeleteHandler) //批量查询账号删除
+
 		apiGroup.GET("/user/wallet", controller.UserWalletHandler)                                 //用户钱包
 		apiGroup.GET("/user/wallet/overview", controller.UserWalletOverviewHandler)                //用户钱包资金总览
 		apiGroup.GET("/user/wallet/records", controller.UserWalletRecordsHandler)                  //用户钱包资金明细

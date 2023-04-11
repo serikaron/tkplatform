@@ -7,6 +7,7 @@ type PurchaseRecords struct {
 }
 
 type CheckSumResp struct {
+	WangWangAccount   string             `json:"wangWangAccount"`   //旺旺账号
 	BuyerGoodNum      string             `json:"buyerGoodNum"`      //买家信誉点
 	Gender            string             `json:"gender"`            //性别
 	Fox               string             `json:"fox"`               //狐狸
@@ -96,4 +97,12 @@ type MemberItemResp struct {
 	Price         int64  `json:"price"`
 	OriginalPrice int64  `json:"originalPrice"`
 	Promotion     bool   `json:"promotion"`
+}
+
+// 数据结构体
+type UserCheckRecordResp struct {
+	UserId             string        `json:"userId"`
+	CheckAccount       string        `json:"checkAccount"`
+	CheckAccountResult *CheckSumResp `json:"checkAccountResult"`
+	CreatedAt          int64         `json:"createdAt"`
 }

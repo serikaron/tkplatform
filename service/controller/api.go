@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
@@ -17,12 +18,90 @@ const (
 	ClientSecret = "mkl23sml8sx9k02DxQkd5M32LkB6ux"
 )
 
-// @Route: [POST] /v1/api/check
-// @Description: 查号接口
-func CheckWangHandler(c *gin.Context) {
+// @Route: [POST] /v1/api/check/daily/balance
+// @Description: 每天查号剩余次数
+func CheckDailyBalanceHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkuser")
+
+	userCount := dao.CountUserCheckDaily(mongoDb, userId)
+
+	balance := int64(0)
+	if userCount >= 3 {
+		balance = 0
+	} else {
+		balance = 3 - userCount
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"daily_times_balance": balance,
+		},
+	})
+}
+
+// @Route: [POST] /v1/api/check/records
+// @Description: 最近查询账号以及最近最近查询结果
+func CheckWangRecordsRecentlyHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkuser")
+
+	//过去一周的查号记录
+	records := dao.GetUserCheckWangWeekRecords(mongoDb, userId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": records,
+	})
+}
+
+// @Route: [POST] /v1/api/user/check/account/list
+// @Description: 批量查询账号列表
+func UserCheckAccountListHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkuser")
+
+	records := dao.GetUserCheckAccountList(mongoDb, userId)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": records,
+	})
+}
+
+// @Route: [POST] /v1/api/user/check/account/add
+// @Description: 批量查询账号添加
+func UserCheckAccountAddHandler(c *gin.Context) {
 	type param struct {
 		WangWangAccount string `json:"wang_wang_account" binding:"required"`
-		UserId          string `json:"user_id"`
 	}
 
 	var p param
@@ -42,6 +121,94 @@ func CheckWangHandler(c *gin.Context) {
 		constant.ErrMsg(c, constant.BadParameter, "旺旺账号不能为空")
 		return
 	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkuser")
+
+	err = dao.GetUserCheckAccountAdd(mongoDb, userId, p.WangWangAccount)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/user/check/account/delete
+// @Description: 批量查询账号删除
+func UserCheckAccountDeleteHandler(c *gin.Context) {
+	type param struct {
+		WangWangAccount string `json:"wang_wang_account" binding:"required"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	if p.WangWangAccount == "" {
+		constant.ErrMsg(c, constant.BadParameter, "旺旺账号不能为空")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkuser")
+
+	err = dao.GetUserCheckAccountDelete(mongoDb, userId, p.WangWangAccount)
+	if err != nil {
+		logger.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/check
+// @Description: 查号接口
+func CheckWangHandler(c *gin.Context) {
+	type param struct {
+		WangWangAccount []string `json:"wang_wang_account" binding:"required"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	if len(p.WangWangAccount) == 0 {
+		constant.ErrMsg(c, constant.BadParameter, "旺旺账号不能为空")
+		return
+	}
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
@@ -54,23 +221,34 @@ func CheckWangHandler(c *gin.Context) {
 		return
 	}
 
-	res, err := third.CheckWangWang(p.WangWangAccount)
-	if err != nil {
-		logger.Error(err)
-		constant.ErrMsg(c, constant.StatusBadRequest, "验号接口调用失败"+err.Error())
-		return
-	}
+	var list []*model.CheckSumResp
 
-	err = dao.AddUserCheckRecord(mongoDb, userId, p.WangWangAccount)
-	if err != nil {
-		logger.Error(err)
-		return
+	for _, wangAccount := range p.WangWangAccount {
+		item, errCheck := third.CheckWangWang(wangAccount)
+		if errCheck != nil {
+			logger.Error(errCheck)
+			constant.ErrMsg(c, constant.StatusBadRequest, "验号接口调用失败"+errCheck.Error())
+			return
+		}
+
+		itemJson, errJson := json.Marshal(item)
+		if err != nil {
+			logger.Error(errJson)
+		}
+
+		errCheck = dao.AddUserCheckRecord(mongoDb, userId, wangAccount, string(itemJson))
+		if errCheck != nil {
+			logger.Error(errCheck)
+			return
+		}
+		item.WangWangAccount = wangAccount
+		list = append(list, item)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
 		"code": constant.Success,
 		"msg":  "ok",
-		"data": res,
+		"data": list,
 	})
 }
 

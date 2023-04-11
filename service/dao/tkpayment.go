@@ -47,7 +47,6 @@ func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64
 	}
 	_ = cur.Close(context.Background())
 
-	log.Println("collection.Find curl.All: ", all)
 	for _, one := range all {
 		log.Println("type:", one.Type, " - createdAt:", one.CreatedAt)
 	}
@@ -90,7 +89,6 @@ func GetUserWalletWithdrawRecords(db *mongo.Database, userId string, offset, lim
 	}
 	_ = cur.Close(context.Background())
 
-	log.Println("collection.Find curl.All: ", all)
 	for _, one := range all {
 		log.Println("comment:", one.Comment, " - amount:", one.Amount)
 	}
@@ -145,7 +143,6 @@ func GetMemberItems(db *mongo.Database) []*model.MemberItem {
 	}
 	_ = cur.Close(context.Background())
 
-	log.Println("collection.Find curl.All: ", all)
 	for _, one := range all {
 		log.Println("name:", one.Name, " - days:", one.Days, " - price:", one.Price)
 	}
@@ -166,7 +163,6 @@ func GetRiceItems(db *mongo.Database) []*model.RiceItem {
 	}
 	_ = cur.Close(context.Background())
 
-	log.Println("collection.Find curl.All: ", all)
 	for _, one := range all {
 		log.Println("name:", one.Name, " - rice:", one.Rice, " - price:", one.Price)
 	}
