@@ -192,19 +192,55 @@ export async function setupMongo(req) {
         },
         getMessages: async (userId, offset, limit) => {
             return await collection.userMessages
-                .find({userId: new ObjectId(userId)})
+                .find({
+                    userId: new ObjectId(userId),
+                    deleted: {$ne: true}
+                })
+                .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
         },
         countMessages: async (userId) => {
             return await collection.userMessages
-                .countDocuments({userId: new ObjectId(userId)})
+                .countDocuments({
+                    userId: new ObjectId(userId),
+                    deleted: {$ne: true}
+                })
         },
         addMessage: async (message) => {
             const r = await collection.userMessages
                 .insertOne(message)
             return r.insertedId
+        },
+        updateMessage: async (messageId, userId, update) => {
+            await collection.userMessages
+                .updateOne(
+                    {
+                        _id: new ObjectId(messageId),
+                        userId: new ObjectId(userId)
+                    },
+                    {$set: update}
+                )
+        },
+        updateMessages: async (userId, update) => {
+            await collection.userMessages
+                .updateMany(
+                    {
+                        userId: new ObjectId(userId)
+                    },
+                    {$set: update}
+                )
+        },
+        delMessages: async (userId) => {
+            await collection.userMessages
+                .updateMany(
+                    {
+                        userId: new ObjectId(userId),
+                        read: true,
+                    },
+                    {$set: {deleted: true}}
+                )
         }
     }
 }

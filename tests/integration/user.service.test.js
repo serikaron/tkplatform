@@ -530,4 +530,149 @@ describe("test user service", () => {
             })
         })
     })
+
+    describe("test message", () => {
+        const userId = new ObjectId().toString()
+
+        const addMessage = async () => {
+            let id = undefined
+            await runTest({
+                method: "POST",
+                path: '/v1/user/message',
+                body: {userId},
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    id = rsp.data.id
+                }
+            })
+            return id
+        }
+
+        const getMessages = async () => {
+            let out = undefined
+            await runTest({
+                method: "GET",
+                path: '/v1/user/messages',
+                baseURL,
+                userId,
+                verify: rsp => {
+                    simpleVerification(rsp)
+                    out = rsp.data
+                }
+            })
+            return out
+        }
+
+        const sortMessages = (a, b) => {
+            if (a.id < b.id) return -1
+            if (a.id > b.id) return 1
+            return 0
+        }
+
+        describe("test", () => {
+
+            const check = async (messages) => {
+                const r = await getMessages()
+                r.items.sort(sortMessages)
+                r.items.forEach(x => delete x.createdAt)
+                expect(r).toStrictEqual({
+                    total: messages.length,
+                    items: messages
+                })
+            }
+
+            const messages = []
+
+            test("prepare message", async () => {
+                for (let i = 0; i < 5; ++i) {
+                    const id = await addMessage()
+                    messages.push({
+                        id, userId,
+                        read: false,
+                    })
+                }
+
+                messages.sort(sortMessages)
+
+                await check(messages)
+            })
+
+            test("read one message", async () => {
+                await runTest({
+                    method: "PUT",
+                    path: `/v1/user/message/${messages[2].id}`,
+                    body: {read: true},
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                        messages[2].read = true
+                    }
+                })
+
+                await check(messages)
+            })
+
+            test("delete read message (one)", async () => {
+                await runTest({
+                    method: "DELETE",
+                    path: `/v1/user/messages`,
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                        messages.splice(2, 1)
+                    }
+                })
+
+                await check(messages)
+            })
+
+            test('delete by id', async () => {
+                await runTest({
+                    method: "DELETE",
+                    path: `/v1/user/message/${messages[1]}`,
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                        messages.splice(1, 1)
+                    }
+                })
+
+                await check(messages)
+            })
+
+            test("read all and delete", async () => {
+                await runTest({
+                    method: "PUT",
+                    path: '/v1/user/messages',
+                    body: {read: true},
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                        messages.forEach(x => x.read = true)
+                    }
+                })
+
+                await check(messages)
+
+                await runTest({
+                    method: "DELETE",
+                    path: '/v1/user/messages',
+                    baseURL,
+                    userId,
+                    verify: rsp => {
+                        expect(rsp.status).toBe(200)
+                        messages.splice(0, messages.length)
+                    }
+                })
+
+                await check(messages)
+            })
+        })
+    })
 })
