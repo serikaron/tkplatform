@@ -27,7 +27,6 @@ test("read message", async () => {
         teardown: testDIContainer.teardown([])
     })
 
-    const messageId = new ObjectId()
     const userId = new ObjectId()
     const response = await supertest(app)
         .put(`/v1/user/messages`)
