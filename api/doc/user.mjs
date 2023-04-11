@@ -714,13 +714,15 @@
  *                         type: string
  *                       createdAt:
  *                         type: number
+ *                       read:
+ *                         type: boolean
  *
  *
  */
 
 /**
  * @swagger
- * /v1/user/messages(全部设为已读):
+ * /v1/user/messages(全部设为已读✅):
  *   put:
  *     tags: ["user(用户相关)","个人中心"]
  *     requestBody:
@@ -736,7 +738,7 @@
 
 /**
  * @swagger
- * /v1/user/messages(删除已读消息):
+ * /v1/user/messages(删除已读消息✅):
  *   delete:
  *     tags: ["user(用户相关)","个人中心"]
  *
@@ -744,7 +746,7 @@
 
 /**
  * @swagger
- * /v1/user/message/:messageId(更新消息):
+ * /v1/user/message/:messageId(更新消息✅):
  *   put:
  *     tags: ["user(用户相关)","个人中心"]
  *     requestBody:
@@ -760,7 +762,7 @@
 
 /**
  * @swagger
- * /v1/user/message/:messageId(删除消息):
+ * /v1/user/message/:messageId(删除消息✅):
  *   delete:
  *     tags: ["user(用户相关)","个人中心"]
  */
