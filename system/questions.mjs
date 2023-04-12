@@ -4,7 +4,7 @@ import {getValueNumber, replaceId} from "../common/utils.mjs";
 
 export const routeQuestion = router => {
     router.get('/questions', async (req, res, next) => {
-        const l = await req.context.mongo.getQuestions(offset, limit)
+        const l = await req.context.mongo.getQuestions()
         res.tkResponse(TKResponse.Success({
             data: l.map(replaceId)
         }))
