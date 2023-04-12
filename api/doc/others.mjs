@@ -19,53 +19,58 @@
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 buyerGoodNum:
- *                   type: string
- *                   example: 买家信誉
- *                 gender:
- *                   type: string
- *                   example: 性别
- *                 fox:
- *                   type: string
- *                 wwcreatedStr:
- *                   type: string
- *                   example: 注册日期
- *                 weekCount:
- *                   type: number
- *                   example: 本周查过商家
- *                 countBefore:
- *                   type: number
- *                   example: 上周查过商家
- *                 taoling:
- *                   type: number
- *                   example: 淘龄
- *                 purchaseRecords:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                 jiangNum:
- *                   type: number
- *                   example:
- *                 sentRate:
- *                   type: string
- *                 weekCreditAverage:
- *                   type: number
- *                   example: 买家总周平均
- *                 receivedRate:
- *                   type: string
- *                   example: 收到好评
- *                 yunBlack:
- *                   type: number
- *                 renZheng:
- *                   type: string
- *                 sellerTotalNum:
- *                   type: string
- *                   example: 商家信誉
- *                 badTotal:
- *                   type: string
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   wangWangAccount:
+ *                     type: string
+ *                     example: 旺旺账号
+ *                   buyerGoodNum:
+ *                     type: string
+ *                     example: 买家信誉
+ *                   gender:
+ *                     type: string
+ *                     example: 性别
+ *                   fox:
+ *                     type: string
+ *                   wwcreatedStr:
+ *                     type: string
+ *                     example: 注册日期
+ *                   weekCount:
+ *                     type: number
+ *                     example: 本周查过商家
+ *                   countBefore:
+ *                     type: number
+ *                     example: 上周查过商家
+ *                   taoling:
+ *                     type: number
+ *                     example: 淘龄
+ *                   purchaseRecords:
+ *                     type: array
+ *                     items:
+ *                       type: object
+ *                       properties:
+ *                   jiangNum:
+ *                     type: number
+ *                     example:
+ *                   sentRate:
+ *                     type: string
+ *                   weekCreditAverage:
+ *                     type: number
+ *                     example: 买家总周平均
+ *                   receivedRate:
+ *                     type: string
+ *                     example: 收到好评
+ *                   yunBlack:
+ *                     type: number
+ *                   renZheng:
+ *                     type: string
+ *                   sellerTotalNum:
+ *                     type: string
+ *                     example: 商家信誉
+ *                   badTotal:
+ *                     type: string
  *
  */
 
@@ -91,7 +96,7 @@
  *   get:
  *     tags: ["其它","site(站点)"]
  *     responses:
- *       200
+ *       200:
  *         content:
  *           application/json:
  *             schema:

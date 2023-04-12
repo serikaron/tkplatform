@@ -10,5 +10,13 @@ export async function migrate(mongoClient) {
                 key: "minimalWithdraw",
                 value: 10000,
             },
+            {
+                key: "upLineCommission",
+                value: 0.1,
+            },
+            {
+                key: "claimDownLinePrice",
+                value: 10,
+            }
         ])
 }
