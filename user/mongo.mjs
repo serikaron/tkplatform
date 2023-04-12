@@ -152,7 +152,7 @@ export async function setupMongo(req) {
             return await collection.users
                 .findOne(
                     {_id: new ObjectId(userId)},
-                    {projection: {phone: 1, member: 1}}
+                    {projection: {phone: 1, member: 1, identification: 1}}
                 )
         },
         addBackendUser: async (user) => {

@@ -9,7 +9,7 @@ export const routeGetUserCentre = router => {
         centre.id = idStr.substring(idStr.length - 8)
         delete centre._id
         centre.notice = []
-        centre.identified = false
+        centre.identified = centre.hasOwnProperty("identification")
         centre.wallet = {
             cash: 0,
             rice: 0

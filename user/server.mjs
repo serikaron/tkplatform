@@ -26,6 +26,7 @@ import {routePutMessage} from "./handlers/putMessage.mjs";
 import {routeDelMessage} from "./handlers/delMessage.mjs";
 import {routePutMessages} from "./handlers/putMessages.mjs";
 import {routeDelMessages} from "./handlers/delMessages.mjs";
+import {routeIdentification} from "./handlers/identification.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -54,6 +55,7 @@ export function setup(app, {
     routePutMessages(router)
     routeDelMessage(router)
     routeDelMessages(router)
+    routeIdentification(router)
 
     routeBackendLogin(router)
     routeBackendRegister(router)

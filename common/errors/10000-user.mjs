@@ -73,3 +73,23 @@ export class ResetAccountFailed extends TKError {
         });
     }
 }
+
+export class IdentifyFailed extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase - 8,
+            msg: "实名认证失败"
+        });
+    }
+}
+
+export class AlreadyIdentified extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase - 9,
+            msg: "已经实名认证"
+        });
+    }
+}
