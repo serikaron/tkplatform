@@ -76,7 +76,7 @@
 
 /**
  * @swagger
- * /v1/search/remain(剩余次数):
+ * /v1/search/remain(剩余次数✅):
  *   get:
  *     tags: ["其它","site(站点)"]
  *     responses:
@@ -92,7 +92,7 @@
 
 /**
  * @swagger
- * /v1/search/recently(最近查询帐号):
+ * /v1/search/recently(最近查询帐号✅):
  *   get:
  *     tags: ["其它","site(站点)"]
  *     responses:
@@ -103,7 +103,7 @@
  *               type: array
  *               items:
  *                 type: object
- *                 properties
+ *                 properties:
  *                   userId:
  *                     type: string
  *                   checkAccount:
@@ -165,7 +165,7 @@
 
 /**
  * @swagger
- * /v1/search/accounts(查询帐号列表):
+ * /v1/search/accounts(查询帐号列表✅):
  *   get:
  *     tags: ["其它","site(站点)"]
  *     responses:
@@ -182,7 +182,7 @@
 
 /**
  * @swagger
- * /v1/search/account/add(添加查询帐号):
+ * /v1/search/account/add(添加查询帐号✅):
  *   post:
  *     tags: ["其它","site(站点)"]
  *     requestBody:
@@ -197,7 +197,7 @@
 
 /**
  * @swagger
- * /v1/search/account/delete(删除查询帐号):
+ * /v1/search/account/delete(删除查询帐号✅):
  *   post:
  *     tags: ["其它","site(站点)"]
  *     requestBody:
