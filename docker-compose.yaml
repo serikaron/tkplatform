@@ -62,11 +62,13 @@ services:
   apid:
     image: car.daoyi365.com:5000/tk-apid
     restart: always
-    entrypoint: ./apid
+    entrypoint: ./apid --conf=/app/go-config.json
     depends_on:
       - user_db
     ports:
       - "9010:9010"
+    volumes:
+      - ./go-config.json:/app/go-config.json
 
   token:
     image: car.daoyi365.com:5000/tk-token

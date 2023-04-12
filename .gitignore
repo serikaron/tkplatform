@@ -107,5 +107,6 @@ dist
 ignore
 client.json
 mongo-data
+go-config.json
 
 service/apid
