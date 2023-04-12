@@ -912,7 +912,7 @@ test.concurrent.each([
         needAuth: true,
         service: {
             baseURL: "http://apid:9010",
-            url: "/v1/api/user/check/accounts"
+            url: "/v1/api/user/check/account/list"
         }
     },
     {
