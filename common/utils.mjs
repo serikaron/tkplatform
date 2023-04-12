@@ -110,6 +110,10 @@ export function mergeObjects(base, update) {
 }
 
 export const getValueNumber = (dict, key, def) => {
+    if (dict === undefined) {
+        return def
+    }
+
     if (!dict.hasOwnProperty(key)) {
         return def
     }

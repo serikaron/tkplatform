@@ -41,6 +41,10 @@ export async function setupMongo(req) {
                 .limit(limit)
                 .toArray()
         },
+        countQuestions: async () => {
+            return await collection.questions
+                .countDocuments()
+        },
         getAnswer: async (id) => {
             return await collection.questions
                 .findOne({_id: new ObjectId(id)})

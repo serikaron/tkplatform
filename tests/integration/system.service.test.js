@@ -29,7 +29,7 @@ test("questions", async () => {
             userId,
             verify: rsp => {
                 simpleVerification(rsp)
-                console.log(rsp.data)
+                // console.log(rsp.data)
             }
         })
     }
