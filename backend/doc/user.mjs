@@ -383,3 +383,43 @@
  *   post:
  *     tags: ['系统配置']
  */
+
+/**
+ * @swagger
+ * /backend/v1/user/reports(用户反馈列表):
+ *   get:
+ *     tags: ["反馈建议管理"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   type:
+ *                     type: string
+ *                   site:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                   detail:
+ *                     type: string
+ *                   screenshot:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ *                       example: 上传后的地址
+ *                   video:
+ *                     type: string
+ *                     example: 上传后的地址
+ *                   reportedAt:
+ *                     type: number
+ *                     example: timestamp
+ */

@@ -184,6 +184,18 @@ export async function setupMongo(req) {
                 .sort({reportedAt: -1})
                 .toArray()
         },
+        backendGetReports: async (offset, limit) => {
+            return await collection.userReports
+                .find()
+                .sort({reportedAt: -1})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+        },
+        backendCountReports: async () => {
+            return await collection.userReports
+                .countDocuments()
+        },
         getReport: async (reportId, userId) => {
             return await collection.userReports
                 .findOne({
