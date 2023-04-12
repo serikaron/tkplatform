@@ -296,6 +296,12 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: 'http://user:8080', url: '/v1/user/message/fake-id'}
     },
+    {
+        url: '/v1/user/identification',
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/identification'}
+    },
 
     // ---- user end ----
 

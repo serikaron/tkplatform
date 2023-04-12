@@ -822,3 +822,52 @@
  *                   constraint:
  *                     type: boolean
  */
+
+/**
+ * @swagger
+ * /v1/user/identification(实名认证✅):
+ *   post:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idNo:
+ *                 type: string
+ *                 example: 身份证号
+ *               name:
+ *                 type: string
+ *                 example: 真实姓名
+ *               image:
+ *                 type: string
+ *                 example: 照片地址
+ *               wechat:
+ *                 type: string
+ *               qq:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: 验证成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *       400:
+ *         description: 验证失败
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: number
+ *                   example: 10008 - 验证失败, 10009 - 已读验证过
+ *                 msg:
+ *                   type: string
+ *
+ *
+ *
+ */

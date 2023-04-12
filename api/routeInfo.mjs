@@ -25,6 +25,9 @@ const routeInfo = [
     {url: '/v1/user/messages', method: 'DELETE', needAuth: true, service: {baseURL: 'http://user:8080'}},
     {url: '/v1/user/message/:messageId', method: 'PUT', needAuth: true, service: {baseURL: 'http://user:8080'}},
     {url: '/v1/user/message/:messageId', method: 'DELETE', needAuth: true, service: {baseURL: 'http://user:8080'}},
+    {url: '/v1/user/identification', method: 'POST', needAuth: true, service: {baseURL: 'http://user:8080'}},
+    // ----- use end ----
+
     // site
     {
         url: '/v1/sites', method: "GET", needAuth: true,
