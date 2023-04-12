@@ -187,6 +187,36 @@ const routeInfo = [
         needAuth: true,
         service: {baseURL: "http://apid:9010", url: '/v1/api/check'}
     },
+    {
+        url: "/v1/search/recently",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/check/records/recently'}
+    },
+    {
+        url: "/v1/search/remain",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/check/daily/balance'}
+    },
+    {
+        url: "/v1/search/accounts",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/user/check/account/list'}
+    },
+    {
+        url: "/v1/search/account/add",
+        method: "POSt",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/user/check/account/add'}
+    },
+    {
+        url: "/v1/search/account/delete",
+        method: "POSt",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/user/check/account/delete'}
+    },
     {url: "/v1/file", method: "POST", needAuth: true, service: {baseURL: "http://file:8080", url: '/v1/file'}},
     {url: "/v1/system/questions", method: "GET", needAuth: true, service: {baseURL: "http://system:8080"}},
     {
