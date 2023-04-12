@@ -43,6 +43,22 @@ export async function setupMongo(req) {
             return await collection.questions
                 .findOne({_id: new ObjectId(id)})
         },
+        addQuestion: async (q) => {
+            const r = await collection.questions
+                .insertOne(q)
+            return r.insertedId
+        },
+        updateQuestion: async (id, q) => {
+            await collection.questions
+                .updateOne(
+                    {_id: new ObjectId(id)},
+                    {$set: q}
+                )
+        },
+        deleteQuestion: async (id) => {
+            await collection.questions
+                .deleteOne({_id: new ObjectId(id)})
+        },
         getVersions: async () => {
             return await collection.versions
                 .find()

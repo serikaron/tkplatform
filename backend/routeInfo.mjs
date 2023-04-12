@@ -102,6 +102,54 @@ const routeInfo = [
             }
         }
     },
+
+    // ----- question -----
+    {
+        url: '/backend/v1/system/questions',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: 'http://system:8080', url: '/v1/system/questions'}
+    },
+    {
+        url: '/backend/v1/system/question/:questionId/answer',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: 'http://system:8080',
+            url: (req) => {
+                return `/v1/system/question/${req.params.questionId}/answer`
+            }
+        }
+    },
+    {
+        url: '/backend/v1/system/question',
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: 'http://system:8080', url: '/v1/system/question'}
+    },
+    {
+        url: '/backend/v1/system/question/:questionId',
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: 'http://system:8080',
+            url: (req) => {
+                return `/v1/system/question/${req.params.questionId}`
+            }
+        }
+    },
+    {
+        url: '/backend/v1/system/question/:questionId',
+        method: "DELETE",
+        needAuth: true,
+        service: {
+            baseURL: 'http://system:8080',
+            url: (req) => {
+                return `/v1/system/question/${req.params.questionId}`
+            }
+        }
+    },
+// ----- question end -----
 ]
 
 export default routeInfo

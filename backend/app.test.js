@@ -159,7 +159,12 @@ test.concurrent.each([
     // ----- user end ----------
 
     {url: "/backend/v1/site", method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/site"}},
-    {url: "/backend/v1/sites", method: "GET", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/backend/sites"}},
+    {
+        url: "/backend/v1/sites",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://site:8080", url: "/v1/backend/sites"}
+    },
     {
         url: "/backend/v1/site/fake-site-id",
         method: "PUT",
@@ -204,6 +209,39 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: "http://system:8080", url: '/v1/system/version/fake-id'}
     },
+
+    // ----- question -----
+    {
+        url: "/backend/v1/system/questions",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/questions'}
+    },
+    {
+        url: "/backend/v1/system/question/q-id/answer",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: "/v1/system/question/q-id/answer"}
+    },
+    {
+        url: '/backend/v1/system/question',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/question'}
+    },
+    {
+        url: '/backend/v1/system/question/q-id',
+        method: 'PUT',
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/question/q-id'}
+    },
+    {
+        url: '/backend/v1/system/question/q-id',
+        method: 'DELETE',
+        needAuth: true,
+        service: {baseURL: "http://system:8080", url: '/v1/system/question/q-id'}
+    },
+    // ----- question end-----
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })

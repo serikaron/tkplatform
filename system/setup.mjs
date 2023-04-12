@@ -2,8 +2,8 @@
 
 import express from "express";
 import {TKResponse} from "../common/TKResponse.mjs";
-import {replaceId} from "../common/utils.mjs";
 import {routeVersion} from "./versions.mjs";
+import {routeQuestion} from "./questions.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -33,21 +33,7 @@ export function setup(app, {setup, teardown}) {
         next()
     })
 
-    router.get('/questions', async (req, res, next) => {
-        const l = await req.context.mongo.getQuestions()
-        res.tkResponse(TKResponse.Success({
-            data: l.map(replaceId)
-        }))
-        next()
-    })
-
-    router.get('/question/:questionId/answer', async (req, res, next) => {
-        const a = await req.context.mongo.getAnswer(req.params.questionId)
-        res.tkResponse(TKResponse.Success({
-            data: a
-        }))
-        next()
-    })
+    routeQuestion(router)
 
     routeVersion(router)
 
