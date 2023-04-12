@@ -7,6 +7,7 @@ type PurchaseRecords struct {
 }
 
 type CheckSumResp struct {
+	WangWangAccount   string             `json:"wangWangAccount"`   //旺旺账号
 	BuyerGoodNum      string             `json:"buyerGoodNum"`      //买家信誉点
 	Gender            string             `json:"gender"`            //性别
 	Fox               string             `json:"fox"`               //狐狸
@@ -23,4 +24,85 @@ type CheckSumResp struct {
 	RenZheng          string             `json:"renZheng"`          //认证信息
 	SellerTotalNum    string             `json:"sellerTotalNum"`    //商家信誉点
 	BadTotal          string             `json:"badTotal"`          //中差评数
+}
+
+type MemberPo struct {
+	Title      string `json:"title"`
+	Price      int64  `json:"price"`
+	RemainDays int    `json:"remainDays"`
+	CreatedAt  int64  `json:"createdAt"`
+}
+
+type WithdrawPo struct {
+	Title     string `json:"title"`
+	Amount    int64  `json:"amount"`
+	Balance   int64  `json:"balance"`
+	CreatedAt int64  `json:"createdAt"`
+}
+
+type DownLinePo struct {
+	Title     string `json:"title"`
+	Amount    int64  `json:"amount"`
+	Balance   int64  `json:"balance"`
+	CreatedAt int64  `json:"createdAt"`
+}
+
+type ActivityPo struct {
+	Title     string `json:"title"`
+	Amount    int64  `json:"amount"`
+	Balance   int64  `json:"balance"`
+	CreatedAt int64  `json:"createdAt"`
+}
+
+type RicePo struct {
+	Title      string `json:"title"`
+	Price      int64  `json:"price"`
+	RemainDays int    `json:"remainDays"`
+	CreatedAt  int64  `json:"createdAt"`
+}
+
+type UserWalletRecordResp struct {
+	Id        string      `json:"id"`
+	Type      int         `json:"type"`
+	Member    *MemberPo   `json:"member"`
+	Withdraw  *WithdrawPo `json:"withdraw"`
+	DownLine  *DownLinePo `json:"downLine"`
+	Activity  *ActivityPo `json:"activity"`
+	Rice      *RicePo     `json:"rice"`
+	CreatedAt int64       `json:"createdAt"`
+}
+
+type UserWalletWithdrawRecordResp struct {
+	Id        string `json:"id"`
+	Comment   string `json:"comment"`
+	Amount    int64  `json:"amount"`
+	Fee       int64  `json:"fee"`
+	Status    bool   `json:"status"`
+	CreatedAt int64  `json:"createdAt"`
+}
+
+type RiceItemResp struct {
+	Id            string `json:"id"`
+	Name          string `json:"name"`
+	Rice          int    `json:"rice"`
+	Price         int64  `json:"price"`
+	OriginalPrice int64  `json:"originalPrice"`
+	Promotion     bool   `json:"promotion"`
+}
+
+type MemberItemResp struct {
+	Id            string `json:"id"`
+	Name          string `json:"name"`
+	Days          int    `json:"days"`
+	Price         int64  `json:"price"`
+	OriginalPrice int64  `json:"originalPrice"`
+	Promotion     bool   `json:"promotion"`
+}
+
+// 数据结构体
+type UserCheckRecordResp struct {
+	UserId             string        `json:"userId"`
+	CheckAccount       string        `json:"checkAccount"`
+	CheckAccountResult *CheckSumResp `json:"checkAccountResult"`
+	CreatedAt          int64         `json:"createdAt"`
 }
