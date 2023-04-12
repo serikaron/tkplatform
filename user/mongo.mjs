@@ -202,11 +202,27 @@ export async function setupMongo(req) {
                 .limit(limit)
                 .toArray()
         },
+        backendGetMessages: async (userId, offset, limit) => {
+            return await collection.userMessages
+                .find({
+                    userId: new ObjectId(userId),
+                })
+                .sort({_id: -1})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+        },
         countMessages: async (userId) => {
             return await collection.userMessages
                 .countDocuments({
                     userId: new ObjectId(userId),
                     deleted: {$ne: true}
+                })
+        },
+        backendCountMessages: async (userId) => {
+            return await collection.userMessages
+                .countDocuments({
+                    userId: new ObjectId(userId),
                 })
         },
         addMessage: async (message) => {

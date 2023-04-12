@@ -274,6 +274,50 @@
 
 /**
  * @swagger
+ * /backend/v1/user/messages(查询消息✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     parameters:
+ *     - in path:
+ *       name: offset
+ *       type: number
+ *     - in path:
+ *       name: limit
+ *       type: number
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       title:
+ *                         type: string
+ *                       content:
+ *                         type: string
+ *                       createdAt:
+ *                         type: number
+ *                       read:
+ *                         type: boolean
+ *
+ *
+ */
+
+/**
+ * @swagger
  * /backend/v1/system/versions(版本列表):
  *   get:
  *     tags: ['系统配置']

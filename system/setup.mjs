@@ -21,7 +21,7 @@ export function setup(app, {setup, teardown}) {
 
     router.put("/setting", async (req, res, next) => {
         await req.context.mongo.set(req.body.key, req.body.value)
-        res.response()
+        res.tkResponse(TKResponse.Success())
         next()
     })
 
