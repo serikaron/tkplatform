@@ -7,10 +7,11 @@ type PurchaseRecords struct {
 }
 
 type CheckSumResp struct {
-	WangWangAccount   string             `json:"wangWangAccount"`   //旺旺账号
-	BuyerGoodNum      string             `json:"buyerGoodNum"`      //买家信誉点
-	Gender            string             `json:"gender"`            //性别
-	Fox               string             `json:"fox"`               //狐狸
+	WangWangAccount string `json:"wangWangAccount"` //旺旺账号
+	BuyerGoodNum    string `json:"buyerGoodNum"`    //买家信誉点
+	Gender          string `json:"gender"`          //性别
+	//Fox               string             `json:"fox"`               //狐狸
+	Fox               int                `json:"fox"`               //狐狸
 	WwcreatedStr      string             `json:"wwcreatedStr"`      //注册时间
 	WeekCount         int                `json:"weekCount"`         //本周被商家查询的次数
 	CountBefore       int                `json:"countBefore"`       //上周被商家查询的次数

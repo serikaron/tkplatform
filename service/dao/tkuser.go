@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 	"service/logger"
@@ -50,6 +51,19 @@ func AddUserCheckRecord(db *mongo.Database, userId, checkAccount, checkResultStr
 	}
 	log.Println("录入数据成功，objId:", objId)
 	return nil
+}
+
+func GetUser(db *mongo.Database, userId string) *model.User {
+	collection := db.Collection("users")
+
+	var user model.User
+	id, _ := primitive.ObjectIDFromHex(userId)
+	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+	return &user
 }
 
 // 过去一周

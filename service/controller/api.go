@@ -11,6 +11,7 @@ import (
 	"service/logger"
 	"service/model"
 	"service/third"
+	"time"
 )
 
 const (
@@ -215,20 +216,30 @@ func CheckWangHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
+	user := dao.GetUser(mongoDb, userId)
+
+	now := time.Now().Unix()
+	if user.Member.Expiration < now {
+		constant.ErrMsg(c, constant.UserMemberExpired)
+		return
+	}
+
 	userCount := dao.CountUserCheckDaily(mongoDb, userId)
 	if userCount >= 3 {
 		constant.ErrMsg(c, constant.CheckAccountTooMuch)
 		return
 	}
 
-	var list []*model.CheckSumResp
+	//var list []model.CheckSumResp
+
+	list := make([]model.CheckSumResp, 0)
 
 	for _, wangAccount := range p.WangWangAccount {
 		item, errCheck := third.CheckWangWang(wangAccount)
 		if errCheck != nil {
 			logger.Error(errCheck)
-			constant.ErrMsg(c, constant.StatusBadRequest, "验号接口调用失败"+errCheck.Error())
-			return
+			//constant.ErrMsg(c, constant.StatusBadRequest, "验号接口调用失败"+errCheck.Error())
+			continue
 		}
 
 		itemJson, errJson := json.Marshal(item)
@@ -242,7 +253,7 @@ func CheckWangHandler(c *gin.Context) {
 			return
 		}
 		item.WangWangAccount = wangAccount
-		list = append(list, item)
+		list = append(list, *item)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -503,6 +514,15 @@ func StoreRiceItemsHandler(c *gin.Context) {
 		})
 	}
 
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": list,
+	})
+}
+
+func TestHandler(c *gin.Context) {
+	list := []string{}
 	c.JSON(http.StatusOK, gin.H{
 		"code": constant.Success,
 		"msg":  "ok",

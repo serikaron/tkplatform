@@ -36,6 +36,7 @@ const (
 	ServiceUnavailable  = ErrorType(503)
 
 	CheckAccountTooMuch = ErrorType(1000)
+	UserMemberExpired   = ErrorType(1001)
 )
 
 var ErrCodeTextMap = map[ErrorType]string{
@@ -53,6 +54,7 @@ var ErrCodeTextMap = map[ErrorType]string{
 	ServiceUnavailable:  "服务不可用",
 
 	CheckAccountTooMuch: "查号次数过多",
+	UserMemberExpired:   "会员已过期",
 }
 
 func printError(w io.Writer, c *gin.Context, msg string) {
@@ -91,7 +93,7 @@ func ErrMsg(c *gin.Context, errCode ErrorType, extra ...string) {
 
 	printError(os.Stdout, c, errMsg)
 
-	c.JSON(http.StatusOK, gin.H{"err_code": errCode, "err_msg": errMsg})
+	c.JSON(http.StatusOK, gin.H{"code": errCode, "msg": errMsg, "data": nil})
 }
 
 func ErrMsgRecordNotFound(err error, c *gin.Context, errCode ErrorType, extra ...string) {

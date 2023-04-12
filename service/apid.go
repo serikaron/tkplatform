@@ -36,6 +36,8 @@ func main() {
 	//系统API
 	apiGroup.Use(middleware.MongoDbPrepareHandler)
 	{
+		apiGroup.GET("/test", controller.TestHandler) //每天查号剩余次数
+
 		apiGroup.GET("/check/daily/balance", controller.CheckDailyBalanceHandler)           //每天查号剩余次数
 		apiGroup.POST("/check", controller.CheckWangHandler)                                //查号接口
 		apiGroup.GET("/check/records/recently", controller.CheckWangRecordsRecentlyHandler) //最近查询账号以及最近最近查询结果
