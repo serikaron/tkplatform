@@ -1,10 +1,12 @@
 'use strict'
 import {TKResponse} from "../common/TKResponse.mjs";
-import {replaceId} from "../common/utils.mjs";
+import {getValueNumber, replaceId} from "../common/utils.mjs";
 
 export const routeQuestion = router => {
     router.get('/questions', async (req, res, next) => {
-        const l = await req.context.mongo.getQuestions()
+        const offset = getValueNumber(req.query.offset, "offset", 0)
+        const limit = getValueNumber(req.query.limit, "limit", 1000)
+        const l = await req.context.mongo.getQuestions(offset, limit)
         res.tkResponse(TKResponse.Success({
             data: l.map(replaceId)
         }))

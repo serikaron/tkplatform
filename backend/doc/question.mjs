@@ -5,6 +5,13 @@
  * /backend/v1/system/questions(问题列表):
  *   get:
  *     tags: ["在线帮助文档管理"]
+ *     parameters:
+ *     - in path:
+ *       name: offset
+ *       type: number
+ *     - in path:
+ *       name: limit
+ *       type: number
  *     responses:
  *       200:
  *        content:

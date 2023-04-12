@@ -32,11 +32,13 @@ export async function setupMongo(req) {
                 .find()
                 .toArray()
         },
-        getQuestions: async () => {
+        getQuestions: async (offset, limit) => {
             return await collection.questions
                 .find({}, {
                     projection: {_id: 1, question: 1, icon: 1}
                 })
+                .skip(offset)
+                .limit(limit)
                 .toArray()
         },
         getAnswer: async (id) => {
