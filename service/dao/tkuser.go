@@ -39,6 +39,12 @@ type UserCheckRecord struct {
 
 func AddUserCheckRecord(db *mongo.Database, userId, checkAccount, checkResultStr string) error {
 	collection := db.Collection("userCheckRecord")
+	deleteResult, err := collection.DeleteMany(context.Background(), bson.M{"userId": userId, "checkAccount": checkAccount})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("删除数据成功:", deleteResult)
+
 	objId, err := collection.InsertOne(context.TODO(), &UserCheckRecord{
 		UserId:             userId,
 		CheckAccount:       checkAccount,
