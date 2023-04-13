@@ -302,6 +302,12 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: 'http://user:8080', url: '/v1/user/identification'}
     },
+    {
+        url: '/v1/user/identification',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/identification'}
+    },
 
     // ---- user end ----
 

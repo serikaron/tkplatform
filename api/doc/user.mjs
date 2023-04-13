@@ -847,6 +847,9 @@
  *                 type: string
  *               qq:
  *                 type: string
+ *               force:
+ *                 type: boolean
+ *                 example: 跳过阿里云检测
  *     responses:
  *       200:
  *         description: 验证成功
@@ -868,6 +871,34 @@
  *                 msg:
  *                   type: string
  *
- *
- *
+ */
+
+/**
+ * @swagger
+ * /v1/user/identification(查询实名认证✅):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 identified:
+ *                   type: boolean
+ *                   example: identified=false 为未实名认证，没有identification字段s
+ *                 identification:
+ *                   type: object
+ *                   properties:
+ *                     idNo:
+ *                      type: string
+ *                     name:
+ *                      type: string
+ *                     image:
+ *                      type: string
+ *                     wechat:
+ *                      type: string
+ *                     qq:
+ *                      type: string
  */
