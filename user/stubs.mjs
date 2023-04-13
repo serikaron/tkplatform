@@ -4,6 +4,7 @@ import {axiosCall} from "../common/call.mjs";
 import FormData from "form-data";
 import axios from "axios";
 import {TKResponse} from "../common/TKResponse.mjs";
+import {InternalError} from "../common/errors/00000-basic.mjs";
 
 export function tokenPayload(id, phone) {
     return {
@@ -92,17 +93,22 @@ export function setupStub(req) {
             const formData = new FormData()
             formData.append("idNo", idNo)
             formData.append("name", name)
-            const r = await axios.post(
-                'https://idenauthen.market.alicloudapi.com/idenAuthentication',
-                formData,
-                {
-                    headers: {
-                        ...formData.getHeaders(),
-                        Authorization: `APPCODE ${appCode}`,
-                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-                    }
-                })
-            return new TKResponse(r.status, r.data)
+            try {
+                const r = await axios.post(
+                    'https://idenauthen.market.alicloudapi.com/idenAuthentication',
+                    formData,
+                    {
+                        headers: {
+                            ...formData.getHeaders(),
+                            Authorization: `APPCODE ${appCode}`,
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        }
+                    })
+                return r
+            } catch (e) {
+                console.log(`axios identify error ${e}`)
+                return TKResponse.fromError(new InternalError())
+            }
         },
     }
 }

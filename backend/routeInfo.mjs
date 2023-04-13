@@ -114,7 +114,7 @@ const routeInfo = [
         url: '/backend/v1/system/questions',
         method: "GET",
         needAuth: true,
-        service: {baseURL: 'http://system:8080', url: '/v1/system/questions'}
+        service: {baseURL: 'http://system:8080', url: '/v1/system/backend/questions'}
     },
     {
         url: '/backend/v1/system/question/:questionId/answer',
