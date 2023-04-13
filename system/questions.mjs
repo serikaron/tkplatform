@@ -36,7 +36,7 @@ export const routeQuestion = router => {
     })
 
     router.post('/question', async (req, res, next) => {
-        const id = await req.context.mongo.addQuestion(q)
+        const id = await req.context.mongo.addQuestion(req.body)
         res.tkResponse(TKResponse.Success({data: {id}}))
         next()
     })

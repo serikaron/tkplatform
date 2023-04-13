@@ -11,11 +11,12 @@ COPY ["package.json", "package-lock.json*", "./"]
 
 RUN npm install --omit=dev
 
+COPY common /app/common
+
 FROM tk-node as node-service
 
 ARG name
 
-COPY common /app/common
 COPY ${name} /app/${name}
 
 FROM golang:1.18-alpine as tk-go

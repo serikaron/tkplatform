@@ -16,6 +16,7 @@ export const routeIdentification = router => {
         }
 
         const r = await req.context.aliyun.identify(process.env.ALIYUN_APP_CODE, req.body.idNo, req.body.name)
+        console.log(`identify result ${r}`)
         if (r.respCode !== "0000") {
             throw new IdentifyFailed()
         }
