@@ -4,13 +4,27 @@ import {getValueNumber, replaceId} from "../common/utils.mjs";
 
 export const routeQuestion = router => {
     router.get('/questions', async (req, res, next) => {
-        const offset = getValueNumber(req.query.offset, "offset", 0)
-        const limit = getValueNumber(req.query.limit, "limit", 1000)
-        const l = await req.context.mongo.getQuestions(offset, limit)
+        const l = await req.context.mongo.getQuestions()
         res.tkResponse(TKResponse.Success({
             data: l.map(replaceId)
         }))
         next()
+    })
+
+    router.get('/backend/questions', async (req, res, next) => {
+        const offset = getValueNumber(req.query.offset, "offset", 0)
+        const limit = getValueNumber(req.query.limit, "limit", 1000)
+        const l = await req.context.mongo.getQuestions(offset, limit)
+        const c = await req.context.mongo.countQuestions()
+        res.tkResponse(TKResponse.Success({
+            data: {
+                total: c,
+                offset, limit,
+                items: l.map(replaceId)
+            }
+        }))
+        next()
+
     })
 
     router.get('/question/:questionId/answer', async (req, res, next) => {
@@ -22,7 +36,7 @@ export const routeQuestion = router => {
     })
 
     router.post('/question', async (req, res, next) => {
-        const id = await req.context.mongo.addQuestion(q)
+        const id = await req.context.mongo.addQuestion(req.body)
         res.tkResponse(TKResponse.Success({data: {id}}))
         next()
     })
