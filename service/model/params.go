@@ -11,7 +11,7 @@ type CheckSumResp struct {
 	BuyerGoodNum    string `json:"buyerGoodNum"`    //买家信誉点
 	Gender          string `json:"gender"`          //性别
 	//Fox               string             `json:"fox"`               //狐狸
-	Fox               int                `json:"fox"`               //狐狸
+	//Fox               int                `json:"fox"`               //狐狸
 	WwcreatedStr      string             `json:"wwcreatedStr"`      //注册时间
 	WeekCount         int                `json:"weekCount"`         //本周被商家查询的次数
 	CountBefore       int                `json:"countBefore"`       //上周被商家查询的次数
@@ -86,8 +86,8 @@ type RiceItemResp struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
 	Rice          int    `json:"rice"`
-	Price         int64  `json:"price"`
-	OriginalPrice int64  `json:"originalPrice"`
+	Price         string `json:"price"`
+	OriginalPrice string `json:"originalPrice"`
 	Promotion     bool   `json:"promotion"`
 }
 
@@ -95,8 +95,8 @@ type MemberItemResp struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
 	Days          int    `json:"days"`
-	Price         int64  `json:"price"`
-	OriginalPrice int64  `json:"originalPrice"`
+	Price         string `json:"price"`
+	OriginalPrice string `json:"originalPrice"`
 	Promotion     bool   `json:"promotion"`
 }
 

@@ -53,7 +53,7 @@ func AddUserCheckRecord(db *mongo.Database, userId, checkAccount, checkResultStr
 	return nil
 }
 
-func GetUser(db *mongo.Database, userId string) *model.User {
+func GetUser(db *mongo.Database, userId string) (*model.User, error) {
 	collection := db.Collection("users")
 
 	var user model.User
@@ -61,9 +61,9 @@ func GetUser(db *mongo.Database, userId string) *model.User {
 	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&user)
 	if err != nil {
 		logger.Error(err)
-		return nil
+		return nil, err
 	}
-	return &user
+	return &user, nil
 }
 
 // 过去一周

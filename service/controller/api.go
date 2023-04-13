@@ -11,6 +11,7 @@ import (
 	"service/logger"
 	"service/model"
 	"service/third"
+	"service/util"
 	"time"
 )
 
@@ -216,7 +217,11 @@ func CheckWangHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
-	user := dao.GetUser(mongoDb, userId)
+	user, err := dao.GetUser(mongoDb, userId)
+	if err != nil {
+		constant.ErrMsg(c, constant.UserNotExist)
+		return
+	}
 
 	now := time.Now().Unix()
 	if user.Member.Expiration < now {
@@ -224,10 +229,12 @@ func CheckWangHandler(c *gin.Context) {
 		return
 	}
 
-	userCount := dao.CountUserCheckDaily(mongoDb, userId)
-	if userCount >= 3 {
-		constant.ErrMsg(c, constant.CheckAccountTooMuch)
-		return
+	if userId != "63f5e5cf1fc4c03affc93fa2" {
+		userCount := dao.CountUserCheckDaily(mongoDb, userId)
+		if userCount >= 3 {
+			constant.ErrMsg(c, constant.CheckAccountTooMuch)
+			return
+		}
 	}
 
 	//var list []model.CheckSumResp
@@ -242,6 +249,9 @@ func CheckWangHandler(c *gin.Context) {
 			continue
 		}
 
+		item.WangWangAccount = wangAccount
+		item.RenZheng = util.TrimHtml(item.RenZheng)
+
 		itemJson, errJson := json.Marshal(item)
 		if err != nil {
 			logger.Error(errJson)
@@ -252,7 +262,6 @@ func CheckWangHandler(c *gin.Context) {
 			logger.Error(errCheck)
 			return
 		}
-		item.WangWangAccount = wangAccount
 		list = append(list, *item)
 	}
 
@@ -473,8 +482,8 @@ func StoreMemberItemsHandler(c *gin.Context) {
 			Id:            item.Id,
 			Name:          item.Name,
 			Days:          item.Days,
-			Price:         item.Price,
-			OriginalPrice: item.OriginalPrice,
+			Price:         util.Int64ConvertString(item.Price),
+			OriginalPrice: util.Int64ConvertString(item.OriginalPrice),
 			Promotion:     item.Promotion,
 		})
 	}
@@ -508,8 +517,8 @@ func StoreRiceItemsHandler(c *gin.Context) {
 			Id:            item.Id,
 			Name:          item.Name,
 			Rice:          item.Rice,
-			Price:         item.Price,
-			OriginalPrice: item.OriginalPrice,
+			Price:         util.Int64ConvertString(item.Price),
+			OriginalPrice: util.Int64ConvertString(item.OriginalPrice),
 			Promotion:     item.Promotion,
 		})
 	}

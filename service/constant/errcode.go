@@ -37,6 +37,7 @@ const (
 
 	CheckAccountTooMuch = ErrorType(1000)
 	UserMemberExpired   = ErrorType(1001)
+	UserNotExist        = ErrorType(1002)
 )
 
 var ErrCodeTextMap = map[ErrorType]string{
@@ -55,6 +56,7 @@ var ErrCodeTextMap = map[ErrorType]string{
 
 	CheckAccountTooMuch: "查号次数过多",
 	UserMemberExpired:   "会员已过期",
+	UserNotExist:        "用户不存在",
 }
 
 func printError(w io.Writer, c *gin.Context, msg string) {
