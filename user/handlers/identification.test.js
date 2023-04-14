@@ -140,7 +140,7 @@ test('ailyun return success', async () => {
                         identify
                     },
                     mongo: {
-                        updateIdentificaion: updateIdentification,
+                        updateIdentification,
                         getUserById
                     }
                 }
