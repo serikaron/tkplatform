@@ -20,7 +20,7 @@ type config struct {
 	BindAddr             string `json:"bind_addr"`
 	MongoUserSource      string `json:"mongo_user_source"`
 	MongoUser            string `json:"mongo_user"`
-	MongoUserPassword    string `json:"mongo_password"`
+	MongoUserPassword    string `json:"mongo_user_password"`
 	MongoPaymentSource   string `json:"mongo_payment_source"`
 	MongoPayment         string `json:"mongo_payment"`
 	MongoPaymentPassword string `json:"mongo_payment_password"`

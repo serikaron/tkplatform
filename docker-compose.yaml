@@ -65,6 +65,7 @@ services:
     entrypoint: ./apid --conf=/app/go-config.json
     depends_on:
       - user_db
+      - payment_db
     ports:
       - "9010:9010"
     volumes:
