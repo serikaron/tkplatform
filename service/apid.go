@@ -52,8 +52,14 @@ func main() {
 		apiGroup.GET("/user/wallet/records", controller.UserWalletRecordsHandler)                  //用户钱包资金明细
 		apiGroup.GET("/user/wallet/withdraw/records", controller.UserWalletWithdrawRecordsHandler) //用户钱包提现管理
 
-		apiGroup.GET("/store/member/items", controller.StoreMemberItemsHandler) //会员充值套餐
-		apiGroup.GET("/store/rice/items", controller.StoreRiceItemsHandler)     //米粒购买套餐
+		apiGroup.GET("/store/member/items", controller.StoreMemberItemsHandler)             //会员充值套餐
+		apiGroup.POST("/store/member/item/add", controller.StoreMemberItemAddHandler)       //会员充值套餐添加
+		apiGroup.POST("/store/member/item/update", controller.StoreMemberItemUpdateHandler) //会员充值套餐修改
+		apiGroup.POST("/store/member/item/delete", controller.StoreMemberItemDeleteHandler) //会员充值套餐删除
+		apiGroup.GET("/store/rice/items", controller.StoreRiceItemsHandler)                 //米粒购买套餐
+		apiGroup.POST("/store/rice/item/add", controller.StoreRiceItemAddHandler)           //米粒套餐添加
+		apiGroup.POST("/store/rice/item/update", controller.StoreRiceItemUpdateHandler)     //米粒套餐修改
+		apiGroup.POST("/store/rice/item/delete", controller.StoreRiceItemDeleteHandler)     //米粒套餐删除
 	}
 
 	r.Run(":" + config.GetBindPort())

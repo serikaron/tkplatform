@@ -45,7 +45,7 @@ var ErrCodeTextMap = map[ErrorType]string{
 	UnknownError:    "未知错误",
 	Success:         "操作成功",
 	BadParameter:    "您的参数有误",
-	OperateWrong:    "您的操作有误",
+	OperateWrong:    "操作失败",
 	OperateNotFound: "操作记录未找到",
 
 	StatusBadRequest:    "请求失败",

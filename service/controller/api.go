@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"service/config"
@@ -576,6 +577,143 @@ func StoreMemberItemsHandler(c *gin.Context) {
 	})
 }
 
+// @Route: [POST] /v1/api/store/member/item/add
+// @Description: 会员充值套餐添加
+func StoreMemberItemAddHandler(c *gin.Context) {
+	type param struct {
+		Name          string `json:"name"`
+		Days          int64  `json:"days"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.AddMemberItems(mongoDb, model.MemberItem{
+		Id:            primitive.NewObjectID().Hex(),
+		Name:          p.Name,
+		Days:          p.Days,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/member/item/update
+// @Description: 会员充值套餐修改
+func StoreMemberItemUpdateHandler(c *gin.Context) {
+	type param struct {
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+		Days          int64  `json:"days"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.UpdateMemberItems(mongoDb, model.MemberItem{
+		Id:            p.Id,
+		Name:          p.Name,
+		Days:          p.Days,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/member/item/delete
+// @Description: 会员充值套餐删除
+func StoreMemberItemDeleteHandler(c *gin.Context) {
+	type param struct {
+		Id string `json:"id"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.DeleteMemberItems(mongoDb, p.Id)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
 // @Route: [POST] /v1/api/store/rice/items
 // @Description: 米粒购买套餐
 func StoreRiceItemsHandler(c *gin.Context) {
@@ -608,6 +746,143 @@ func StoreRiceItemsHandler(c *gin.Context) {
 		"code": constant.Success,
 		"msg":  "ok",
 		"data": list,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/item/add
+// @Description: 米粒套餐添加
+func StoreRiceItemAddHandler(c *gin.Context) {
+	type param struct {
+		Name          string `json:"name"`
+		Rice          int64  `json:"rice"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.AddRiceItems(mongoDb, model.RiceItem{
+		Id:            primitive.NewObjectID().Hex(),
+		Name:          p.Name,
+		Rice:          p.Rice,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/item/update
+// @Description: 米粒套餐修改
+func StoreRiceItemUpdateHandler(c *gin.Context) {
+	type param struct {
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+		Rice          int64  `json:"rice"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.UpdateRiceItems(mongoDb, model.RiceItem{
+		Id:            p.Id,
+		Name:          p.Name,
+		Rice:          p.Rice,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/item/delete
+// @Description: 米粒套餐删除
+func StoreRiceItemDeleteHandler(c *gin.Context) {
+	type param struct {
+		Id string `json:"id"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.DeleteRiceItems(mongoDb, p.Id)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
 	})
 }
 

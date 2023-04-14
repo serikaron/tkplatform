@@ -79,7 +79,7 @@ func UserMemberRecharge(db *mongo.Database, userId string, expiration int64) err
 	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{{"member.expiration", expiration}}}})
 	if err != nil {
 		logger.Error(err)
-		return nil
+		return err
 	}
 	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
 
@@ -175,7 +175,8 @@ func GetUserCheckAccountDelete(db *mongo.Database, userId, checkAccount string) 
 
 	deleteResult, err := collection.DeleteOne(context.Background(), bson.M{"userId": userId, "checkAccount": checkAccount})
 	if err != nil {
-		log.Fatal(err)
+		logger.Error(err)
+		return err
 	}
 	log.Println("删除数据成功:", deleteResult)
 
