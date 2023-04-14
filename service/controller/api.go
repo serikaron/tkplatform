@@ -31,7 +31,7 @@ func CheckDailyBalanceHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	userCount := dao.CountUserCheckDaily(mongoDb, userId)
@@ -63,7 +63,7 @@ func CheckWangRecordsRecentlyHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	//过去一周的查号记录
@@ -87,7 +87,7 @@ func UserCheckAccountListHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	records := dao.GetUserCheckAccountList(mongoDb, userId)
@@ -127,7 +127,7 @@ func UserCheckAccountAddHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	err = dao.GetUserCheckAccountAdd(mongoDb, userId, p.WangWangAccount)
@@ -171,7 +171,7 @@ func UserCheckAccountDeleteHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	err = dao.GetUserCheckAccountDelete(mongoDb, userId, p.WangWangAccount)
@@ -214,7 +214,7 @@ func CheckWangHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	user, err := dao.GetUser(mongoDb, userId)
@@ -283,7 +283,7 @@ func UserWalletHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	wallet := dao.GetUserWallet(mongoDb, userId)
@@ -326,19 +326,20 @@ func UserWalletRechargeHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
-	mongoDb := db.Database("tkuser")
+	userDb := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
+	mongoUserDb := userDb.Database("tkuser")
 
-	user, err := dao.GetUser(mongoDb, userId)
+	user, err := dao.GetUser(mongoUserDb, userId)
 	if err != nil {
 		constant.ErrMsg(c, constant.UserNotExist)
 		return
 	}
 
-	mongoDb = db.Database("tkpayment")
+	paymentDb := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoPaymentDb := paymentDb.Database("tkpayment")
 	switch p.RechargeType {
 	case 1:
-		items := dao.GetMemberItems(mongoDb)
+		items := dao.GetMemberItems(mongoPaymentDb)
 		var priceMember *model.MemberItem
 		for _, item := range items {
 			if item.Id == p.ProductId {
@@ -346,15 +347,14 @@ func UserWalletRechargeHandler(c *gin.Context) {
 			}
 		}
 		logger.Debug("充值会员item:", priceMember)
-		mongoDb = db.Database("tkuser")
 		expiration := user.Member.Expiration + (priceMember.Days * 24 * 3600)
-		errRice := dao.UserMemberRecharge(mongoDb, userId, expiration)
+		errRice := dao.UserMemberRecharge(mongoUserDb, userId, expiration)
 		if errRice != nil {
 			constant.ErrMsg(c, constant.RechargeFailed)
 			return
 		}
 	case 2:
-		items := dao.GetRiceItems(mongoDb)
+		items := dao.GetRiceItems(mongoPaymentDb)
 		var priceRice *model.RiceItem
 		for _, item := range items {
 			if item.Id == p.ProductId {
@@ -362,9 +362,9 @@ func UserWalletRechargeHandler(c *gin.Context) {
 			}
 		}
 		logger.Debug("充值米粒item:", priceRice)
-		wallet := dao.GetUserWallet(mongoDb, userId)
+		wallet := dao.GetUserWallet(mongoPaymentDb, userId)
 		rice := wallet.Rice + priceRice.Rice
-		errRice := dao.UserWalletRiceRecharge(mongoDb, userId, rice)
+		errRice := dao.UserWalletRiceRecharge(mongoPaymentDb, userId, rice)
 		if errRice != nil {
 			constant.ErrMsg(c, constant.RechargeFailed)
 			return
@@ -389,7 +389,7 @@ func UserWalletOverviewHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	wallet := dao.GetUserWallet(mongoDb, userId)
@@ -430,7 +430,7 @@ func UserWalletRecordsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	records := dao.GetUserWalletRecords(mongoDb, userId, p.Offset, p.Limit, p.Type)
@@ -509,7 +509,7 @@ func UserWalletWithdrawRecordsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit)
@@ -552,7 +552,7 @@ func StoreMemberItemsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	items := dao.GetMemberItems(mongoDb)
@@ -587,7 +587,7 @@ func StoreRiceItemsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	items := dao.GetRiceItems(mongoDb)
