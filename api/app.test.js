@@ -842,10 +842,10 @@ test.concurrent.each([
         method: "GET",
         needAuth: true,
         service: {
-            // baseURL: "http://apid:9010",
-            // url: "/v1/api/store/member/items",
-            baseURL: "http://payment:8080",
-            url: '/v1/store/member/items',
+            baseURL: "http://apid:9010",
+            url: "/v1/api/store/member/items",
+            // baseURL: "http://payment:8080",
+            // url: '/v1/store/member/items',
         }
     },
     {
@@ -853,10 +853,10 @@ test.concurrent.each([
         method: "GET",
         needAuth: true,
         service: {
-            // baseURL: "http://apid:9010",
-            // url: "/v1/api/store/rice/items",
-            baseURL: "http://payment:8080",
-            url: '/v1/store/rice/items',
+            baseURL: "http://apid:9010",
+            url: "/v1/api/store/rice/items",
+            // baseURL: "http://payment:8080",
+            // url: '/v1/store/rice/items',
         }
     },
     {
