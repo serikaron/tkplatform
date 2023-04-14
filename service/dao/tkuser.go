@@ -75,7 +75,8 @@ func GetUser(db *mongo.Database, userId string) (*model.User, error) {
 
 func UserMemberRecharge(db *mongo.Database, userId string, expiration int64) error {
 	collection := db.Collection("users")
-	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"userId": userId}, bson.D{{"$set", bson.D{{"member.$.expiration", expiration}}}})
+	id, _ := primitive.ObjectIDFromHex(userId)
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{{"member.expiration", expiration}}}})
 	if err != nil {
 		logger.Error(err)
 		return nil
