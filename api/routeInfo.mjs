@@ -184,6 +184,7 @@ const routeInfo = [
     {url: "/v1/wallet/detail", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/detail"}},
     {url: "/v1/wallet/overview", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/overview"}},
     {url: "/v1/wallet/withdraw/records", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/withdraw/records"}},
+    {url: '/v1/wallet/recharge', method: "POST", needAuth: true, service: {baseURL: "http://apid:9010", url: '/v1/api/user/wallet/recharge'}},
 
     {
         url: "/v1/search/external/account",

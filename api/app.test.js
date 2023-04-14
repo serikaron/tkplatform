@@ -947,6 +947,15 @@ test.concurrent.each([
         }
     },
     {
+        url: "/v1/wallet/recharge",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: "/v1/api/user/wallet/recharge"
+        }
+    },
+    {
         url: "/v1/file",
         method: "POST",
         needAuth: true,
