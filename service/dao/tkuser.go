@@ -3,6 +3,7 @@ package dao
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -70,6 +71,21 @@ func GetUser(db *mongo.Database, userId string) (*model.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func UserMemberRecharge(db *mongo.Database, userId string, expiration int64) error {
+	collection := db.Collection("users")
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"userId": userId}, bson.D{{"$set", bson.D{{"member.$.expiration", expiration}}}})
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
 }
 
 // 过去一周

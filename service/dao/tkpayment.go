@@ -2,6 +2,7 @@ package dao
 
 import (
 	"context"
+	"errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,6 +21,20 @@ func GetUserWallet(db *mongo.Database, userId string) *model.UserWallet {
 	}
 	log.Println("collection.FindOne: ", wallet)
 	return &wallet
+}
+
+func UserWalletRiceRecharge(db *mongo.Database, userId string, rice int64) error {
+	collection := db.Collection("wallets")
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"userId": userId}, bson.D{{"$set", bson.D{{"rice", rice}}}})
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+	log.Println("collection.UpdateOne: ", updateResult)
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
 }
 
 func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64, typ int) []*model.UserWalletRecord {

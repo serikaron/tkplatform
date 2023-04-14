@@ -297,6 +297,87 @@ func UserWalletHandler(c *gin.Context) {
 	})
 }
 
+// @Route: [POST] /v1/api/user/wallet/recharge
+// @Description: 用户钱包充值
+func UserWalletRechargeHandler(c *gin.Context) {
+	type param struct {
+		RechargeType int    `json:"recharge_type" binding:"required"` //1-会员充值，2-米粒购买
+		ProductId    string `json:"product_id" binding:"required"`    //充值产品id
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	if p.RechargeType == 0 {
+		constant.ErrMsg(c, constant.BadParameter, "充值类型不能为空")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	mongoDb := db.Database("tkuser")
+
+	user, err := dao.GetUser(mongoDb, userId)
+	if err != nil {
+		constant.ErrMsg(c, constant.UserNotExist)
+		return
+	}
+
+	mongoDb = db.Database("tkpayment")
+	switch p.RechargeType {
+	case 1:
+		items := dao.GetMemberItems(mongoDb)
+		var priceMember *model.MemberItem
+		for _, item := range items {
+			if item.Id == p.ProductId {
+				priceMember = item
+			}
+		}
+		logger.Debug("充值会员item:", priceMember)
+		mongoDb = db.Database("tkuser")
+		expiration := user.Member.Expiration + (priceMember.Days * 24 * 3600)
+		errRice := dao.UserMemberRecharge(mongoDb, userId, expiration)
+		if errRice != nil {
+			constant.ErrMsg(c, constant.RechargeFailed)
+			return
+		}
+	case 2:
+		items := dao.GetRiceItems(mongoDb)
+		var priceRice *model.RiceItem
+		for _, item := range items {
+			if item.Id == p.ProductId {
+				priceRice = item
+			}
+		}
+		logger.Debug("充值米粒item:", priceRice)
+		wallet := dao.GetUserWallet(mongoDb, userId)
+		rice := wallet.Rice + priceRice.Rice
+		errRice := dao.UserWalletRiceRecharge(mongoDb, userId, rice)
+		if errRice != nil {
+			constant.ErrMsg(c, constant.RechargeFailed)
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
 // @Route: [POST] /v1/api/user/wallet/overview
 // @Description: 用户钱包总览
 func UserWalletOverviewHandler(c *gin.Context) {

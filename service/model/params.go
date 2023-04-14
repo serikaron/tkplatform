@@ -85,7 +85,7 @@ type UserWalletWithdrawRecordResp struct {
 type RiceItemResp struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
-	Rice          int    `json:"rice"`
+	Rice          int64  `json:"rice"`
 	Price         string `json:"price"`
 	OriginalPrice string `json:"originalPrice"`
 	Promotion     bool   `json:"promotion"`
@@ -94,7 +94,7 @@ type RiceItemResp struct {
 type MemberItemResp struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`
-	Days          int    `json:"days"`
+	Days          int64  `json:"days"`
 	Price         string `json:"price"`
 	OriginalPrice string `json:"originalPrice"`
 	Promotion     bool   `json:"promotion"`

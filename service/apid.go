@@ -47,6 +47,7 @@ func main() {
 		apiGroup.POST("/user/check/account/delete", controller.UserCheckAccountDeleteHandler) //批量查询账号删除
 
 		apiGroup.GET("/user/wallet", controller.UserWalletHandler)                                 //用户钱包
+		apiGroup.POST("/user/wallet/recharge", controller.UserWalletRechargeHandler)               //用户钱包充值
 		apiGroup.GET("/user/wallet/overview", controller.UserWalletOverviewHandler)                //用户钱包资金总览
 		apiGroup.GET("/user/wallet/records", controller.UserWalletRecordsHandler)                  //用户钱包资金明细
 		apiGroup.GET("/user/wallet/withdraw/records", controller.UserWalletWithdrawRecordsHandler) //用户钱包提现管理
