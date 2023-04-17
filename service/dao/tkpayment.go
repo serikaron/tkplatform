@@ -2,7 +2,10 @@ package dao
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
@@ -20,6 +23,20 @@ func GetUserWallet(db *mongo.Database, userId string) *model.UserWallet {
 	}
 	log.Println("collection.FindOne: ", wallet)
 	return &wallet
+}
+
+func UserWalletRiceRecharge(db *mongo.Database, userId string, rice int64) error {
+	collection := db.Collection("wallets")
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"userId": userId}, bson.D{{"$set", bson.D{{"rice", rice}}}})
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+	log.Println("collection.UpdateOne: ", updateResult)
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
 }
 
 func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64, typ int) []*model.UserWalletRecord {
@@ -149,6 +166,72 @@ func GetMemberItems(db *mongo.Database) []*model.MemberItem {
 	return all
 }
 
+func AddMemberItems(db *mongo.Database, m model.MemberItem) error {
+	collection := db.Collection("memberItems")
+	type MemberItemDb struct {
+		Id            primitive.ObjectID `bson:"_id"`
+		Name          string             `bson:"name"`
+		Days          int64              `bson:"days"`
+		Price         int64              `bson:"price"`
+		OriginalPrice int64              `bson:"originalPrice"`
+		Promotion     bool               `bson:"promotion"`
+	}
+
+	newItem := MemberItemDb{
+		Id:            primitive.NewObjectID(),
+		Name:          m.Name,
+		Days:          m.Days,
+		Price:         m.Price,
+		OriginalPrice: m.OriginalPrice,
+		Promotion:     m.Promotion,
+	}
+
+	objId, err := collection.InsertOne(context.TODO(), newItem)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	fmt.Println("_id:", objId.InsertedID)
+	return nil
+}
+
+func UpdateMemberItems(db *mongo.Database, m model.MemberItem) error {
+	collection := db.Collection("memberItems")
+	logger.Debug("m.Id:", m.Id)
+	id, _ := primitive.ObjectIDFromHex(m.Id)
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{
+		{"name", m.Name},
+		{"days", m.Days},
+		{"price", m.Price},
+		{"originalPrice", m.OriginalPrice},
+		{"promotion", m.Promotion},
+	}}})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
+}
+
+func DeleteMemberItems(db *mongo.Database, id string) error {
+	collection := db.Collection("memberItems")
+	itemId, _ := primitive.ObjectIDFromHex(id)
+
+	deleteResult, err := collection.DeleteOne(context.Background(), bson.M{"_id": itemId})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("删除数据成功:", deleteResult)
+
+	return nil
+}
+
 func GetRiceItems(db *mongo.Database) []*model.RiceItem {
 	collection := db.Collection("riceItems")
 	cur, err := collection.Find(context.Background(), bson.M{})
@@ -167,4 +250,70 @@ func GetRiceItems(db *mongo.Database) []*model.RiceItem {
 		log.Println("name:", one.Name, " - rice:", one.Rice, " - price:", one.Price)
 	}
 	return all
+}
+
+func AddRiceItems(db *mongo.Database, m model.RiceItem) error {
+	collection := db.Collection("riceItems")
+
+	type RiceItemDb struct {
+		Id            primitive.ObjectID `bson:"_id"`
+		Name          string             `bson:"name"`
+		Rice          int64              `bson:"rice"`
+		Days          int64              `bson:"days"`
+		Price         int64              `bson:"price"`
+		OriginalPrice int64              `bson:"originalPrice"`
+		Promotion     bool               `bson:"promotion"`
+	}
+
+	newItem := RiceItemDb{
+		Id:            primitive.NewObjectID(),
+		Name:          m.Name,
+		Rice:          m.Rice,
+		Price:         m.Price,
+		OriginalPrice: m.OriginalPrice,
+		Promotion:     m.Promotion,
+	}
+	objId, err := collection.InsertOne(context.TODO(), newItem)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	fmt.Println("_id:", objId.InsertedID)
+	return nil
+}
+
+func UpdateRiceItems(db *mongo.Database, m model.RiceItem) error {
+	collection := db.Collection("riceItems")
+	id, _ := primitive.ObjectIDFromHex(m.Id)
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{
+		{"name", m.Name},
+		{"rice", m.Rice},
+		{"price", m.Price},
+		{"originalPrice", m.OriginalPrice},
+		{"promotion", m.Promotion},
+	}}})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
+}
+
+func DeleteRiceItems(db *mongo.Database, id string) error {
+	collection := db.Collection("riceItems")
+	itemId, _ := primitive.ObjectIDFromHex(id)
+
+	deleteResult, err := collection.DeleteOne(context.Background(), bson.M{"_id": itemId})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("删除数据成功:", deleteResult)
+
+	return nil
 }

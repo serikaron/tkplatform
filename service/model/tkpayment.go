@@ -69,7 +69,7 @@ type UserWalletWithdrawRecord struct {
 type MemberItem struct {
 	Id            string `bson:"_id"`
 	Name          string `bson:"name"`
-	Days          int    `bson:"days"`
+	Days          int64  `bson:"days"`
 	Price         int64  `bson:"price"`
 	OriginalPrice int64  `bson:"originalPrice"`
 	Promotion     bool   `bson:"promotion"`
@@ -78,7 +78,7 @@ type MemberItem struct {
 type RiceItem struct {
 	Id            string `bson:"_id"`
 	Name          string `bson:"name"`
-	Rice          int    `bson:"rice"`
+	Rice          int64  `bson:"rice"`
 	Price         int64  `bson:"price"`
 	OriginalPrice int64  `bson:"originalPrice"`
 	Promotion     bool   `bson:"promotion"`

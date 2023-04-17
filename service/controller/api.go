@@ -3,6 +3,7 @@ package controller
 import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"net/http"
 	"service/config"
@@ -31,7 +32,7 @@ func CheckDailyBalanceHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	userCount := dao.CountUserCheckDaily(mongoDb, userId)
@@ -63,7 +64,7 @@ func CheckWangRecordsRecentlyHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	//过去一周的查号记录
@@ -87,7 +88,7 @@ func UserCheckAccountListHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	records := dao.GetUserCheckAccountList(mongoDb, userId)
@@ -127,7 +128,7 @@ func UserCheckAccountAddHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	err = dao.GetUserCheckAccountAdd(mongoDb, userId, p.WangWangAccount)
@@ -171,7 +172,7 @@ func UserCheckAccountDeleteHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	err = dao.GetUserCheckAccountDelete(mongoDb, userId, p.WangWangAccount)
@@ -214,7 +215,7 @@ func CheckWangHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoDb := db.Database("tkuser")
 
 	user, err := dao.GetUser(mongoDb, userId)
@@ -283,7 +284,7 @@ func UserWalletHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	wallet := dao.GetUserWallet(mongoDb, userId)
@@ -294,6 +295,87 @@ func UserWalletHandler(c *gin.Context) {
 		"data": gin.H{
 			"rice": wallet.Rice,
 		},
+	})
+}
+
+// @Route: [POST] /v1/api/user/wallet/recharge
+// @Description: 用户钱包充值
+func UserWalletRechargeHandler(c *gin.Context) {
+	type param struct {
+		RechargeType int    `json:"recharge_type" binding:"required"` //1-会员充值，2-米粒购买
+		ProductId    string `json:"product_id" binding:"required"`    //充值产品id
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	if p.RechargeType == 0 {
+		constant.ErrMsg(c, constant.BadParameter, "充值类型不能为空")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	userDb := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
+	mongoUserDb := userDb.Database("tkuser")
+
+	user, err := dao.GetUser(mongoUserDb, userId)
+	if err != nil {
+		constant.ErrMsg(c, constant.UserNotExist)
+		return
+	}
+
+	paymentDb := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoPaymentDb := paymentDb.Database("tkpayment")
+	switch p.RechargeType {
+	case 1:
+		items := dao.GetMemberItems(mongoPaymentDb)
+		var priceMember *model.MemberItem
+		for _, item := range items {
+			if item.Id == p.ProductId {
+				priceMember = item
+			}
+		}
+		logger.Debug("充值会员item:", priceMember)
+		expiration := user.Member.Expiration + (priceMember.Days * 24 * 3600)
+		errRice := dao.UserMemberRecharge(mongoUserDb, userId, expiration)
+		if errRice != nil {
+			constant.ErrMsg(c, constant.RechargeFailed)
+			return
+		}
+	case 2:
+		items := dao.GetRiceItems(mongoPaymentDb)
+		var priceRice *model.RiceItem
+		for _, item := range items {
+			if item.Id == p.ProductId {
+				priceRice = item
+			}
+		}
+		logger.Debug("充值米粒item:", priceRice)
+		wallet := dao.GetUserWallet(mongoPaymentDb, userId)
+		rice := wallet.Rice + priceRice.Rice
+		errRice := dao.UserWalletRiceRecharge(mongoPaymentDb, userId, rice)
+		if errRice != nil {
+			constant.ErrMsg(c, constant.RechargeFailed)
+			return
+		}
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
 	})
 }
 
@@ -308,7 +390,7 @@ func UserWalletOverviewHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	wallet := dao.GetUserWallet(mongoDb, userId)
@@ -349,7 +431,7 @@ func UserWalletRecordsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	records := dao.GetUserWalletRecords(mongoDb, userId, p.Offset, p.Limit, p.Type)
@@ -428,7 +510,7 @@ func UserWalletWithdrawRecordsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit)
@@ -471,7 +553,7 @@ func StoreMemberItemsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	items := dao.GetMemberItems(mongoDb)
@@ -495,6 +577,143 @@ func StoreMemberItemsHandler(c *gin.Context) {
 	})
 }
 
+// @Route: [POST] /v1/api/store/member/item/add
+// @Description: 会员充值套餐添加
+func StoreMemberItemAddHandler(c *gin.Context) {
+	type param struct {
+		Name          string `json:"name"`
+		Days          int64  `json:"days"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.AddMemberItems(mongoDb, model.MemberItem{
+		Id:            primitive.NewObjectID().Hex(),
+		Name:          p.Name,
+		Days:          p.Days,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/member/item/update
+// @Description: 会员充值套餐修改
+func StoreMemberItemUpdateHandler(c *gin.Context) {
+	type param struct {
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+		Days          int64  `json:"days"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.UpdateMemberItems(mongoDb, model.MemberItem{
+		Id:            p.Id,
+		Name:          p.Name,
+		Days:          p.Days,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/member/item/delete
+// @Description: 会员充值套餐删除
+func StoreMemberItemDeleteHandler(c *gin.Context) {
+	type param struct {
+		Id string `json:"id"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.DeleteMemberItems(mongoDb, p.Id)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
 // @Route: [POST] /v1/api/store/rice/items
 // @Description: 米粒购买套餐
 func StoreRiceItemsHandler(c *gin.Context) {
@@ -506,7 +725,7 @@ func StoreRiceItemsHandler(c *gin.Context) {
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
-	db := c.MustGet(constant.ContextMongoDb).(*mongo.Client)
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
 	items := dao.GetRiceItems(mongoDb)
@@ -527,6 +746,143 @@ func StoreRiceItemsHandler(c *gin.Context) {
 		"code": constant.Success,
 		"msg":  "ok",
 		"data": list,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/item/add
+// @Description: 米粒套餐添加
+func StoreRiceItemAddHandler(c *gin.Context) {
+	type param struct {
+		Name          string `json:"name"`
+		Rice          int64  `json:"rice"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.AddRiceItems(mongoDb, model.RiceItem{
+		Id:            primitive.NewObjectID().Hex(),
+		Name:          p.Name,
+		Rice:          p.Rice,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/item/update
+// @Description: 米粒套餐修改
+func StoreRiceItemUpdateHandler(c *gin.Context) {
+	type param struct {
+		Id            string `json:"id"`
+		Name          string `json:"name"`
+		Rice          int64  `json:"rice"`
+		Price         int64  `json:"price"`
+		OriginalPrice int64  `json:"originalPrice"`
+		Promotion     bool   `json:"promotion"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.UpdateRiceItems(mongoDb, model.RiceItem{
+		Id:            p.Id,
+		Name:          p.Name,
+		Rice:          p.Rice,
+		Price:         p.Price,
+		OriginalPrice: p.OriginalPrice,
+		Promotion:     p.Promotion,
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/store/rice/item/delete
+// @Description: 米粒套餐删除
+func StoreRiceItemDeleteHandler(c *gin.Context) {
+	type param struct {
+		Id string `json:"id"`
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.DeleteRiceItems(mongoDb, p.Id)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
 	})
 }
 

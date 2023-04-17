@@ -38,13 +38,14 @@ const (
 	CheckAccountTooMuch = ErrorType(1000)
 	UserMemberExpired   = ErrorType(1001)
 	UserNotExist        = ErrorType(1002)
+	RechargeFailed      = ErrorType(1003)
 )
 
 var ErrCodeTextMap = map[ErrorType]string{
 	UnknownError:    "未知错误",
 	Success:         "操作成功",
 	BadParameter:    "您的参数有误",
-	OperateWrong:    "您的操作有误",
+	OperateWrong:    "操作失败",
 	OperateNotFound: "操作记录未找到",
 
 	StatusBadRequest:    "请求失败",
@@ -57,6 +58,7 @@ var ErrCodeTextMap = map[ErrorType]string{
 	CheckAccountTooMuch: "查号次数过多",
 	UserMemberExpired:   "会员已过期",
 	UserNotExist:        "用户不存在",
+	RechargeFailed:      "充值失败",
 }
 
 func printError(w io.Writer, c *gin.Context, msg string) {
