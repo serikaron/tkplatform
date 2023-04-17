@@ -260,5 +260,23 @@
  *                       status:
  *                         type: number
  *
+ */
+
+/**
+ * @swagger
+ * /v1/wallet/recharge(充值✅):
+ *   post:
+ *     tags: ["payment(支付/商城)","个人中心"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recharge_type:
+ *                 type: number
+ *                 example: 1-会员充值，2-米粒购买
+ *               product_id:
+ *                 type: string
  *
  */

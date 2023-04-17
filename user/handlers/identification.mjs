@@ -44,7 +44,7 @@ export const routeIdentification = router => {
         if (req.body.hasOwnProperty("qq")) {
             update["contact.qq.account"] = req.body.qq
         }
-        await req.context.mongo.updateIdentificaion(req.headers.id, update)
+        await req.context.mongo.updateIdentification(req.headers.id, update)
 
         res.tkResponse(TKResponse.Success())
 
