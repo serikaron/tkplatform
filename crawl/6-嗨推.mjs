@@ -97,10 +97,13 @@ for (const pid of platformList) {
     }
 }
 
-do {
-    for (const t of tasks) {
-        console.log(JSON.stringify(t))
-        await task(t.uid, t.token, t.pid, t.aids)
+while (true) {
+    try {
+        for (const t of tasks) {
+            await task(t.uid, t.token, t.pid, t.aids)
+        }
+        await new Promise(resolve => setTimeout(resolve, 180 * 1000))
+    } catch (e) {
+        console.log(e)
     }
-    await new Promise(resolve => setTimeout(resolve, 180 * 1000))
-} while (true)
+}
