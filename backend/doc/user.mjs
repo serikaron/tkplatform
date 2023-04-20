@@ -91,7 +91,7 @@
 
 /**
  * @swagger
- * /v1/captcha/require(请求图形码✅):
+ * /backend/v1/captcha/require(请求图形码✅):
  *   post:
  *     tags: ["captcha(图形码)"]
  *     description: 获取图形码
@@ -123,7 +123,7 @@
 
 /**
  * @swagger
- * /v1/sms/send(发送手机验证码✅):
+ * /backend/v1/sms/send(发送手机验证码✅):
  *   post:
  *     tags: ["sms(短信服务)"]
  *     description: 发送验证码到手机

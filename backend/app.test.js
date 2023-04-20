@@ -118,6 +118,24 @@ async function runTest(
 
 test.concurrent.each([
     {
+        url: "/backend/v1/captcha/require",
+        method: "POST",
+        needAuth: false,
+        service: {
+            baseURL: "http://captcha:8080",
+            url: "/v1/captcha/require"
+        }
+    },
+    {
+        url: "/backend/v1/sms/send",
+        method: "POST",
+        needAuth: false,
+        service: {
+            baseURL: "http://sms:8080",
+            url: "/v1/sms/send"
+        }
+    },
+    {
         url: '/backend/v1/admin/register',
         method: "POST",
         needAuth: false,
