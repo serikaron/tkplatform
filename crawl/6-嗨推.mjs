@@ -98,12 +98,8 @@ for (const pid of platformList) {
 }
 
 while (true) {
-    try {
-        for (const t of tasks) {
-            await task(t.uid, t.token, t.pid, t.aids)
-        }
-        await new Promise(resolve => setTimeout(resolve, 180 * 1000))
-    } catch (e) {
-        console.log(e)
+    for (const t of tasks) {
+        await task(t.uid, t.token, t.pid, t.aids)
     }
+    await new Promise(resolve => setTimeout(resolve, 180 * 1000))
 }
