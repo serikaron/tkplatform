@@ -165,7 +165,7 @@
 
 /**
  * @swagger
- * /backend/v1/user/register(用户注册):
+ * /backend/v1/register/user(用户注册):
  *   post:
  *     tags: ["user(用户相关)"]
  *     description: 用户注册

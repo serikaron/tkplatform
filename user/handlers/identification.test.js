@@ -110,7 +110,7 @@ test('aliyun return failed', async () => {
     expect(getUserById).toHaveBeenCalledWith(userId.toString())
 })
 
-test.only('ailyun return success', async () => {
+test('ailyun return success', async () => {
     const identify = jest.fn(async () => {
         return successRsp
     })

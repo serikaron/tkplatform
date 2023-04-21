@@ -26,7 +26,7 @@ const routeInfo = [
         service: {baseURL: "http://user:8080", url: "/v1/backend/login"}
     },
     {
-        url: '/backend/v1/user/register',
+        url: '/backend/v1/register/user',
         method: "POST",
         needAuth: false,
         service: {baseURL: "http://user:8080", url: "/v1/user/register"}
