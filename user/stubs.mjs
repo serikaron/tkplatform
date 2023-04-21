@@ -90,21 +90,22 @@ export function setupStub(req) {
 
     req.context.aliyun = {
         identify: async (appCode, idNo, name) => {
-            const formData = new FormData()
-            formData.append("idNo", idNo)
-            formData.append("name", name)
+            console.log(`实名认证, appCode:${appCode}, idNo:${idNo}, name:${name}`)
+            const body = {
+                cardNo: idNo,
+                realName: name
+            }
             try {
                 const r = await axios.post(
-                    'https://idenauthen.market.alicloudapi.com/idenAuthentication',
-                    formData,
+                    'https://zidv2.market.alicloudapi.com/idcheck/Post',
+                    body,
                     {
                         headers: {
-                            ...formData.getHeaders(),
                             Authorization: `APPCODE ${appCode}`,
                             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
                         }
                     })
-                return r
+                return r.data
             } catch (e) {
                 console.log(`axios identify error ${e}`)
                 return TKResponse.fromError(new InternalError())
