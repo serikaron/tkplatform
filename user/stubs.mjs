@@ -1,7 +1,6 @@
 'use strict'
 
 import {axiosCall} from "../common/call.mjs";
-import FormData from "form-data";
 import axios from "axios";
 import {TKResponse} from "../common/TKResponse.mjs";
 import {InternalError} from "../common/errors/00000-basic.mjs";
