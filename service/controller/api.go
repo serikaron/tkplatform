@@ -484,42 +484,53 @@ func UserWalletRecordsHandler(c *gin.Context) {
 
 	var list []*model.UserWalletRecordResp
 	for _, record := range records {
-		list = append(list, &model.UserWalletRecordResp{
-			Id:     record.Id,
-			UserId: record.UserId,
-			Type:   record.Type,
-			Member: &model.MemberPo{
+		var item model.UserWalletRecordResp
+		item.Id = record.Id
+		item.UserId = record.UserId
+		item.Type = record.Type
+		item.CreatedAt = record.CreatedAt
+		if record.Member != nil {
+			item.Member = &model.MemberPo{
 				Title:      record.Member.Title,
 				Price:      record.Member.Price,
 				RemainDays: record.Member.RemainDays,
 				CreatedAt:  record.Member.CreatedAt,
-			},
-			Withdraw: &model.WithdrawPo{
+			}
+		}
+		if record.Withdraw != nil {
+			item.Withdraw = &model.WithdrawPo{
 				Title:     record.Withdraw.Title,
 				Amount:    record.Withdraw.Amount,
 				Balance:   record.Withdraw.Balance,
 				CreatedAt: record.Withdraw.CreatedAt,
-			},
-			DownLine: &model.DownLinePo{
+			}
+		}
+		if record.DownLine != nil {
+			item.DownLine = &model.DownLinePo{
 				Title:     record.DownLine.Title,
 				Amount:    record.DownLine.Amount,
 				Balance:   record.DownLine.Balance,
 				CreatedAt: record.DownLine.CreatedAt,
-			},
-			Activity: &model.ActivityPo{
+			}
+		}
+		if record.Activity != nil {
+			item.Activity = &model.ActivityPo{
 				Title:     record.Activity.Title,
 				Amount:    record.Activity.Amount,
 				Balance:   record.Activity.Balance,
 				CreatedAt: record.Activity.CreatedAt,
-			},
-			Rice: &model.RicePo{
+			}
+		}
+		if record.Rice != nil {
+			item.Rice = &model.RicePo{
 				Title:      record.Member.Title,
 				Price:      record.Member.Price,
 				RemainDays: record.Member.RemainDays,
 				CreatedAt:  record.Member.CreatedAt,
-			},
-			CreatedAt: record.CreatedAt,
-		})
+			}
+		}
+
+		list = append(list, &item)
 	}
 
 	c.JSON(http.StatusOK, gin.H{
@@ -551,6 +562,11 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 		return
 	}
 
+	if p.Amount == 0 {
+		constant.ErrMsg(c, constant.BadParameter, "提现金额不能为0")
+		return
+	}
+
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
@@ -575,7 +591,7 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 		return
 	}
 
-	err = dao.AddUserWalletWithdrawRecords(mongoDb, model.UserWalletWithdrawRecord{
+	err = dao.AddUserWalletWithdrawRecord(mongoDb, model.UserWalletWithdrawRecord{
 		UserId:    userId,
 		Comment:   "申请提现",
 		Amount:    p.Amount,
@@ -599,7 +615,7 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 // @Description: 用户钱包提现审核
 func UserWalletWithdrawAuditHandler(c *gin.Context) {
 	type param struct {
-		RecordId string `json:"record_id"` //以分为单位
+		RecordId string `json:"record_id"` //提现id
 	}
 
 	var p param
@@ -620,17 +636,25 @@ func UserWalletWithdrawAuditHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
+	wallet := dao.GetUserWallet(mongoDb, userId)
+
 	err = dao.AuditUserWalletWithdrawRecord(mongoDb, p.RecordId)
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)
 		return
 	}
-	//todo 数据完善
+
+	record, err := dao.GetUserWalletWithdrawRecord(mongoDb, p.RecordId)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
 	err = dao.AddUserWalletRecord(mongoDb, userId, model.UserWalletRecordTypeWithdraw, nil, &model.Withdraw{
 		CreatedAt: time.Now().Unix(),
 		Title:     "提现",
-		Amount:    0,
-		Balance:   0,
+		Amount:    record.Amount,
+		Balance:   wallet.Cash,
 	}, nil, nil, nil)
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)

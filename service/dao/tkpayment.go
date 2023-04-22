@@ -100,6 +100,7 @@ func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *mod
 
 	var newItem UserWalletRecordDb
 
+	newItem.Id = primitive.NewObjectID()
 	newItem.UserId = userId
 	newItem.Type = typ
 	newItem.CreatedAt = time.Now().Unix()
@@ -144,8 +145,21 @@ func CountUserWalletRecords(db *mongo.Database, userId string, typ int) int64 {
 	return count
 }
 
-func AddUserWalletWithdrawRecords(db *mongo.Database, m model.UserWalletWithdrawRecord) error {
-	collection := db.Collection("memberItems")
+func GetUserWalletWithdrawRecord(db *mongo.Database, recordId string) (*model.UserWalletWithdrawRecord, error) {
+	collection := db.Collection("walletWithdrawRecords")
+
+	var record model.UserWalletWithdrawRecord
+	id, _ := primitive.ObjectIDFromHex(recordId)
+	err := collection.FindOne(context.TODO(), bson.M{"_id": id}).Decode(&record)
+	if err != nil {
+		logger.Error(err)
+		return nil, err
+	}
+	return &record, nil
+}
+
+func AddUserWalletWithdrawRecord(db *mongo.Database, m model.UserWalletWithdrawRecord) error {
+	collection := db.Collection("walletWithdrawRecords")
 	type UserWalletWithdrawRecordDb struct {
 		Id        primitive.ObjectID `bson:"_id"`
 		UserId    string             `bson:"userId"`
@@ -176,7 +190,7 @@ func AddUserWalletWithdrawRecords(db *mongo.Database, m model.UserWalletWithdraw
 }
 
 func AuditUserWalletWithdrawRecord(db *mongo.Database, recordId string) error {
-	collection := db.Collection("memberItems")
+	collection := db.Collection("walletWithdrawRecords")
 	logger.Debug("recordId:", recordId)
 	id, _ := primitive.ObjectIDFromHex(recordId)
 	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{
