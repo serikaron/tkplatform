@@ -62,6 +62,9 @@
  *                         type: string
  *                       downloadURL:
  *                         type: string
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  *
  *
  */
@@ -100,6 +103,9 @@
  *                         type: string
  *                       downloadURL:
  *                         type: string
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  *                   credential:
  *                     type: object
  *                     properties:
@@ -186,6 +192,9 @@
  *                         type: string
  *                       downloadURL:
  *                         type: string
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  *                   credential:
  *                     type: object
  *                     properties:
@@ -273,6 +282,9 @@
  *                       alias:
  *                         type: string
  *                         example: 备注名
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  *                   credential:
  *                     type: object
  *                     properties:

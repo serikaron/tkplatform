@@ -68,6 +68,9 @@
  *                         type: string
  *                       downloadURL:
  *                         type: string
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  *
  */
 
@@ -110,6 +113,9 @@
  *                         type: string
  *                       downloadURL:
  *                         type: string
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  *     responses:
  *       200:
  *         content:
@@ -161,4 +167,7 @@
  *                         type: string
  *                       downloadURL:
  *                         type: string
+ *                       type:
+ *                         type: string
+ *                         description: 模板类型
  */
