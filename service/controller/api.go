@@ -485,8 +485,9 @@ func UserWalletRecordsHandler(c *gin.Context) {
 	var list []*model.UserWalletRecordResp
 	for _, record := range records {
 		list = append(list, &model.UserWalletRecordResp{
-			Id:   record.Id,
-			Type: record.Type,
+			Id:     record.Id,
+			UserId: record.UserId,
+			Type:   record.Type,
 			Member: &model.MemberPo{
 				Title:      record.Member.Title,
 				Price:      record.Member.Price,
@@ -535,7 +536,7 @@ func UserWalletRecordsHandler(c *gin.Context) {
 // @Description: 用户钱包提现
 func UserWalletWithdrawHandler(c *gin.Context) {
 	type param struct {
-		Amount int64 `json:"amount"`
+		Amount int64 `json:"amount"` //以分为单位
 	}
 
 	var p param
@@ -561,29 +562,86 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 
 	logger.Debug("wallet.Cash:", wallet.Cash)
 
-	//var list []*model.UserWalletWithdrawRecordResp
-	//for _, record := range records {
-	//	list = append(list, &model.UserWalletWithdrawRecordResp{
-	//		Id:        record.Id,
-	//		Comment:   record.Comment,
-	//		Amount:    record.Amount,
-	//		Fee:       record.Fee,
-	//		Status:    record.Status,
-	//		CreatedAt: record.CreatedAt,
-	//	})
-	//}
-	//
-	//c.JSON(http.StatusOK, gin.H{
-	//	"code": constant.Success,
-	//	"msg":  "ok",
-	//	"data": gin.H{
-	//		"total": gin.H{
-	//			"count":  total,
-	//			"amount": sumAmount,
-	//		},
-	//		"items": list,
-	//	},
-	//})
+	if p.Amount > wallet.Cash {
+		constant.ErrMsg(c, constant.BalanceNotEnough)
+		return
+	}
+
+	cash := wallet.Cash - p.Amount
+
+	err = dao.UserWalletCashWithdraw(mongoDb, userId, cash)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	err = dao.AddUserWalletWithdrawRecords(mongoDb, model.UserWalletWithdrawRecord{
+		UserId:    userId,
+		Comment:   "申请提现",
+		Amount:    p.Amount,
+		Fee:       50,
+		Status:    false,
+		CreatedAt: time.Now().Unix(),
+	})
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/user/wallet/withdraw/audit
+// @Description: 用户钱包提现审核
+func UserWalletWithdrawAuditHandler(c *gin.Context) {
+	type param struct {
+		RecordId string `json:"record_id"` //以分为单位
+	}
+
+	var p param
+	var err error
+	if err = c.Bind(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.AuditUserWalletWithdrawRecord(mongoDb, p.RecordId)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+	//todo 数据完善
+	err = dao.AddUserWalletRecord(mongoDb, userId, model.UserWalletRecordTypeWithdraw, nil, &model.Withdraw{
+		CreatedAt: time.Now().Unix(),
+		Title:     "提现",
+		Amount:    0,
+		Balance:   0,
+	}, nil, nil, nil)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
 }
 
 // @Route: [POST] /v1/api/user/wallet/withdraw/records
@@ -620,6 +678,7 @@ func UserWalletWithdrawRecordsHandler(c *gin.Context) {
 	for _, record := range records {
 		list = append(list, &model.UserWalletWithdrawRecordResp{
 			Id:        record.Id,
+			UserId:    record.UserId,
 			Comment:   record.Comment,
 			Amount:    record.Amount,
 			Fee:       record.Fee,
