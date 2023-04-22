@@ -317,3 +317,85 @@ func DeleteRiceItems(db *mongo.Database, id string) error {
 
 	return nil
 }
+
+func GetCommissionItems(db *mongo.Database) []*model.CommissionItem {
+	collection := db.Collection("commissionSetting")
+	cur, err := collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+	var all []*model.CommissionItem
+	err = cur.All(context.Background(), &all)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = cur.Close(context.Background())
+
+	for _, one := range all {
+		log.Println("CommissionType:", one.CommissionType, " - Rate:", one.Rate, " - level:", one.Level, " - PeopleNumber:", one.PeopleNumber)
+	}
+	return all
+}
+
+func AddCommissionItems(db *mongo.Database, m model.CommissionItem) error {
+	collection := db.Collection("commissionSetting")
+
+	type CommissionItemDb struct {
+		Id             primitive.ObjectID `bson:"_id"`
+		CommissionType int                `bson:"commissionType"`
+		Level          int                `bson:"level"`
+		PeopleNumber   int                `bson:"peopleNumber"`
+		Rate           float32            `bson:"rate"`
+	}
+
+	newItem := CommissionItemDb{
+		Id:             primitive.NewObjectID(),
+		CommissionType: m.CommissionType,
+		Level:          m.Level,
+		PeopleNumber:   m.PeopleNumber,
+		Rate:           m.Rate,
+	}
+	objId, err := collection.InsertOne(context.TODO(), newItem)
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	fmt.Println("_id:", objId.InsertedID)
+	return nil
+}
+
+func UpdateCommissionItems(db *mongo.Database, m model.CommissionItem) error {
+	collection := db.Collection("commissionSetting")
+	id, _ := primitive.ObjectIDFromHex(m.Id)
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{
+		{"commissionType", m.CommissionType},
+		{"level", m.Level},
+		{"peopleNumber", m.PeopleNumber},
+		{"rate", m.Rate},
+	}}})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
+}
+
+func DeleteCommissionItems(db *mongo.Database, id string) error {
+	collection := db.Collection("commissionSetting")
+	itemId, _ := primitive.ObjectIDFromHex(id)
+
+	deleteResult, err := collection.DeleteOne(context.Background(), bson.M{"_id": itemId})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("删除数据成功:", deleteResult)
+
+	return nil
+}

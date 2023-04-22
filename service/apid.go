@@ -42,6 +42,8 @@ func main() {
 		apiGroup.POST("/check", controller.CheckWangHandler)                                //查号接口
 		apiGroup.GET("/check/records/recently", controller.CheckWangRecordsRecentlyHandler) //最近查询账号以及最近最近查询结果
 
+		apiGroup.POST("/user/level/setting", controller.UserLevelSettingHandler) //用户等级设置
+
 		apiGroup.GET("/user/check/account/list", controller.UserCheckAccountListHandler)      //批量查询账号列表
 		apiGroup.POST("/user/check/account/add", controller.UserCheckAccountAddHandler)       //批量查询账号添加
 		apiGroup.POST("/user/check/account/delete", controller.UserCheckAccountDeleteHandler) //批量查询账号删除
@@ -50,7 +52,13 @@ func main() {
 		apiGroup.POST("/user/wallet/recharge", controller.UserWalletRechargeHandler)               //用户钱包充值
 		apiGroup.GET("/user/wallet/overview", controller.UserWalletOverviewHandler)                //用户钱包资金总览
 		apiGroup.GET("/user/wallet/records", controller.UserWalletRecordsHandler)                  //用户钱包资金明细
+		apiGroup.POST("/user/wallet/withdraw", controller.UserWalletWithdrawHandler)               //用户钱包提现
 		apiGroup.GET("/user/wallet/withdraw/records", controller.UserWalletWithdrawRecordsHandler) //用户钱包提现管理
+
+		apiGroup.GET("/promotion/commission/list", controller.PromotionCommissionListHandler)      //推广比例列表
+		apiGroup.POST("/promotion/commission/add", controller.PromotionCommissionAddHandler)       //推广比例添加
+		apiGroup.POST("/promotion/commission/update", controller.PromotionCommissionUpdateHandler) //推广比例修改
+		apiGroup.POST("/promotion/commission/delete", controller.PromotionCommissionDeleteHandler) //推广比例删除
 
 		apiGroup.GET("/store/member/items", controller.StoreMemberItemsHandler)             //会员充值套餐
 		apiGroup.POST("/store/member/item/add", controller.StoreMemberItemAddHandler)       //会员充值套餐添加
