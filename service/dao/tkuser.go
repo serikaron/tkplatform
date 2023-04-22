@@ -89,6 +89,22 @@ func UserMemberRecharge(db *mongo.Database, userId string, expiration int64) err
 	return nil
 }
 
+func SetUserLevel(db *mongo.Database, userId string, level int) error {
+	collection := db.Collection("users")
+	id, _ := primitive.ObjectIDFromHex(userId)
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"_id": id}, bson.D{{"$set", bson.D{{"level", level}}}})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
+	return nil
+}
+
 // 过去一周
 func GetUserCheckWangWeekRecords(db *mongo.Database, userId string) []*model.UserCheckRecordResp {
 	collection := db.Collection("userCheckRecord")

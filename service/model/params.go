@@ -91,6 +91,14 @@ type RiceItemResp struct {
 	Promotion     bool   `json:"promotion"`
 }
 
+type CommissionItemResp struct {
+	Id             string  `json:"id"`
+	CommissionType int     `json:"commissionType"`
+	Level          int     `json:"level"`
+	PeopleNumber   int     `json:"peopleNumber"`
+	Rate           float32 `json:"rate"`
+}
+
 type MemberItemResp struct {
 	Id            string `json:"id"`
 	Name          string `json:"name"`

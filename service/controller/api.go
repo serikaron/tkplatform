@@ -379,6 +379,50 @@ func UserWalletRechargeHandler(c *gin.Context) {
 	})
 }
 
+// @Route: [POST] /v1/api/user/level/setting
+// @Description: 用户等级设置
+func UserLevelSettingHandler(c *gin.Context) {
+	type param struct {
+		Level int `json:"level" binding:"required"` //1-会员充值，2-米粒购买
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	if p.Level == 0 {
+		constant.ErrMsg(c, constant.BadParameter, "等级不能为空")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	userDb := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
+	mongoUserDb := userDb.Database("tkuser")
+
+	errRice := dao.SetUserLevel(mongoUserDb, userId, p.Level)
+	if errRice != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
 // @Route: [POST] /v1/api/user/wallet/overview
 // @Description: 用户钱包总览
 func UserWalletOverviewHandler(c *gin.Context) {
@@ -485,6 +529,61 @@ func UserWalletRecordsHandler(c *gin.Context) {
 			"items": list,
 		},
 	})
+}
+
+// @Route: [POST] /v1/api/user/wallet/withdraw
+// @Description: 用户钱包提现
+func UserWalletWithdrawHandler(c *gin.Context) {
+	type param struct {
+		Amount int64 `json:"amount"`
+	}
+
+	var p param
+	var err error
+	if err = c.Bind(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	//records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit)
+	wallet := dao.GetUserWallet(mongoDb, userId)
+
+	logger.Debug("wallet.Cash:", wallet.Cash)
+
+	//var list []*model.UserWalletWithdrawRecordResp
+	//for _, record := range records {
+	//	list = append(list, &model.UserWalletWithdrawRecordResp{
+	//		Id:        record.Id,
+	//		Comment:   record.Comment,
+	//		Amount:    record.Amount,
+	//		Fee:       record.Fee,
+	//		Status:    record.Status,
+	//		CreatedAt: record.CreatedAt,
+	//	})
+	//}
+	//
+	//c.JSON(http.StatusOK, gin.H{
+	//	"code": constant.Success,
+	//	"msg":  "ok",
+	//	"data": gin.H{
+	//		"total": gin.H{
+	//			"count":  total,
+	//			"amount": sumAmount,
+	//		},
+	//		"items": list,
+	//	},
+	//})
 }
 
 // @Route: [POST] /v1/api/user/wallet/withdraw/records

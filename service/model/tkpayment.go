@@ -83,3 +83,11 @@ type RiceItem struct {
 	OriginalPrice int64  `bson:"originalPrice"`
 	Promotion     bool   `bson:"promotion"`
 }
+
+type CommissionItem struct {
+	Id             string  `bson:"_id"`
+	CommissionType int     `bson:"commissionType"`
+	Level          int     `bson:"level"`
+	PeopleNumber   int     `bson:"peopleNumber"`
+	Rate           float32 `bson:"rate"`
+}
