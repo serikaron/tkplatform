@@ -29,8 +29,11 @@
   },
   "devDependencies": {
     "@types/jest": "^29.4.0",
+    "chromedriver": "^112.0.0",
     "form-data": "^4.0.0",
     "jest": "^29.4.1",
+    "jssoup": "^0.0.15",
+    "selenium-webdriver": "^4.8.2",
     "supertest": "^6.3.3"
   }
 }

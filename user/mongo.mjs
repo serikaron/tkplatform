@@ -82,6 +82,13 @@ export async function setupMongo(req) {
                 return false
             }
         },
+        updateIdentification: async (userId, update) => {
+            await collection.users
+                .updateOne(
+                    {_id: new ObjectId(userId),},
+                    {$set: update}
+                )
+        },
         updatePassword: async (_id, password) => {
             await collection.users
                 .updateOne({_id}, {$set: {password}})
@@ -214,11 +221,9 @@ export async function setupMongo(req) {
                 .limit(limit)
                 .toArray()
         },
-        backendGetMessages: async (userId, offset, limit) => {
+        backendGetMessages: async (offset, limit) => {
             return await collection.userMessages
-                .find({
-                    userId: new ObjectId(userId),
-                })
+                .find()
                 .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
@@ -231,11 +236,9 @@ export async function setupMongo(req) {
                     deleted: {$ne: true}
                 })
         },
-        backendCountMessages: async (userId) => {
+        backendCountMessages: async () => {
             return await collection.userMessages
-                .countDocuments({
-                    userId: new ObjectId(userId),
-                })
+                .countDocuments()
         },
         addMessage: async (message) => {
             const r = await collection.userMessages

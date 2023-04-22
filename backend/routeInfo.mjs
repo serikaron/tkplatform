@@ -2,16 +2,34 @@
 
 const routeInfo = [
     {
-        url: "/backend/v1/register",
+        url: "/backend/v1/captcha/require",
+        method: "POST",
+        needAuth: false,
+        service: {baseURL: "http://captcha:8080", url: "/v1/captcha/require"}
+    },
+    {
+        url: "/backend/v1/sms/send",
+        method: "POST",
+        needAuth: false,
+        service: {baseURL: "http://sms:8080", url: "/v1/sms/send"}
+    },
+    {
+        url: "/backend/v1/admin/register",
         method: "POST",
         needAuth: false,
         service: {baseURL: "http://user:8080", url: "/v1/backend/register"}
     },
     {
-        url: '/backend/v1/login',
+        url: '/backend/v1/admin/login',
         method: "POST",
         needAuth: false,
         service: {baseURL: "http://user:8080", url: "/v1/backend/login"}
+    },
+    {
+        url: '/backend/v1/register/user',
+        method: "POST",
+        needAuth: false,
+        service: {baseURL: "http://user:8080", url: "/v1/user/register"}
     },
     {
         url: '/backend/v1/user/:userId', method: "GET", needAuth: true, service: {
@@ -155,7 +173,58 @@ const routeInfo = [
             }
         }
     },
-// ----- question end -----
+    // ----- question end -----
+
+    // ----- payment -----
+    {
+        url: '/backend/v1/member/items',
+        method: 'GET',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/member/items'}
+    },
+    {
+        url: '/backend/v1/member/item/add',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/member/item/add'}
+    },
+    {
+        url: '/backend/v1/member/item/update',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/member/item/update'}
+    },
+    {
+        url: '/backend/v1/member/item/delete',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/member/item/delete'}
+    },
+    {
+        url: '/backend/v1/rice/items',
+        method: 'GET',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/rice/items'}
+    },
+    {
+        url: '/backend/v1/rice/item/add',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/rice/item/add'}
+    },
+    {
+        url: '/backend/v1/rice/item/update',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/rice/item/update'}
+    },
+    {
+        url: '/backend/v1/rice/item/delete',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/store/rice/item/delete'}
+    },
+    // ----- payment end -----
 ]
 
 export default routeInfo

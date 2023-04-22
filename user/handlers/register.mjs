@@ -5,7 +5,7 @@ import {RegisterFailed, UserExists, UserNotExists, VerifySmsCodeFailed} from "..
 import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {now} from "../../common/utils.mjs";
 
-// import argon2i from "argon2";
+// 拉新页面也会到这里注册，有泄漏token的危险
 
 function checkInput(req) {
     function isBadField(field) {

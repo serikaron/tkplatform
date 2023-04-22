@@ -16,15 +16,15 @@ export const routeIdentification = router => {
         }
 
         const r = await req.context.aliyun.identify(process.env.ALIYUN_APP_CODE, req.body.idNo, req.body.name)
-        console.log(`identify result ${r}`)
-        if (r.respCode !== "0000") {
+        console.log(`identify result ${JSON.stringify(r)}`)
+        if (r.error_code !== 0 || !r.result.isok) {
             throw new IdentifyFailed()
         }
 
         const update = {
             identification: {
-                idNo: r.idNo,
-                name: r.name,
+                idNo: req.body.idNo,
+                name: req.body.name,
                 image: req.body.image
             },
         }
@@ -34,7 +34,7 @@ export const routeIdentification = router => {
         if (req.body.hasOwnProperty("qq")) {
             update["contact.qq.account"] = req.body.qq
         }
-        await req.context.mongo.updateIdentificaion(req.headers.id, update)
+        await req.context.mongo.updateIdentification(req.headers.id, update)
 
         res.tkResponse(TKResponse.Success())
 

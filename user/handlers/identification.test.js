@@ -14,29 +14,28 @@ import dotenv from "dotenv";
 dotenv.config()
 
 const successRsp = {
-    "name": "张三",
-    "idNo": "340421190710145412",
-    "respMessage": "身份证信息匹配",
-    "respCode": "0000",
-    "province": "安徽省",
-    "city": "淮南市",
-    "county": "凤台县",
-    "birthday": "19071014",
-    "sex": "M",
-    "age": "111"
+    "error_code": 0,/*当error_code为0 通过不通过isok值判断*/
+    "reason": "Success",
+    "result": {
+        "realname": "张*", /*用户传递上来真实姓名脱敏返回*/
+        "idcard": "3303***********", /*用户传递上来IdcardNo的脱敏返回*/
+        "isok": true
+        /*true：匹配 false：不匹配*/,
+        "IdCardInfor": {
+            "province": "浙江省",
+            "city": "杭州市",
+            "district": "xx县",
+            "area": "浙江省杭州市区xx县",
+            "sex": "男",
+            "birthday": "1965-3-10"
+        }
+    }
 }
 
 const failedRsp = {
-    "name": "李四",
-    "idNo": "340421190710145412",
-    "respMessage": "身份证信息不匹配",
-    "respCode": "0008",
-    "province": "安徽省",
-    "city": "淮南市",
-    "county": "凤台县",
-    "birthday": "19071014",
-    "sex": "M",
-    "age": "111"
+    "error_code": 206501,
+    "reason": "NoExistERROR",
+    "result": {"realname": "2*******", "idcard": "1****", "isok": false, "IdCardInfor": null}
 }
 
 test("already identified", async () => {
@@ -140,7 +139,7 @@ test('ailyun return success', async () => {
                         identify
                     },
                     mongo: {
-                        updateIdentificaion: updateIdentification,
+                        updateIdentification,
                         getUserById
                     }
                 }
@@ -166,8 +165,8 @@ test('ailyun return success', async () => {
     expect(identify).toHaveBeenCalledWith(process.env.ALIYUN_APP_CODE, "123456", "name")
     expect(updateIdentification).toHaveBeenCalledWith(userId.toString(), {
         identification: {
-            idNo: "340421190710145412",
-            name: "张三",
+            idNo: "123456",
+            name: "name",
             image: "url"
         },
         "contact.qq.account": "qq",

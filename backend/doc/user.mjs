@@ -5,7 +5,7 @@
 
 /**
  * @swagger
- * /backend/v1/user/register(注册):
+ * /backend/v1/admin/register(管理员注册):
  *   post:
  *     tags: ["user(用户相关)"]
  *     description: 用户注册
@@ -46,10 +46,9 @@
  *
  */
 
-
 /**
  * @swagger
- * /backend/v1/user/login(登录):
+ * /backend/v1/admin/login(管理员登录):
  *   post:
  *     tags: ["user(用户相关)"]
  *     description: 用户登录
@@ -87,6 +86,147 @@
  *                     refreshToken:
  *                       type: string
  *                       example: "96defd9f-1a54-4cb8-b501-9076d8709074"
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/captcha/require(请求图形码✅):
+ *   post:
+ *     tags: ["captcha(图形码)"]
+ *     description: 获取图形码
+ *     responses:
+ *       200:
+ *         description: 获取成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 0
+ *                 msg:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     key:
+ *                       type: string
+ *                       example: 1234
+ *                     image:
+ *                       type: string
+ *                       example: baas64 图片字节
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/sms/send(发送手机验证码✅):
+ *   post:
+ *     tags: ["sms(短信服务)"]
+ *     description: 发送验证码到手机
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "13333333333"
+ *               captcha:
+ *                  type: object
+ *                  properties:
+ *                    key:
+ *                      type: string
+ *                      example: "1234"
+ *                    code:
+ *                      type: string
+ *                      example: "4iF9"
+ *
+ *     responses:
+ *       200:
+ *         description: 发送成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 0
+ *                 msg:
+ *                   type: string
+ *                   example: "success"
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/register/user(用户注册):
+ *   post:
+ *     tags: ["user(用户相关)"]
+ *     description: 用户注册
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "13333333333"
+ *               password:
+ *                 type: string
+ *                 example: "123456"
+ *               inviter:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *               smsCode:
+ *                 type: string
+ *                 example: "1234"
+ *
+ *     responses:
+ *       200:
+ *         description: 注册成功
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: 0
+ *                 msg:
+ *                   type: string
+ *                   example: "success"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     accessToken:
+ *                       type: string
+ *                       example: "a jwt object"
+ *                     refreshToken:
+ *                       type: string
+ *                       example: "96defd9f-1a54-4cb8-b501-9076d8709074"
+ *       409:
+ *         description: 用户已存在
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 code:
+ *                   type: integer
+ *                   example: -100
+ *                 msg:
+ *                   type: string
+ *                   example: "用户已存在"
+ *
  *
  */
 

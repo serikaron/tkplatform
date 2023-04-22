@@ -302,6 +302,12 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: 'http://user:8080', url: '/v1/user/identification'}
     },
+    {
+        url: '/v1/user/identification',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: 'http://user:8080', url: '/v1/user/identification'}
+    },
 
     // ---- user end ----
 
@@ -838,6 +844,8 @@ test.concurrent.each([
         service: {
             baseURL: "http://apid:9010",
             url: "/v1/api/store/member/items",
+            // baseURL: "http://payment:8080",
+            // url: '/v1/store/member/items',
         }
     },
     {
@@ -847,6 +855,8 @@ test.concurrent.each([
         service: {
             baseURL: "http://apid:9010",
             url: "/v1/api/store/rice/items",
+            // baseURL: "http://payment:8080",
+            // url: '/v1/store/rice/items',
         }
     },
     {
@@ -938,6 +948,15 @@ test.concurrent.each([
         service: {
             baseURL: "http://apid:9010",
             url: "/v1/api/user/check/account/delete"
+        }
+    },
+    {
+        url: "/v1/wallet/recharge",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: "/v1/api/user/wallet/recharge"
         }
     },
     {
