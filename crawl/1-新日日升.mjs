@@ -47,11 +47,11 @@ const withdraw = async () => {
     console.log(r.da)
 }
 
-// while (true) {
-//     for (const a of accounts) {
-//         await task(a)
-//     }
-//     await new Promise(resolve => setTimeout(resolve, 180 * 1000))
-// }
+while (true) {
+    for (const a of accounts) {
+        await task(a)
+    }
+    await new Promise(resolve => setTimeout(resolve, 180 * 1000))
+}
 
-await withdraw()
+// await withdraw()
