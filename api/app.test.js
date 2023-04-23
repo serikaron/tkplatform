@@ -1004,6 +1004,15 @@ test.concurrent.each([
             url: "/v1/system/version/latest",
         }
     },
+    {
+        url: "/v1/api/user/wallet/withdraw",
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: "/v1/api/user/wallet/withdraw"
+        }
+    }
 ])("$url should dispatch correctly", async (argument) => {
     await runTest(argument)
 })
