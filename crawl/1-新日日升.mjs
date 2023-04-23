@@ -36,9 +36,22 @@ const task = async (account) => {
     console.log(`新日日升, ${new Date().toLocaleString()}, ${account}, ${JSON.stringify(r.data)}`)
 }
 
-while (true) {
-    for (const a of accounts) {
-        await task(a)
-    }
-    await new Promise(resolve => setTimeout(resolve, 180 * 1000))
+const withdraw = async () => {
+    const r = await post("http://user.xinrisheng1688.com/index.php/User/Pay/posttx/", {
+        username,
+        password: "hxy197984",
+        userid,
+        tixian_type: 1,
+        price: 10
+    })
+    console.log(r.da)
 }
+
+// while (true) {
+//     for (const a of accounts) {
+//         await task(a)
+//     }
+//     await new Promise(resolve => setTimeout(resolve, 180 * 1000))
+// }
+
+await withdraw()
