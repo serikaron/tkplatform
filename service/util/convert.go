@@ -4,6 +4,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func Int64ConvertString(n int64) string {
@@ -49,4 +50,9 @@ func TrimHtml(src string) string {
 
 	return strings.TrimSpace(src)
 
+}
+
+func YmdStringToTime(s string) time.Time {
+	t, _ := time.ParseInLocation("2006-01-02", s, time.Local)
+	return t
 }

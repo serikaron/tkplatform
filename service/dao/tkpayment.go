@@ -209,14 +209,24 @@ func AuditUserWalletWithdrawRecord(db *mongo.Database, recordId string) error {
 	return nil
 }
 
-func GetUserWalletWithdrawRecords(db *mongo.Database, userId string, offset, limit int64) []*model.UserWalletWithdrawRecord {
+func GetUserWalletWithdrawRecords(db *mongo.Database, userId string, offset, limit, startAt, endAt int64) []*model.UserWalletWithdrawRecord {
 	collection := db.Collection("walletWithdrawRecords")
 	var findOptions options.FindOptions
 	if limit > 0 {
 		findOptions.SetLimit(limit)
 		findOptions.SetSkip(offset)
 	}
-	cur, err := collection.Find(context.Background(), bson.M{"userId": userId}, &findOptions)
+	var m bson.M
+	if startAt > 0 && endAt > 0 {
+		m = bson.M{"userId": userId, "createdAt": bson.M{
+			"$gt": startAt,
+			"$lt": endAt,
+		}}
+	} else {
+		m = bson.M{"userId": userId}
+	}
+
+	cur, err := collection.Find(context.Background(), m, &findOptions)
 	if err != nil {
 		logger.Error(err)
 		return nil
@@ -234,9 +244,20 @@ func GetUserWalletWithdrawRecords(db *mongo.Database, userId string, offset, lim
 	return all
 }
 
-func CountUserWalletWithdrawRecords(db *mongo.Database, userId string) int64 {
+func CountUserWalletWithdrawRecords(db *mongo.Database, userId string, startAt, endAt int64) int64 {
 	collection := db.Collection("walletWithdrawRecords")
-	count, err := collection.CountDocuments(context.Background(), bson.M{"userId": userId})
+
+	var m bson.M
+	if startAt > 0 && endAt > 0 {
+		m = bson.M{"userId": userId, "createdAt": bson.M{
+			"$gt": startAt,
+			"$lt": endAt,
+		}}
+	} else {
+		m = bson.M{"userId": userId}
+	}
+
+	count, err := collection.CountDocuments(context.Background(), m)
 	if err != nil {
 		logger.Error(err)
 		return 0
@@ -246,9 +267,20 @@ func CountUserWalletWithdrawRecords(db *mongo.Database, userId string) int64 {
 	return count
 }
 
-func SumUserWalletWithdrawRecordsAmount(db *mongo.Database, userId string) int64 {
+func SumUserWalletWithdrawRecordsAmount(db *mongo.Database, userId string, startAt, endAt int64) int64 {
 	collection := db.Collection("walletWithdrawRecords")
-	cur, err := collection.Find(context.Background(), bson.M{"userId": userId})
+
+	var m bson.M
+	if startAt > 0 && endAt > 0 {
+		m = bson.M{"userId": userId, "createdAt": bson.M{
+			"$gt": startAt,
+			"$lt": endAt,
+		}}
+	} else {
+		m = bson.M{"userId": userId}
+	}
+
+	cur, err := collection.Find(context.Background(), m)
 	if err != nil {
 		logger.Error(err)
 		return 0

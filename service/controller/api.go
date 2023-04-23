@@ -383,7 +383,8 @@ func UserWalletRechargeHandler(c *gin.Context) {
 // @Description: 用户等级设置
 func UserLevelSettingHandler(c *gin.Context) {
 	type param struct {
-		Level int `json:"level" binding:"required"` //1-会员充值，2-米粒购买
+		Level  int    `json:"level" binding:"required"`   //1-会员充值，2-米粒购买
+		UserId string `json:"user_id" binding:"required"` //用户id
 	}
 
 	var p param
@@ -404,13 +405,18 @@ func UserLevelSettingHandler(c *gin.Context) {
 		return
 	}
 
+	if p.UserId == "" {
+		constant.ErrMsg(c, constant.BadParameter, "用户id不能为空")
+		return
+	}
+
 	userId := c.Request.Header.Get("id")
 	logger.Debug("userId:", userId)
 
 	userDb := c.MustGet(constant.ContextMongoUserDb).(*mongo.Client)
 	mongoUserDb := userDb.Database("tkuser")
 
-	errRice := dao.SetUserLevel(mongoUserDb, userId, p.Level)
+	errRice := dao.SetUserLevel(mongoUserDb, p.UserId, p.Level)
 	if errRice != nil {
 		constant.ErrMsg(c, constant.OperateWrong)
 		return
@@ -694,9 +700,9 @@ func UserWalletWithdrawRecordsHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
-	records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit)
-	total := dao.CountUserWalletWithdrawRecords(mongoDb, userId)
-	sumAmount := dao.SumUserWalletWithdrawRecordsAmount(mongoDb, userId)
+	records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit, 0, 0)
+	total := dao.CountUserWalletWithdrawRecords(mongoDb, userId, 0, 0)
+	sumAmount := dao.SumUserWalletWithdrawRecordsAmount(mongoDb, userId, 0, 0)
 
 	var list []*model.UserWalletWithdrawRecordResp
 	for _, record := range records {
@@ -720,6 +726,75 @@ func UserWalletWithdrawRecordsHandler(c *gin.Context) {
 				"amount": sumAmount,
 			},
 			"items": list,
+		},
+	})
+}
+
+// @Route: [POST] /v1/api/user/withdraw/records
+// @Description: 用户钱包提现管理后台
+func UserWithdrawRecordsHandler(c *gin.Context) {
+	type param struct {
+		Limit     int64  `form:"limit"`
+		Offset    int64  `form:"offset"`
+		UserId    string `form:"user_id"`
+		StartDate string `form:"start_date"`
+		EndDate   string `form:"end_date"`
+	}
+
+	var p param
+	var err error
+	if err = c.Bind(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	startAt := int64(0)
+	endAt := int64(0)
+
+	if p.StartDate != "" && p.EndDate != "" {
+		startAtDate := util.YmdStringToTime(p.StartDate)
+		startAt = startAtDate.Unix()
+		endAtDate := util.YmdStringToTime(p.EndDate)
+		endAt = endAtDate.Unix()
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	records := dao.GetUserWalletWithdrawRecords(mongoDb, p.UserId, p.Offset, p.Limit, startAt, endAt)
+	total := dao.CountUserWalletWithdrawRecords(mongoDb, p.UserId, startAt, endAt)
+	sumAmount := dao.SumUserWalletWithdrawRecordsAmount(mongoDb, p.UserId, startAt, endAt)
+
+	var list []*model.UserWalletWithdrawRecordResp
+	for _, record := range records {
+		list = append(list, &model.UserWalletWithdrawRecordResp{
+			Id:        record.Id,
+			UserId:    record.UserId,
+			Comment:   record.Comment,
+			Amount:    record.Amount,
+			Fee:       record.Fee,
+			Status:    record.Status,
+			CreatedAt: record.CreatedAt,
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"total":  total,
+			"amount": sumAmount,
+			"limit":  p.Limit,
+			"offset": p.Offset,
+			"items":  list,
 		},
 	})
 }
