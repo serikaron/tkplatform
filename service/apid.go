@@ -53,6 +53,7 @@ func main() {
 		apiGroup.GET("/user/wallet/overview", controller.UserWalletOverviewHandler)                //用户钱包资金总览
 		apiGroup.GET("/user/wallet/records", controller.UserWalletRecordsHandler)                  //用户钱包资金明细
 		apiGroup.POST("/user/wallet/withdraw", controller.UserWalletWithdrawHandler)               //用户钱包提现
+		apiGroup.POST("/user/wallet/withdraw/audit", controller.UserWalletWithdrawAuditHandler)    //用户钱包提现审核
 		apiGroup.GET("/user/wallet/withdraw/records", controller.UserWalletWithdrawRecordsHandler) //用户钱包提现管理
 
 		apiGroup.GET("/promotion/commission/list", controller.PromotionCommissionListHandler)      //推广比例列表

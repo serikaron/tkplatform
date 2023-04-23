@@ -39,6 +39,7 @@ const (
 	UserMemberExpired   = ErrorType(1001)
 	UserNotExist        = ErrorType(1002)
 	RechargeFailed      = ErrorType(1003)
+	BalanceNotEnough    = ErrorType(1004)
 )
 
 var ErrCodeTextMap = map[ErrorType]string{
@@ -59,6 +60,7 @@ var ErrCodeTextMap = map[ErrorType]string{
 	UserMemberExpired:   "会员已过期",
 	UserNotExist:        "用户不存在",
 	RechargeFailed:      "充值失败",
+	BalanceNotEnough:    "余额不足",
 }
 
 func printError(w io.Writer, c *gin.Context, msg string) {

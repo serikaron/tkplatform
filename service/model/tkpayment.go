@@ -48,6 +48,7 @@ type Rice struct {
 
 type UserWalletRecord struct {
 	Id        string    `bson:"_id"`
+	UserId    string    `bson:"userId"`
 	Type      int       `bson:"type"`
 	Member    *Member   `bson:"member"`
 	Withdraw  *Withdraw `bson:"withdraw"`
@@ -57,8 +58,17 @@ type UserWalletRecord struct {
 	CreatedAt int64     `bson:"createdAt"`
 }
 
+const (
+	UserWalletRecordTypeMember   = 1
+	UserWalletRecordTypeWithdraw = 2
+	UserWalletRecordTypeDownLine = 3
+	UserWalletRecordTypeActivity = 4
+	UserWalletRecordTypeRice     = 5
+)
+
 type UserWalletWithdrawRecord struct {
 	Id        string `bson:"_id"`
+	UserId    string `bson:"userId"`
 	Comment   string `bson:"comment"`
 	Amount    int64  `bson:"amount"`
 	Fee       int64  `bson:"fee"`

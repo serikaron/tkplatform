@@ -64,6 +64,7 @@ type RicePo struct {
 
 type UserWalletRecordResp struct {
 	Id        string      `json:"id"`
+	UserId    string      `json:"userId"`
 	Type      int         `json:"type"`
 	Member    *MemberPo   `json:"member"`
 	Withdraw  *WithdrawPo `json:"withdraw"`
@@ -75,6 +76,7 @@ type UserWalletRecordResp struct {
 
 type UserWalletWithdrawRecordResp struct {
 	Id        string `json:"id"`
+	UserId    string `json:"userId"`
 	Comment   string `json:"comment"`
 	Amount    int64  `json:"amount"`
 	Fee       int64  `json:"fee"`
