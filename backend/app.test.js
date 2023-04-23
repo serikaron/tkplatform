@@ -186,6 +186,18 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: 'http://user:8080', url: '/v1/backend/user/reports'}
     },
+    {
+        url: '/backend/v1/user/level/setting',
+        method: 'POST',
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/user/level/setting'}
+    },
+    {
+        url: "/backend/v1/api/user/wallet/withdraw/audit",
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: 'http://apid:9010', url: '/v1/api/user/wallet/withdraw/audit'}
+    },
     // ----- user end ----------
 
     {url: "/backend/v1/site", method: "POST", needAuth: true, service: {baseURL: "http://site:8080", url: "/v1/site"}},
@@ -322,6 +334,30 @@ test.concurrent.each([
         needAuth: true,
         service: {baseURL: "http://apid:9010", url: "/v1/api/store/rice/item/delete"}
     },
+    {
+        url: "/backend/v1/api/promotion/commission/list",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/promotion/commission/list"}
+    },
+    {
+        url: "/backend/v1/api/promotion/commission/add",
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/promotion/commission/add"}
+    },
+    {
+        url: "/backend/v1/api/promotion/commission/update",
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/promotion/commission/update"}
+    },
+    {
+        url: '/backend/v1/api/promotion/commission/delete',
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/promotion/commission/delete'}
+    }
     // ----- payment end -----
 
 ])("$url should dispatch correctly", async (argument) => {

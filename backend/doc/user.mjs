@@ -563,3 +563,37 @@
  *                     type: number
  *                     example: timestamp
  */
+
+/**
+ * @swagger
+ * /backend/v1/user/level/setting(用户等级设置):
+ *   post:
+ *     tags: ["user(用户相关)"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               level:
+ *                 type: number
+ *               user_id:
+ *                 type: string
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/api/user/wallet/withdraw/audit(用户提现审核):
+ *   post:
+ *     tags: ["user(用户相关)"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               record_id:
+ *                 type: string
+ *
+ */
