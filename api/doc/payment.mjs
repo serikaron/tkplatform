@@ -86,6 +86,8 @@
  *               properties:
  *                 rices:
  *                  type: number
+ *                 cash:
+ *                  type: number
  *
  */
 
@@ -212,6 +214,10 @@
  *                 withdraw:
  *                   type: number
  *                 recharge:
+ *                   type: number
+ *                 cash:
+ *                   type: number
+ *                 rice:
  *                   type: number
  *
  */

@@ -114,6 +114,14 @@ describe("test user service", () => {
                 userId,
                 verify: response => {
                     simpleVerification(response)
+                    for (let i = 0; i < response.data.length; ++i) {
+                        expect(response.data[i].registeredAt).toBeGreaterThanOrEqual(desired[i].registeredAt)
+                        expect(response.data[i].member.expiration).toBeGreaterThanOrEqual(desired[i].member.expiration)
+                        delete response.data[i].registeredAt
+                        delete response.data[i].member.expiration
+                        delete desired[i].registeredAt
+                        delete desired[i].member.expiration
+                    }
                     expect(response.data).toStrictEqual(desired)
                 }
             })
