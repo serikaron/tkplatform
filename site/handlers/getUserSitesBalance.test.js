@@ -53,9 +53,10 @@ test("get balance from userSites", async () => {
         data: [{
             id: `${userSiteId}`,
             site: {
-                name: "site-name"
+                name: "site-name",
             },
             credentialAccount: "account",
+            credentialPassword: "password",
             balance: 100
         }]
     }))

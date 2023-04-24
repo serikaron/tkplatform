@@ -7,6 +7,7 @@ const siteBalance = userSite => {
         id: userSite._id,
         site: userSite.site,
         credentialAccount: userSite.credential.account,
+        credentialPassword: userSite.credential.password,
         balance: userSite.balance === undefined ? 0 : userSite.balance
     }
 }
