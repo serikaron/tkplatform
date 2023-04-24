@@ -326,6 +326,47 @@ describe("test site service", () => {
                 })
             })
         })
+
+
+        describe("test get balance with siteId filter", () => {
+            it("verify another site", async () => {
+                await setUserSite(box.data.userSite2, userId, {verified: true})
+            })
+
+            it("get all balance", async () => {
+                await runTest({
+                    method: "GET",
+                    path: "/v1/user/sites/balance",
+                    baseURL,
+                    userId,
+                    verify: response => {
+                        simpleVerification(response)
+                        expect(Array.isArray(response.data)).toBe(true)
+                        expect(response.data).toStrictEqual([
+                            siteBalanceOf(box.data.userSite1),
+                            siteBalanceOf(box.data.userSite2)
+                        ])
+                    }
+                })
+            })
+
+            it("get balance with siteId filter", async () => {
+                await runTest({
+                    method: "GET",
+                    path: "/v1/user/sites/balance",
+                    query: {siteId: box.data.userSite2.site.id},
+                    baseURL,
+                    userId,
+                    verify: response => {
+                        simpleVerification(response)
+                        expect(Array.isArray(response.data)).toBe(true)
+                        expect(response.data).toStrictEqual([
+                            siteBalanceOf(box.data.userSite2)
+                        ])
+                    }
+                })
+            })
+        })
     })
 
     describe("test user site journal entries", () => {

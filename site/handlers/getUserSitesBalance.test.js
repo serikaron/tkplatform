@@ -46,7 +46,7 @@ test("get balance from userSites", async () => {
     })
 
     const response = await supertest(app)
-        .get("/v1/user/sites/balance")
+        .get("/v1/user/sites/balance?siteId=abc")
         .set({id: `${userId}`})
 
     simpleCheckTKResponse(response, TKResponse.Success({
@@ -61,5 +61,5 @@ test("get balance from userSites", async () => {
         }]
     }))
 
-    expect(getUserSitesBalance).toHaveBeenCalledWith(`${userId}`)
+    expect(getUserSitesBalance).toHaveBeenCalledWith(`${userId}`, "abc")
 })

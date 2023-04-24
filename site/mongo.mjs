@@ -80,12 +80,16 @@ export async function setupMongo(req) {
                 {$set: {deleted: true}}
             )
         },
-        getUserSitesBalance: async (userId) => {
+        getUserSitesBalance: async (userId, siteId) => {
+            const filter = {
+                userId: new ObjectId(userId),
+                verified: true
+            }
+            if (siteId !== null) {
+                filter["site.id"] = new ObjectId(siteId)
+            }
             return await collection.userSites
-                .find({
-                    userId: new ObjectId(userId),
-                    verified: true
-                }, {
+                .find(filter, {
                     projection: {site: 1, balance: 1, credential: 1}
                 })
                 .toArray()

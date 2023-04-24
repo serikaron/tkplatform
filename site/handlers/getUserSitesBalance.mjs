@@ -1,6 +1,7 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {getValueString} from "../../common/utils.mjs";
 
 const siteBalance = userSite => {
     return {
@@ -14,7 +15,8 @@ const siteBalance = userSite => {
 
 export const routeGetSitesBalance = (router) => {
     router.get('/user/sites/balance', async (req, res, next) => {
-        const l = await req.context.mongo.getUserSitesBalance(req.headers.id)
+        const siteId = getValueString(req.query, "siteId", null)
+        const l = await req.context.mongo.getUserSitesBalance(req.headers.id, siteId)
         res.tkResponse(TKResponse.Success({
             data: l.map(siteBalance)
         }))
