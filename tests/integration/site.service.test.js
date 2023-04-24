@@ -265,7 +265,7 @@ describe("test site service", () => {
                 site: userSite.site,
                 credentialAccount: userSite.credential.account,
                 credentialPassword: userSite.credential.password,
-                balance: userSite.balance === undefined ? 0 : userSite.balance
+                balance: userSite.balance === undefined ? "0" : userSite.balance
             }
         }
 
@@ -303,12 +303,12 @@ describe("test site service", () => {
                 await runTest({
                     method: "PUT",
                     path: `/v1/user/site/${box.data.userSite1.id}/balance`,
-                    body: {balance: 100},
+                    body: {balance: "100"},
                     baseURL,
                     userId,
                     verify: response => {
                         expect(response.status).toBe(200)
-                        box.data.userSite1.balance = 100
+                        box.data.userSite1.balance = "100"
                     }
                 })
             })

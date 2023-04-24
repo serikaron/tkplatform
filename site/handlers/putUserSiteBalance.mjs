@@ -1,6 +1,6 @@
 'use strict'
 
-import {isBadFieldNumber, isBadFieldString} from "../../common/utils.mjs";
+import {isBadFieldString} from "../../common/utils.mjs";
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
