@@ -12,13 +12,13 @@ import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 
 describe.each([
     {
-        body: {balance: 100},
-        update: {balance: 100},
+        body: {balance: "100"},
+        update: {balance: "100"},
         tkResponse: TKResponse.Success()
     },
     {
-        body: {balance: 100, extraField: "should be ignore"},
-        update: {balance: 100},
+        body: {balance: "100", extraField: "should be ignore"},
+        update: {balance: "100"},
         tkResponse: TKResponse.Success()
     },
     {
@@ -26,7 +26,7 @@ describe.each([
         tkResponse: TKResponse.fromError(new InvalidArgument())
     },
     {
-        body: {balance: "100"},
+        body: {balance: 100},
         tkResponse: TKResponse.fromError(new InvalidArgument())
     }
 ])("($#) scenario", ({body, update, tkResponse}) => {

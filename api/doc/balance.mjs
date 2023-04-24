@@ -45,7 +45,7 @@
  *                     type: string
  *                     example: 帐号(13902822010)
  *                   balance:
- *                     type: number
+ *                     type: string
  */
 
 /**
@@ -60,7 +60,7 @@
  *            type: object
  *            properties:
  *              balance:
- *                type: number
+ *                type: string
  */
 
 /**

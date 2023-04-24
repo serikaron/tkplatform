@@ -1,12 +1,12 @@
 'use strict'
 
-import {isBadFieldNumber} from "../../common/utils.mjs";
+import {isBadFieldNumber, isBadFieldString} from "../../common/utils.mjs";
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 export const routePutUserSiteBalance = (router) => {
     router.put('/user/site/:userSiteId/balance', async (req, res, next) => {
-        if (isBadFieldNumber(req.body.balance)) {
+        if (isBadFieldString(req.body.balance)) {
             throw new InvalidArgument()
         }
 
