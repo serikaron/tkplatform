@@ -1005,6 +1005,15 @@ test.concurrent.each([
         }
     },
     {
+        url: '/v1/system/announcement',
+        method: "GET",
+        needAuth: false,
+        service: {
+            baseURL: "http://system:8080",
+            url: '/v1/system/announcement'
+        }
+    },
+    {
         url: "/v1/api/user/wallet/withdraw",
         method: "POST",
         needAuth: true,

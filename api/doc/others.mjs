@@ -263,3 +263,24 @@
  *                       content:
  *                         type: string
  */
+
+/**
+ * @swagger
+ * /v1/system/announcement(首页公告✅):
+ *   get:
+ *     tags: ["其它"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 announcement:
+ *                   type: string
+ *                   example: 公告
+ *                 updateLog:
+ *                   type: string
+ *                   example: 更新日志
+ *
+ */

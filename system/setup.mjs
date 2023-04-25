@@ -4,6 +4,7 @@ import express from "express";
 import {TKResponse} from "../common/TKResponse.mjs";
 import {routeVersion} from "./versions.mjs";
 import {routeQuestion} from "./questions.mjs";
+import {routeAnnouncement} from "./announcement.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -36,6 +37,8 @@ export function setup(app, {setup, teardown}) {
     routeQuestion(router)
 
     routeVersion(router)
+
+    routeAnnouncement(router)
 
     teardown(router)
 }

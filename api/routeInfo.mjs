@@ -240,6 +240,7 @@ const routeInfo = [
     },
     {url: '/v1/system/version/latest', method: "GET", needAuth: false, service: {baseURL: "http://system:8080"}},
     {url: '/v1/api/user/wallet/withdraw', method: "POST", needAuth: true, service: {baseURL: "http://apid:9010"}},
+    {url: '/v1/system/announcement', method: 'GET', needAuth: false, service: {baseURL: "http://system:8080"}},
 ]
 
 export default routeInfo

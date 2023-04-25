@@ -25,7 +25,7 @@ export async function setupMongo(req) {
         },
         set: async (key, value) => {
             return await collection.settings
-                .updateOne({key}, {$set: {value}})
+                .updateOne({key}, {$set: {value}}, {upsert: true})
         },
         getAll: async () => {
             return await collection.settings
@@ -80,6 +80,9 @@ export async function setupMongo(req) {
             await collection.versions
                 .deleteOne({_id: new ObjectId(id)})
         },
+        getAnnouncement: async () => {
+            return await collection.settings
+        }
     }
 }
 
