@@ -95,9 +95,9 @@ type RiceItem struct {
 }
 
 type CommissionItem struct {
-	Id             string  `bson:"_id"`
-	CommissionType int     `bson:"commissionType"`
-	Level          int     `bson:"level"`
-	PeopleNumber   int     `bson:"peopleNumber"`
-	Rate           float32 `bson:"rate"`
+	Id             string `bson:"_id"`
+	CommissionType int    `bson:"commissionType"`
+	Level          int    `bson:"level"`
+	PeopleNumber   int    `bson:"peopleNumber"`
+	Rate           int    `bson:"rate"`
 }

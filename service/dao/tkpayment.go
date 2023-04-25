@@ -500,7 +500,7 @@ func AddCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		CommissionType int                `bson:"commissionType"`
 		Level          int                `bson:"level"`
 		PeopleNumber   int                `bson:"peopleNumber"`
-		Rate           float32            `bson:"rate"`
+		Rate           int                `bson:"rate"`
 	}
 
 	newItem := CommissionItemDb{
