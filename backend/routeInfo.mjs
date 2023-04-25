@@ -264,7 +264,7 @@ const routeInfo = [
         url: '/backend/v1/api/user/withdraw/records',
         method: "GET",
         needAuth: true,
-        service: {baseURL: "http://apid:9010", "/v1/api/user/withdraw/records"}
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/withdraw/records"}
     }
     // ----- payment end -----
 ]

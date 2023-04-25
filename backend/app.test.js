@@ -363,7 +363,7 @@ test.concurrent.each([
         method: "GET",
         needAuth: true,
         service: {baseURL: "http://apid:9010", url: "/v1/api/user/withdraw/records"}
-    }
+    },
     // ----- payment end -----
 
 ])("$url should dispatch correctly", async (argument) => {
