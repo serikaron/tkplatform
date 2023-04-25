@@ -357,6 +357,12 @@ test.concurrent.each([
         method: "POST",
         needAuth: true,
         service: {baseURL: "http://apid:9010", url: '/v1/api/promotion/commission/delete'}
+    },
+    {
+        url: '/backend/v1/api/user/withdraw/records',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/withdraw/records"}
     }
     // ----- payment end -----
 
