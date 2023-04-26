@@ -222,7 +222,8 @@ func GetUserWalletWithdrawRecords(db *mongo.Database, userId string, offset, lim
 			"$gt": startAt,
 			"$lt": endAt,
 		}}
-	} else {
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
 	}
 
@@ -253,7 +254,8 @@ func CountUserWalletWithdrawRecords(db *mongo.Database, userId string, startAt, 
 			"$gt": startAt,
 			"$lt": endAt,
 		}}
-	} else {
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
 	}
 
@@ -276,7 +278,8 @@ func SumUserWalletWithdrawRecordsAmount(db *mongo.Database, userId string, start
 			"$gt": startAt,
 			"$lt": endAt,
 		}}
-	} else {
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
 	}
 
