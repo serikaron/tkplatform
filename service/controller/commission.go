@@ -50,10 +50,10 @@ func PromotionCommissionListHandler(c *gin.Context) {
 // @Description: 推广提成比例添加
 func PromotionCommissionAddHandler(c *gin.Context) {
 	type param struct {
-		CommissionType int     `json:"commissionType"`
-		Level          int     `json:"level"`
-		PeopleNumber   int     `json:"peopleNumber"`
-		Rate           float32 `json:"rate"`
+		CommissionType int `json:"commissionType"`
+		Level          int `json:"level"`
+		PeopleNumber   int `json:"peopleNumber"`
+		Rate           int `json:"rate"`
 	}
 
 	var p param
@@ -97,11 +97,11 @@ func PromotionCommissionAddHandler(c *gin.Context) {
 // @Description: 推广提成比例修改
 func PromotionCommissionUpdateHandler(c *gin.Context) {
 	type param struct {
-		Id             string  `json:"id"`
-		CommissionType int     `json:"commissionType"`
-		Level          int     `json:"level"`
-		PeopleNumber   int     `json:"peopleNumber"`
-		Rate           float32 `json:"rate"`
+		Id             string `json:"id"`
+		CommissionType int    `json:"commissionType"`
+		Level          int    `json:"level"`
+		PeopleNumber   int    `json:"peopleNumber"`
+		Rate           int    `json:"rate"`
 	}
 
 	var p param

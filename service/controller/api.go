@@ -294,6 +294,7 @@ func UserWalletHandler(c *gin.Context) {
 		"msg":  "ok",
 		"data": gin.H{
 			"rice": wallet.Rice,
+			"cash": wallet.Cash,
 		},
 	})
 }
@@ -449,6 +450,8 @@ func UserWalletOverviewHandler(c *gin.Context) {
 		"code": constant.Success,
 		"msg":  "ok",
 		"data": gin.H{
+			"rice":     wallet.Rice,
+			"cash":     wallet.Cash,
 			"income":   wallet.Income,
 			"withdraw": wallet.Withdraw,
 			"recharge": wallet.Recharge,

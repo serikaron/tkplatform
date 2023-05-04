@@ -94,11 +94,11 @@ type RiceItemResp struct {
 }
 
 type CommissionItemResp struct {
-	Id             string  `json:"id"`
-	CommissionType int     `json:"commissionType"`
-	Level          int     `json:"level"`
-	PeopleNumber   int     `json:"peopleNumber"`
-	Rate           float32 `json:"rate"`
+	Id             string `json:"id"`
+	CommissionType int    `json:"commissionType"`
+	Level          int    `json:"level"`
+	PeopleNumber   int    `json:"peopleNumber"`
+	Rate           int    `json:"rate"`
 }
 
 type MemberItemResp struct {
