@@ -14,7 +14,7 @@ const getKey = (req) => {
         }
 
         const pathSetup = l1[1].split("/")
-        const pathInput = base64Decode(req.params.path).split("/")
+        const pathInput = decodeURIComponent(req.params.path).split("?")[0].split("/")
         console.log(`pathSetup:${pathSetup}, pathInput:${pathInput}`)
 
         if (pathSetup.length !== pathInput.length) {
