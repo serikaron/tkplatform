@@ -197,6 +197,7 @@ export async function setupMongo(req) {
                     ["account", "ledgerAccount.account", "shop", "orderId"] :
                     ["account", "journalAccount.account", "orderId"]
             )
+            // console.log(JSON.stringify(filter.toMatch(), null, 4))
             const r = await ledger.db.collection(collectionName)
                 .aggregate([
                     filter.toMatch(),
@@ -952,6 +953,7 @@ function makeOptionalFilter(filter, optionalFilter, searchFields) {
     Object.entries(optionalFilter).forEach(x => {
         const f = makeFilter(x[0], x[1], searchFields)
         if (f !== null) {
+            filter.plug(f)
         }
     })
 }
