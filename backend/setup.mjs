@@ -14,7 +14,7 @@ export function setup(app, {setup, teardown}) {
 
     useTokenCheck(app)
     useDispatcher(app)
-    usePrivilege()
+    usePrivilege(app)
 
     teardown(app)
 }
