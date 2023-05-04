@@ -1,5 +1,5 @@
 export default {
     transform: {},
-    roots: ["tests/integration"],
+    roots: ["nodes/tests/integration"],
     // detectOpenHandles: true
 }
