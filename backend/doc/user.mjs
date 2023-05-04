@@ -597,3 +597,83 @@
  *                 type: string
  *
  */
+
+/**
+ * @swagger
+ * /backend/v1/admins/profile(查询后台管理员):
+ *   get:
+ *     tags: ["user(用户相关)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   username:
+ *                     type: string
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/admin/:adminId/profile(查询后台管理员):
+ *   get:
+ *     tags: ["user(用户相关)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *                 type: object
+ *                 properties:
+ *                   _id:
+ *                     type: string
+ *                   username:
+ *                     type: string
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/admins/privileges(查询后台管理员权限):
+ *   get:
+ *     tags: ["user(用户相关)"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   adminId:
+ *                     type: string
+ *                   privileges:
+ *                     type: array
+ *                     items:
+ *                       type: integer
+ *                       example: 0-超级权限，1-用户权限，2-财务权限，3-站点权限，4-系统权限
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v1/admin/:adminId/privileges(设置管理员权限):
+ *   put:
+ *     tags: ["user(用户相关)"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *                     type: array
+ *                     items:
+ *                       type: integer
+ *                       example: 0-超级权限，1-用户权限，2-财务权限，3-站点权限，4-系统权限
+ *
+ */

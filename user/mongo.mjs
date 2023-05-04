@@ -171,6 +171,15 @@ export async function setupMongo(req) {
             return await collection.backendUsers
                 .findOne({username})
         },
+        getBackendUserById: async (id) => {
+            return await collection.backendUsers
+                .findOne({_id: new ObjectId(id)})
+        },
+        getBackendUsers: async () => {
+            return await collection.backendUsers
+                .find()
+                .toArray()
+        },
         updateClaimed: async (upLine, downLine) => {
             await collection.users
                 .updateOne(

@@ -32,4 +32,20 @@ export const routeBackendGetUser = backendRouter => {
 
         next()
     })
+
+    backendRouter.get('/backend/admins', async (req, res, next) => {
+        const r = await req.context.mongo.getBackendUsers()
+        res.tkResponse(TKResponse.Success({
+            data: r
+        }))
+        next()
+    })
+
+    backendRouter.get('/backend/admin/:adminId', async (req, res, next) => {
+        const r = await req.context.mongo.getBackendUserById(req.params.adminId)
+        res.tkResponse(TKResponse.Success({
+            data: r
+        }))
+        next()
+    })
 }

@@ -1,6 +1,6 @@
 'use strict'
 
-const privileges = {
+export const privileges = {
     admin: 0,
     user: 1,
     finance: 2,
@@ -45,4 +45,6 @@ export const privilegeSettings = [
     {url: '/backend/v1/api/user/withdraw/records', method: "GET", privilege: privileges.finance},
     {url: '/backend/v1/admins/privileges', method: "GET", privilege: privileges.admin},
     {url: '/backend/v1/admin/:adminId/privileges', method: "PUT", privilege: privileges.admin},
+    {url: '/backend/v1/admins/profile', method: "GET", privilege: privileges.admin},
+    {url: '/backend/v1/admin/:adminId/profile', method: "GET", privilege: privileges.admin},
 ]

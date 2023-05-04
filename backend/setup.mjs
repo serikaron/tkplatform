@@ -4,7 +4,7 @@ import swaggerUi from 'swagger-ui-express'
 import swaggerJsdoc from 'swagger-jsdoc'
 import routeInfo from "./routeInfo.mjs";
 import {dispatch} from "./dispatcher.mjs";
-import {checkToken} from "./middleware.mjs";
+import {checkPrivilege, checkToken} from "./middleware.mjs";
 
 export function setup(app, {setup, teardown}) {
 
@@ -14,6 +14,7 @@ export function setup(app, {setup, teardown}) {
 
     useTokenCheck(app)
     useDispatcher(app)
+    usePrivilege()
 
     teardown(app)
 }
@@ -61,6 +62,14 @@ function useTokenCheck(router) {
         if (info.needAuth) {
             console.log(`${info.url} need auth`)
             router.use(info.url, checkToken)
+        }
+    })
+}
+
+function usePrivilege(router) {
+    routeInfo.forEach(info => {
+        if (info.needAuth) {
+            router.use(info.url, checkPrivilege)
         }
     })
 }

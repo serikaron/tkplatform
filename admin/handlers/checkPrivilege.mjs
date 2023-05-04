@@ -3,7 +3,6 @@
 import {privilegeSettings} from "../privileges.mjs";
 import {Forbidden} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {base64Decode} from "../../common/utils.mjs";
 
 const getPrivilege = (req) => {
     console.log(`get privilege, req.method:${req.params.method}, req.url:${decodeURIComponent(req.params.path)}`)

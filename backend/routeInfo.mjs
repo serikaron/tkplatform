@@ -285,6 +285,26 @@ const routeInfo = [
             }
         }
     },
+    {
+        url: '/backend/v1/admins/profile',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: '/v1/backend/admins'
+        }
+    },
+    {
+        url: '/backend/v1/admin/:adminId/profile',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://user:8080",
+            url: (req) => {
+                return `/v1/backend/admin/${req.params.adminId}`
+            }
+        }
+    }
 ]
 
 export default routeInfo

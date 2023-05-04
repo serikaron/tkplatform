@@ -5,8 +5,6 @@ import {sign} from "./sign.mjs";
 import {axiosCall} from "../common/call.mjs";
 import {TKResponse} from "../common/TKResponse.mjs";
 import {NeedAuth} from "../common/errors/00000-basic.mjs";
-import axios from "axios";
-import {base64Encode} from "../common/utils.mjs";
 
 export function checkSign(req, res, next) {
     // console.log(`checkSign, url:${req.originalUrl}`)
@@ -79,8 +77,8 @@ export async function checkToken(req, res, next) {
 }
 
 export async function checkPrivilege(req, res, next) {
-    console.log(`check privilege for admin:${req.headers.id}, method:${req.method}, url:${req.url}`)
-    console.log(`url: /v1/privilege/${req.method}/${encodeURIComponent(req.url)}`)
+    // console.log(`check privilege for admin:${req.headers.id}, method:${req.method}, url:${req.url}`)
+    // console.log(`url: /v1/privilege/${req.method}/${encodeURIComponent(req.url)}`)
     const checkResult = await axiosCall({
         url: `/v1/privilege/${req.method}/${encodeURIComponent(req.url)}`,
         baseURL: "http://admin:8080",
