@@ -79,11 +79,13 @@ export async function checkToken(req, res, next) {
 }
 
 export async function checkPrivilege(req, res, next) {
+    console.log(`check privilege for admin:${req.headers.id}, method:${req.method}, url:${req.url}`)
+    console.log(`url: /v1/privilege/${req.method}/${encodeURIComponent(req.url)}`)
     const checkResult = await axiosCall({
         url: `/v1/privilege/${req.method}/${encodeURIComponent(req.url)}`,
         baseURL: "http://admin:8080",
         method: 'get',
-        headers: req.headers
+        headers: {id: req.headers.id}
     })
 
     if (checkResult.isError()) {

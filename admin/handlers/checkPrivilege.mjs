@@ -6,16 +6,20 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 import {base64Decode} from "../../common/utils.mjs";
 
 const getPrivilege = (req) => {
-    for (const setting of Object.keys(privilegeSettings)) {
+    console.log(`get privilege, req.method:${req.params.method}, req.url:${decodeURIComponent(req.params.path)}`)
+
+    for (const setting of privilegeSettings) {
+        // console.log(`setting: ${JSON.stringify(setting)}`)
         const method = setting.method
+        // console.log(`setting.method:${setting.method}, req.method:${req.params.method}`)
         if (method.toUpperCase() !== req.params.method.toUpperCase()) {
-            console.log(`method not match: ${l1[0]} - ${req.params.method}`)
+            // console.log(`method not match: ${method} - ${req.params.method}`)
             continue
         }
 
         const pathSetup = setting.url.split("/")
         const pathInput = decodeURIComponent(req.params.path).split("?")[0].split("/")
-        console.log(`pathSetup:${pathSetup}, pathInput:${pathInput}`)
+        // console.log(`pathSetup:${pathSetup}, pathInput:${pathInput}`)
 
         if (pathSetup.length !== pathInput.length) {
             continue
@@ -23,10 +27,12 @@ const getPrivilege = (req) => {
 
         let match = true
         for (let i = 0; i < pathInput.length; ++i) {
+            // console.log(`setup:${pathSetup[i]}, input:${pathInput}`)
             if (pathInput[i] === pathSetup[i]) {
                 continue
             }
 
+            // console.log(`setup: ${pathSetup[i]}, s:${pathSetup[i][0]}, match:${pathSetup[i][0] === ":"}`)
             if (pathSetup[i][0] === ":") {
                 continue
             }
@@ -51,6 +57,7 @@ export const routeCheckPrivileges = (router) => {
         const p = await req.context.mongo.getPrivileges(req.headers.id)
 
         if (!p.privileges.includes(requirePrivilege)) {
+            console.log("privilege not match")
             throw new Forbidden()
         }
 
