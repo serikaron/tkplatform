@@ -19,7 +19,7 @@ await runTest({
             accessToken: response.data.accessToken,
             refreshToken: response.data.refreshToken,
         }
-        await fs.writeFile('./tests/integration/client.json', JSON.stringify(client, null, 4))
+        await fs.writeFile('./nodes/tests/integration/client.json', JSON.stringify(client, null, 4))
     }
 })
 
