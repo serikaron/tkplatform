@@ -3,7 +3,6 @@
 import * as dotenv from 'dotenv'
 import {connectAdmin} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
-import {dateToTimestamp} from "../common/utils.mjs";
 
 dotenv.config()
 
