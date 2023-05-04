@@ -1,9 +1,9 @@
 group default {
-  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "migration"]
+  targets = ["tk-node", "api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "admin", "migration"]
 }
 
 group push {
-  targets = ["api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "migration"]
+  targets = ["api", "backend", "user", "token", "sms", "captcha", "system", "site", "ledger", "payment", "file", "admin", "migration"]
 }
 
 variable "GITHUB_SHA" {
@@ -204,6 +204,20 @@ target "file" {
   ]
   cache-from = ["type=gha,scope=file"]
   cache-to   = ["type=gha,mode=max,scope=file"]
+}
+
+target "admin" {
+  contexts = {
+    tk-node = "target:tk-node",
+  }
+  args = {
+    name = "admin"
+  }
+  tags = [
+    tag_name("admin"),
+  ]
+  cache-from = ["type=gha,scope=admin"]
+  cache-to   = ["type=gha,mode=max,scope=admin"]
 }
 
 target "tk-go" {

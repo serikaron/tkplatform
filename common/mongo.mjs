@@ -46,6 +46,15 @@ export async function connectPayment() {
     })
 }
 
+export async function connectAdmin  () {
+    return await connect({
+        user: process.env.MONGO_ADMIN_USER,
+        pass: process.env.MONGO_ADMIN_PASS,
+        host: process.env.MONGO_ADMIN_HOST,
+        name: process.env.MONGO_ADMIN_DB
+    })
+}
+
 async function connect({user, pass, host, name}) {
     // console.log(`connecting ${name}`)
     const uri = `mongodb://${user}:${pass}@${host}:27017`

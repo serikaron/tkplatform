@@ -2,7 +2,7 @@
 
 import createApp from "../common/app.mjs";
 import diContainer from "../common/dicontainer.mjs";
-import {checkSign, checkTime, tokenContext} from "./middleware.mjs";
+import {checkPrivilege, checkSign, checkTime, tokenContext} from "./middleware.mjs";
 import {setup} from "./setup.mjs";
 import {dispatchContext} from "./dispatcher.mjs";
 import cors from 'cors'
@@ -17,6 +17,7 @@ setup(app, {
         tokenContext,
         checkTime,
         checkSign,
+        checkPrivilege,
     ]),
     teardown: diContainer.teardown([])
 })

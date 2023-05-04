@@ -952,7 +952,6 @@ function makeOptionalFilter(filter, optionalFilter, searchFields) {
     Object.entries(optionalFilter).forEach(x => {
         const f = makeFilter(x[0], x[1], searchFields)
         if (f !== null) {
-            filter.plug(f)
         }
     })
 }

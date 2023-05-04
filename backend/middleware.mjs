@@ -5,6 +5,7 @@ import {sign} from "./sign.mjs";
 import {axiosCall} from "../common/call.mjs";
 import {TKResponse} from "../common/TKResponse.mjs";
 import {NeedAuth} from "../common/errors/00000-basic.mjs";
+import axios from "axios";
 
 export function checkSign(req, res, next) {
     // console.log(`checkSign, url:${req.originalUrl}`)
@@ -76,3 +77,19 @@ export async function checkToken(req, res, next) {
     next()
 }
 
+export async function checkPrivilege(req, res, next) {
+    const checkResult = await axiosCall({
+        url: `/v1/admin/privilege/${req.method}/${atob(req.url)}`,
+        baseURL: "http://admin:8080",
+        method: 'get',
+        headers: req.headers
+    })
+
+    if (checkResult.isError()) {
+        console.log(`FORBIDDEN, admin:${req.headers.id}, method:${req.method}, path:${req.url}`)
+        res.status(403).end()
+        return
+    }
+
+    next()
+}

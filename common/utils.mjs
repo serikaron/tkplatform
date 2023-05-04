@@ -125,3 +125,11 @@ export const getValueNumber = (dict, key, def) => {
 export const getValueString = (dict, key, def) => {
     return dict.hasOwnProperty(key) ? dict[key] : def
 }
+
+export const base64Encode = (str) => {
+    return new Buffer(str).toString('base64')
+}
+
+export const base64Decode = (str) => {
+    return new Buffer(str, 'base64').toString()
+}

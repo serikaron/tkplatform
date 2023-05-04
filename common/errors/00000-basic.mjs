@@ -63,3 +63,13 @@ export class Unauthorized extends TKError {
         });
     }
 }
+
+export class Forbidden extends TKError {
+    constructor({msg = ""} = {}) {
+        super({
+            status: 403,
+            code: codeBase - 7,
+            msg
+        });
+    }
+}
