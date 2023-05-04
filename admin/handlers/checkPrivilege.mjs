@@ -1,19 +1,19 @@
 'use strict'
 
-import {privilegeMap} from "../privileges.mjs";
+import {privilegeSettings} from "../privileges.mjs";
 import {Forbidden} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {base64Decode} from "../../common/utils.mjs";
 
-const getKey = (req) => {
-    for (const key of Object.keys(privilegeMap)) {
-        const l1 = key.split("-")
-        if (l1[0].toUpperCase() !== req.params.method.toUpperCase()) {
+const getPrivilege = (req) => {
+    for (const setting of Object.keys(privilegeSettings)) {
+        const method = setting.method
+        if (method.toUpperCase() !== req.params.method.toUpperCase()) {
             console.log(`method not match: ${l1[0]} - ${req.params.method}`)
             continue
         }
 
-        const pathSetup = l1[1].split("/")
+        const pathSetup = setting.url.split("/")
         const pathInput = decodeURIComponent(req.params.path).split("?")[0].split("/")
         console.log(`pathSetup:${pathSetup}, pathInput:${pathInput}`)
 
@@ -35,22 +35,15 @@ const getKey = (req) => {
             break
         }
 
-        if (match) return key
+        if (match) return setting.privilege
     }
 
     return null
 }
 export const routeCheckPrivileges = (router) => {
     router.get("/privilege/:method/:path", async (req, res, next) => {
-        const key = getKey(req)
-        if (key === null) {
-            console.log("key not found")
-            throw new Forbidden()
-        }
-
-        const requirePrivilege = privilegeMap[key]
-
-        if (requirePrivilege === undefined) {
+        const requirePrivilege = getPrivilege(req)
+        if (requirePrivilege === null) {
             console.log("privilege not found")
             throw new Forbidden()
         }
