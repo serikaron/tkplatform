@@ -276,6 +276,17 @@ const routeInfo = [
     },
     {
         url: '/backend/v1/admin/:adminId/privileges',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://admin:8080",
+            url: (req) => {
+                return `/v1/admin/${req.params.adminId}/privileges`
+            }
+        }
+    },
+    {
+        url: '/backend/v1/admin/:adminId/privileges',
         method: "PUT",
         needAuth: true,
         service: {

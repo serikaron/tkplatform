@@ -7,4 +7,4 @@ then
 fi
 
 echo "reset $service_name"
-docker compose stop $service_name && docker compose -f docker-compose.yaml -f ./tests/integration/docker-compose.yaml up -d $service_name && docker compose logs -f $service_name
+docker compose stop $service_name && docker compose -f docker-compose.yaml -f ./nodes/tests/integration/docker-compose.yaml up -d $service_name && docker compose logs -f $service_name
