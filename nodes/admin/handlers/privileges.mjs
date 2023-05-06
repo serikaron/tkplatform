@@ -9,6 +9,14 @@ export const routePrivileges = (router) => {
         next()
     })
 
+    router.get("/admin/:adminId/privileges", async (req, res, next) => {
+        const p = await req.context.mongo.getPrivileges(req.params.adminId)
+        res.tkResponse(TKResponse.Success({
+            data: p !== null && p.hasOwnProperty("privileges") ? p.privileges : []
+        }))
+        next()
+    })
+
     router.get("/admins/privileges", async (req, res, next) => {
         const p = await req.context.mongo.getAllPrivileges()
         res.tkResponse(TKResponse.Success({
