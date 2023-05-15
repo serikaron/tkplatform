@@ -225,7 +225,7 @@ export async function setupMongo(req) {
             return await collection.userReports
                 .countDocuments()
         },
-        backednPutReport: async (reportId) => {
+        backendPutReport: async (reportId) => {
             await collection.userReports
                 .updateOne(
                     {_id: new ObjectId(reportId)},

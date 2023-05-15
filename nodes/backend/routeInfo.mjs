@@ -64,6 +64,16 @@ const routeInfo = [
         service: {baseURL: 'http://user:8080', url: '/v1/backend/user/reports'}
     },
     {
+        url: '/backend/v1/user/report/:reportId',
+        method: 'PUT',
+        needAuth: true,
+        service: {
+            baseURL: 'http://user:8080', url: (req) => {
+                return `/v1/backend/report/${req.params.reportId}`
+            }
+        }
+    },
+    {
         url: '/backend/v1/user/level/setting',
         method: 'POST',
         needAuth: true,
