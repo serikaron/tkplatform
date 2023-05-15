@@ -37,11 +37,23 @@ export async function dispatch(req, res, next) {
             && req.routeInfo.service.hasOwnProperty("url")
         ) {
             if (typeof req.routeInfo.service.url === "function") {
+                console.log(`getUrl, is function`)
                 return req.routeInfo.service.url(req)
             }
-            return req.routeInfo.service.url
+            if (req.query !== null
+                && req.query !== undefined
+                && Object.keys(req.query).length > 0) {
+                const out = `${req.routeInfo.service.url}?${new URLSearchParams(req.query)}`
+                console.log(`getUrl, with query, ${out}`)
+                return out
+            } else {
+                const out = req.routeInfo.service.url
+                console.log(`getUrl, without query, ${out}`)
+                return out
+            }
         }
 
+        console.log(`getUrl, origin, ${req.url}`)
         return req.url
     }
 

@@ -1,14 +1,17 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {getValueNumber, replaceId} from "../../common/utils.mjs";
+import {getValueNumber, getValueString, replaceId} from "../../common/utils.mjs";
 
 export const routeBackendGetUsers = router => {
     router.get('/backend/users', async (req, res, next) => {
         const offset = getValueNumber(req.query, "offset", 0)
         const limit = Math.min(getValueNumber(req.query, "limit", 50), 50)
 
-        const keyword = getValueNumber(req.query, "keyword", null)
+        const keyword = getValueString(req.query, "keyword", null)
+
+        console.log(`offset: ${offset}, limit: ${limit}, keyword: ${keyword}`)
+
         if (keyword === null) {
             const r = await req.context.mongo.getUsers(offset, limit)
             const c = await req.context.mongo.countUsers()
@@ -21,7 +24,8 @@ export const routeBackendGetUsers = router => {
                 }
             }))
         } else {
-            const r = await req.context.mongo.searchUser(req.params.keyword, offset, limit)
+            console.log(`search user with keyword: ${keyword}`)
+            const r = await req.context.mongo.searchUser(keyword, offset, limit)
 
             res.tkResponse(TKResponse.Success({
                 data: {
