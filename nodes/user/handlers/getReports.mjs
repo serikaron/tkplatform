@@ -27,7 +27,11 @@ const routeBackend = router => {
             data: {
                 total: c,
                 offset, limit,
-                items: r.map(replaceId)
+                items: r.map(x => {
+                    replaceId(x)
+                    x.handled = x.handled === true
+                    return x
+                })
             }
         }))
         next()

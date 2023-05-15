@@ -37,6 +37,19 @@ export async function setupMongo(req) {
                 .limit(limit)
                 .toArray()
         },
+        searchUser: async (keyword, offset, limit) => {
+            const regex = `.*${keyword}.*`
+            const c = await collection.users
+                .countDocuments(
+                    {phone: {$regex: regex}}
+                )
+            const l = await collection.users
+                .find({phone: {$regex: regex}})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+            return {total: c, list: l}
+        },
         countUsers: async () => {
             return await collection.users
                 .countDocuments()
@@ -211,6 +224,13 @@ export async function setupMongo(req) {
         backendCountReports: async () => {
             return await collection.userReports
                 .countDocuments()
+        },
+        backednPutReport: async (reportId) => {
+            await collection.userReports
+                .updateOne(
+                    {_id: new ObjectId(reportId)},
+                    {$set: {handled: true}}
+                )
         },
         getReport: async (reportId, userId) => {
             return await collection.userReports

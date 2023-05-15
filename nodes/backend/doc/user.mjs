@@ -244,6 +244,10 @@
  *       name: limit
  *       schema:
  *         type: Number
+ *     - in: path
+ *       name: keyword
+ *       schema:
+ *         type: string
  *     responses:
  *       200:
  *         content:
@@ -562,6 +566,16 @@
  *                   reportedAt:
  *                     type: number
  *                     example: timestamp
+ *                   handled:
+ *                     type: boolean
+ */
+
+/**
+ * @swagger
+ * /backend/v1/user/report/:reportId(设置用户反馈):
+ *   put:
+ *     tags: ["反馈建议管理"]
+ *
  */
 
 /**
