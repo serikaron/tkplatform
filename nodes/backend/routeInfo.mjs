@@ -325,6 +325,33 @@ const routeInfo = [
                 return `/v1/backend/admin/${req.params.adminId}`
             }
         }
+    },
+    {
+        url: '/backend/v1/api/wallet/records',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: '/v1/api/wallet/records'
+        }
+    },
+    {
+        url: '/backend/v1/api/withdraw/fee/setting',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: 'v1/api/withdraw/fee/setting'
+        }
+    },
+    {
+        url: '/backend/v1/api/withdraw/fee/setting',
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://apid:9010",
+            url: '/v1/api/withdraw/fee/setting'
+        }
     }
 ]
 
