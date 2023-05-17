@@ -101,3 +101,11 @@ type CommissionItem struct {
 	PeopleNumber   int    `bson:"peopleNumber"`
 	Rate           int    `bson:"rate"`
 }
+
+type WithdrawFeeSetting struct {
+	Id      string `bson:"_id"`
+	FeeType int    `bson:"feeType"` //1-每X元固定金额手续费，2-比例
+	Amount  int64  `bson:"amount"`  //固定金额
+	Fee     int64  `bson:"fee"`     //手续费
+	Rate    int    `bson:"rate"`
+}

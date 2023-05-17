@@ -62,10 +62,11 @@ func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64
 		findOptions.SetSkip(offset)
 	}
 	var m bson.M
-	if typ == 0 {
+	if typ > 0 && typ <= 5 {
+		m = bson.M{"type": typ}
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
-	} else if typ > 0 && typ <= 5 {
-		m = bson.M{"userId": userId, "type": typ}
 	}
 	cur, err := collection.Find(context.Background(), m, &findOptions)
 	if err != nil {
@@ -130,10 +131,11 @@ func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *mod
 
 func CountUserWalletRecords(db *mongo.Database, userId string, typ int) int64 {
 	var m bson.M
-	if typ == 0 {
+	if typ > 0 && typ <= 5 {
+		m = bson.M{"type": typ}
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
-	} else if typ > 0 && typ <= 5 {
-		m = bson.M{"userId": userId, "type": typ}
 	}
 	collection := db.Collection("walletRecords")
 	count, err := collection.CountDocuments(context.Background(), m)
@@ -554,5 +556,47 @@ func DeleteCommissionItems(db *mongo.Database, id string) error {
 	}
 	log.Println("删除数据成功:", deleteResult)
 
+	return nil
+}
+
+func GetWithdrawFeeSetting(db *mongo.Database) (amount, fee int64) {
+	collection := db.Collection("withdrawFeeSetting")
+	cur, err := collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		logger.Error(err)
+		return 0, 0
+	}
+	var all []*model.WithdrawFeeSetting
+	err = cur.All(context.Background(), &all)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = cur.Close(context.Background())
+
+	for _, one := range all {
+		log.Println("FeeType:", one.FeeType, " - Amount:", one.Amount, " - Fee:", one.Fee, " - Rate:", one.Rate)
+		if one.FeeType == 1 {
+			amount = one.Amount
+			fee = one.Fee
+		}
+	}
+	return amount, fee
+}
+
+func UpdateWithdrawFeeSetting(db *mongo.Database, m model.WithdrawFeeSetting) error {
+	collection := db.Collection("withdrawFeeSetting")
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"feeType": 1}, bson.D{{"$set", bson.D{
+		{"amount", m.Amount},
+		{"fee", m.Fee},
+	}}})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
 	return nil
 }

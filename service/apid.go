@@ -56,6 +56,10 @@ func main() {
 		apiGroup.POST("/user/wallet/withdraw/audit", controller.UserWalletWithdrawAuditHandler)    //用户钱包提现审核
 		apiGroup.GET("/user/wallet/withdraw/records", controller.UserWalletWithdrawRecordsHandler) //用户钱包提现管理
 		apiGroup.GET("/user/withdraw/records", controller.UserWithdrawRecordsHandler)              //用户钱包提现管理后台
+		apiGroup.GET("/wallet/records", controller.WalletRecordsHandler)                           //钱包资金明细
+
+		apiGroup.GET("/withdraw/fee/setting", controller.WithdrawFeeSettingHandler)        //获取提现手续费设置
+		apiGroup.POST("/withdraw/fee/setting", controller.WithdrawFeeSettingUpdateHandler) //设置提现手续费
 
 		apiGroup.GET("/promotion/commission/list", controller.PromotionCommissionListHandler)      //推广比例列表
 		apiGroup.POST("/promotion/commission/add", controller.PromotionCommissionAddHandler)       //推广比例添加

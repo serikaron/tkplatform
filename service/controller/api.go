@@ -600,11 +600,17 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 		return
 	}
 
+	amount, fee := dao.GetWithdrawFeeSetting(mongoDb)
+
+	withdrawFee := (p.Amount/amount + 1) * fee //每amount就扣除fee的手续费
+
+	balance := p.Amount - withdrawFee
+
 	err = dao.AddUserWalletWithdrawRecord(mongoDb, model.UserWalletWithdrawRecord{
 		UserId:    userId,
 		Comment:   "申请提现",
-		Amount:    p.Amount,
-		Fee:       50,
+		Amount:    balance,
+		Fee:       withdrawFee,
 		Status:    false,
 		CreatedAt: time.Now().Unix(),
 	})
@@ -798,6 +804,99 @@ func UserWithdrawRecordsHandler(c *gin.Context) {
 			"limit":  p.Limit,
 			"offset": p.Offset,
 			"items":  list,
+		},
+	})
+}
+
+// @Route: [GET] /v1/api/wallet/records
+// @Description: 后台钱包资金明细
+func WalletRecordsHandler(c *gin.Context) {
+	type param struct {
+		Type   int    `form:"type"`
+		UserId string `form:"user_id"`
+		Limit  int64  `form:"limit"`
+		Offset int64  `form:"offset"`
+	}
+
+	var p param
+	var err error
+	if err = c.Bind(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	logger.Debug("userId:", p.UserId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	records := dao.GetUserWalletRecords(mongoDb, p.UserId, p.Offset, p.Limit, p.Type)
+
+	total := dao.CountUserWalletRecords(mongoDb, p.UserId, p.Type)
+
+	var list []*model.UserWalletRecordResp
+	for _, record := range records {
+		var item model.UserWalletRecordResp
+		item.Id = record.Id
+		item.UserId = record.UserId
+		item.Type = record.Type
+		item.CreatedAt = record.CreatedAt
+		if record.Member != nil {
+			item.Member = &model.MemberPo{
+				Title:      record.Member.Title,
+				Price:      record.Member.Price,
+				RemainDays: record.Member.RemainDays,
+				CreatedAt:  record.Member.CreatedAt,
+			}
+		}
+		if record.Withdraw != nil {
+			item.Withdraw = &model.WithdrawPo{
+				Title:     record.Withdraw.Title,
+				Amount:    record.Withdraw.Amount,
+				Balance:   record.Withdraw.Balance,
+				CreatedAt: record.Withdraw.CreatedAt,
+			}
+		}
+		if record.DownLine != nil {
+			item.DownLine = &model.DownLinePo{
+				Title:     record.DownLine.Title,
+				Amount:    record.DownLine.Amount,
+				Balance:   record.DownLine.Balance,
+				CreatedAt: record.DownLine.CreatedAt,
+			}
+		}
+		if record.Activity != nil {
+			item.Activity = &model.ActivityPo{
+				Title:     record.Activity.Title,
+				Amount:    record.Activity.Amount,
+				Balance:   record.Activity.Balance,
+				CreatedAt: record.Activity.CreatedAt,
+			}
+		}
+		if record.Rice != nil {
+			item.Rice = &model.RicePo{
+				Title:      record.Member.Title,
+				Price:      record.Member.Price,
+				RemainDays: record.Member.RemainDays,
+				CreatedAt:  record.Member.CreatedAt,
+			}
+		}
+
+		list = append(list, &item)
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"total": total,
+			"items": list,
 		},
 	})
 }
