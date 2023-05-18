@@ -86,10 +86,13 @@ func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64
 	return all
 }
 
-func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *model.Member, withdraw *model.Withdraw, downLine *model.DownLine, activity *model.Activity, rice *model.Rice) error {
+func AddUserWalletRecord(db *mongo.Database, userId, phone, name, idNo string, typ int, member *model.Member, withdraw *model.Withdraw, downLine *model.DownLine, activity *model.Activity, rice *model.Rice) error {
 	type UserWalletRecordDb struct {
 		Id        primitive.ObjectID `bson:"_id"`
 		UserId    string             `bson:"userId"`
+		Phone     string             `bson:"phone"`
+		IdNo      string             `bson:"idNo"`
+		Name      string             `bson:"name"`
 		Type      int                `bson:"type"`
 		Member    *model.Member      `bson:"member"`
 		Withdraw  *model.Withdraw    `bson:"withdraw"`
@@ -103,6 +106,9 @@ func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *mod
 
 	newItem.Id = primitive.NewObjectID()
 	newItem.UserId = userId
+	newItem.Phone = phone
+	newItem.Name = name
+	newItem.IdNo = idNo
 	newItem.Type = typ
 	newItem.CreatedAt = time.Now().Unix()
 
@@ -165,6 +171,9 @@ func AddUserWalletWithdrawRecord(db *mongo.Database, m model.UserWalletWithdrawR
 	type UserWalletWithdrawRecordDb struct {
 		Id        primitive.ObjectID `bson:"_id"`
 		UserId    string             `bson:"userId"`
+		Phone     string             `bson:"phone"`
+		IdNo      string             `bson:"idNo"`
+		Name      string             `bson:"name"`
 		Comment   string             `bson:"comment"`
 		Amount    int64              `bson:"amount"`
 		Fee       int64              `bson:"fee"`
@@ -175,6 +184,9 @@ func AddUserWalletWithdrawRecord(db *mongo.Database, m model.UserWalletWithdrawR
 	newItem := UserWalletWithdrawRecordDb{
 		Id:        primitive.NewObjectID(),
 		UserId:    m.UserId,
+		Phone:     m.Phone,
+		Name:      m.Name,
+		IdNo:      m.IdNo,
 		Comment:   m.Comment,
 		Amount:    m.Amount,
 		Fee:       m.Fee,

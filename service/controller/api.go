@@ -496,6 +496,9 @@ func UserWalletRecordsHandler(c *gin.Context) {
 		var item model.UserWalletRecordResp
 		item.Id = record.Id
 		item.UserId = record.UserId
+		item.Phone = record.Phone
+		item.Name = record.Name
+		item.IdNo = record.IdNo
 		item.Type = record.Type
 		item.CreatedAt = record.CreatedAt
 		if record.Member != nil {
@@ -581,6 +584,12 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 
 	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
+	mongoUserDb := db.Database("tkuser")
+	user, err := dao.GetUser(mongoUserDb, userId)
+	if err != nil {
+		constant.ErrMsg(c, constant.UserNotExist)
+		return
+	}
 
 	//records := dao.GetUserWalletWithdrawRecords(mongoDb, userId, p.Offset, p.Limit)
 	wallet := dao.GetUserWallet(mongoDb, userId)
@@ -608,6 +617,9 @@ func UserWalletWithdrawHandler(c *gin.Context) {
 
 	err = dao.AddUserWalletWithdrawRecord(mongoDb, model.UserWalletWithdrawRecord{
 		UserId:    userId,
+		Phone:     user.Phone,
+		Name:      user.Identification.Name,
+		IdNo:      user.Identification.IdNo,
 		Comment:   "申请提现",
 		Amount:    balance,
 		Fee:       withdrawFee,
@@ -665,7 +677,13 @@ func UserWalletWithdrawAuditHandler(c *gin.Context) {
 		return
 	}
 
-	err = dao.AddUserWalletRecord(mongoDb, userId, model.UserWalletRecordTypeWithdraw, nil, &model.Withdraw{
+	mongoUserDb := db.Database("tkuser")
+	user, err := dao.GetUser(mongoUserDb, userId)
+	if err != nil {
+		constant.ErrMsg(c, constant.UserNotExist)
+		return
+	}
+	err = dao.AddUserWalletRecord(mongoDb, userId, user.Phone, user.Identification.Name, user.Identification.IdNo, model.UserWalletRecordTypeWithdraw, nil, &model.Withdraw{
 		CreatedAt: time.Now().Unix(),
 		Title:     "提现",
 		Amount:    record.Amount,
@@ -718,6 +736,9 @@ func UserWalletWithdrawRecordsHandler(c *gin.Context) {
 		list = append(list, &model.UserWalletWithdrawRecordResp{
 			Id:        record.Id,
 			UserId:    record.UserId,
+			Phone:     record.Phone,
+			Name:      record.Name,
+			IdNo:      record.IdNo,
 			Comment:   record.Comment,
 			Amount:    record.Amount,
 			Fee:       record.Fee,
@@ -787,6 +808,9 @@ func UserWithdrawRecordsHandler(c *gin.Context) {
 		list = append(list, &model.UserWalletWithdrawRecordResp{
 			Id:        record.Id,
 			UserId:    record.UserId,
+			Phone:     record.Phone,
+			Name:      record.Name,
+			IdNo:      record.IdNo,
 			Comment:   record.Comment,
 			Amount:    record.Amount,
 			Fee:       record.Fee,
@@ -845,6 +869,9 @@ func WalletRecordsHandler(c *gin.Context) {
 		var item model.UserWalletRecordResp
 		item.Id = record.Id
 		item.UserId = record.UserId
+		item.Phone = record.Phone
+		item.Name = record.Name
+		item.IdNo = record.IdNo
 		item.Type = record.Type
 		item.CreatedAt = record.CreatedAt
 		if record.Member != nil {

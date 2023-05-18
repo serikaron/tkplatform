@@ -49,6 +49,9 @@ type Rice struct {
 type UserWalletRecord struct {
 	Id        string    `bson:"_id"`
 	UserId    string    `bson:"userId"`
+	Phone     string    `bson:"phone"`
+	IdNo      string    `bson:"idNo"`
+	Name      string    `bson:"name"`
 	Type      int       `bson:"type"`
 	Member    *Member   `bson:"member"`
 	Withdraw  *Withdraw `bson:"withdraw"`
@@ -69,6 +72,9 @@ const (
 type UserWalletWithdrawRecord struct {
 	Id        string `bson:"_id"`
 	UserId    string `bson:"userId"`
+	Phone     string `bson:"phone"`
+	IdNo      string `bson:"idNo"`
+	Name      string `bson:"name"`
 	Comment   string `bson:"comment"`
 	Amount    int64  `bson:"amount"`
 	Fee       int64  `bson:"fee"`
