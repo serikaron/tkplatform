@@ -37,6 +37,19 @@ export async function setupMongo(req) {
         getSite: async objectId => {
             return await collection.sites.findOne({_id: objectId})
         },
+        searchSite: async (keyword, offset, limit) => {
+            const regex = `.*${keyword}.*`
+            const c = await collection.sites
+                .countDocuments(
+                    {name: {$regex: regex}}
+                )
+            const l = await collection.sites
+                .find({name: {$regex: regex}})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+            return {total: c, list: l}
+        },
         getSitesForBackend: async (offset, limit) => {
             return await collection.sites.find()
                 .skip(offset)
