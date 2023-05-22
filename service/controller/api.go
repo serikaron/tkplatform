@@ -487,9 +487,9 @@ func UserWalletRecordsHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
-	records := dao.GetUserWalletRecords(mongoDb, userId, p.Offset, p.Limit, p.Type)
+	records := dao.GetUserWalletRecords(mongoDb, userId, "", p.Offset, p.Limit, p.Type)
 
-	total := dao.CountUserWalletRecords(mongoDb, userId, p.Type)
+	total := dao.CountUserWalletRecords(mongoDb, userId, "", p.Type)
 
 	var list []*model.UserWalletRecordResp
 	for _, record := range records {
@@ -838,6 +838,7 @@ func WalletRecordsHandler(c *gin.Context) {
 	type param struct {
 		Type   int    `form:"type"`
 		UserId string `form:"user_id"`
+		Phone  string `form:"phone"`
 		Limit  int64  `form:"limit"`
 		Offset int64  `form:"offset"`
 	}
@@ -860,9 +861,9 @@ func WalletRecordsHandler(c *gin.Context) {
 	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
 	mongoDb := db.Database("tkpayment")
 
-	records := dao.GetUserWalletRecords(mongoDb, p.UserId, p.Offset, p.Limit, p.Type)
+	records := dao.GetUserWalletRecords(mongoDb, p.UserId, p.Phone, p.Offset, p.Limit, p.Type)
 
-	total := dao.CountUserWalletRecords(mongoDb, p.UserId, p.Type)
+	total := dao.CountUserWalletRecords(mongoDb, p.UserId, p.Phone, p.Type)
 
 	var list []*model.UserWalletRecordResp
 	for _, record := range records {

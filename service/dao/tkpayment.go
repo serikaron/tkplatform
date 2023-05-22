@@ -54,7 +54,7 @@ func UserWalletCashWithdraw(db *mongo.Database, userId string, cash int64) error
 	return nil
 }
 
-func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64, typ int) []*model.UserWalletRecord {
+func GetUserWalletRecords(db *mongo.Database, userId, phone string, offset, limit int64, typ int) []*model.UserWalletRecord {
 	collection := db.Collection("walletRecords")
 	var findOptions options.FindOptions
 	if limit > 0 {
@@ -67,6 +67,9 @@ func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64
 	}
 	if userId != "" {
 		m = bson.M{"userId": userId}
+	}
+	if phone != "" {
+		m = bson.M{"phone": phone}
 	}
 	cur, err := collection.Find(context.Background(), m, &findOptions)
 	if err != nil {
@@ -135,13 +138,16 @@ func AddUserWalletRecord(db *mongo.Database, userId, phone, name, idNo string, t
 	return nil
 }
 
-func CountUserWalletRecords(db *mongo.Database, userId string, typ int) int64 {
+func CountUserWalletRecords(db *mongo.Database, userId, phone string, typ int) int64 {
 	var m bson.M
 	if typ > 0 && typ <= 5 {
 		m = bson.M{"type": typ}
 	}
 	if userId != "" {
 		m = bson.M{"userId": userId}
+	}
+	if phone != "" {
+		m = bson.M{"phone": phone}
 	}
 	collection := db.Collection("walletRecords")
 	count, err := collection.CountDocuments(context.Background(), m)
