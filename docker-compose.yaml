@@ -1,6 +1,11 @@
 version: '3.8'
 
 services:
+  tk-node:
+    image: car.daoyi365.com:5000/tk-node
+    build:
+      context: .
+
   proxy:
     image: nginx:latest
     restart: always
@@ -11,7 +16,7 @@ services:
       - "9000:9000"
 
   api:
-    image: car.daoyi365.com:5000/tk-api
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/api/app.mjs
     depends_on:
@@ -25,7 +30,7 @@ services:
       - .env:/app/.env
 
   backend:
-    image: car.daoyi365.com:5000/tk-backend
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/backend/app.mjs
     depends_on:
@@ -36,7 +41,7 @@ services:
       - .env:/app/.env
 
   user:
-    image: car.daoyi365.com:5000/tk-user
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/user/app.mjs
     depends_on:
@@ -72,7 +77,7 @@ services:
       - ./go-config.json:/app/go-config.json
 
   token:
-    image: car.daoyi365.com:5000/tk-token
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     environment:
       - SECRET_KEY=${SECRET_KEY}
@@ -87,7 +92,7 @@ services:
     restart: always
 
   captcha:
-    image: car.daoyi365.com:5000/tk-captcha
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/captcha/app.mjs
     depends_on:
@@ -100,7 +105,7 @@ services:
     restart: always
 
   sms:
-    image: car.daoyi365.com:5000/tk-sms
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/sms/app.mjs
     depends_on:
@@ -115,7 +120,7 @@ services:
     restart: always
 
   system:
-    image: car.daoyi365.com:5000/tk-system
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/system/app.mjs
     depends_on:
@@ -136,7 +141,7 @@ services:
       - ./mongo-data/system_db:/data/db
 
   site:
-    image: car.daoyi365.com:5000/tk-site
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/site/app.mjs
     depends_on:
@@ -157,7 +162,7 @@ services:
       - ./mongo-data/site_db:/data/db
 
   ledger:
-    image: car.daoyi365.com:5000/tk-ledger
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/ledger/app.mjs
     depends_on:
@@ -178,7 +183,7 @@ services:
       - ./mongo-data/ledger_db:/data/db
 
   payment:
-    image: car.daoyi365.com:5000/tk-payment
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/payment/app.mjs
     depends_on:
@@ -199,7 +204,7 @@ services:
       - ./mongo-data/payment_db:/data/db
 
   migration:
-    image: car.daoyi365.com:5000/tk-migration
+    image: car.daoyi365.com:5000/tk-node
     entrypoint: node /app/migration/migration.mjs
     depends_on:
       - system_db
@@ -208,7 +213,7 @@ services:
       - .env:/app/.env
 
   file:
-    image: car.daoyi365.com:5000/tk-file
+    image: car.daoyi365.com:5000/tk-node
     restart: always
     entrypoint: node /app/file/app.mjs
     ports:
@@ -216,3 +221,25 @@ services:
     volumes:
       - ./res:/res
       - .env:/app/.env
+
+  admin:
+    image: car.daoyi365.com:5000/tk-node
+    restart: always
+    entrypoint: node /app/admin/app.mjs
+    depends_on:
+      - admin_db
+    ports:
+      - "9011:8080"
+    volumes:
+      - ./res:/res
+      - .env:/app/.env
+
+  admin_db:
+    image: mongo
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ADMIN_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ADMIN_PASS}
+      MONGO_INITDB_AUTHENTICATION_DATABASE: ${MONGO_ADMIN_DB}
+    volumes:
+      - ./mongo-data/admin_db:/data/db

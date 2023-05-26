@@ -1,5 +1,5 @@
 export default {
     // roots: ["<rootDir>/src"],
     transform: {},
-    modulePathIgnorePatterns: ["tests/integration"]
+    modulePathIgnorePatterns: ["nodes/tests/integration"]
 }

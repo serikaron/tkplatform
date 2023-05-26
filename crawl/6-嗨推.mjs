@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import crypto from "crypto";
-import {now} from "../common/utils.mjs";
+import {now} from "../nodes/common/utils.mjs";
 
 function serialize(obj) {
     switch (typeof obj) {
