@@ -230,6 +230,26 @@ export async function setupMongo(req) {
                 })
                 .toArray()
         },
+        getMissings: async (offset, limit) => {
+            const count = await collection.missingSites.countDocuments()
+            const items = await collection.missingSites.find({
+                "operate.thumb": false
+            })
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+            return {count, items}
+        },
+        updateMissing: async (id, status, comment) => {
+            await collection.missingSites.updateOne(
+                {_id: new ObjectId(id)},
+                {
+                    $set: {
+                        operate: {status: status, comment: comment, thumb: true}
+                    }
+                }
+            )
+        },
         addSite: async (site) => {
             const r = await collection.sites
                 .insertOne(site)

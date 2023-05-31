@@ -352,6 +352,26 @@ const routeInfo = [
             baseURL: "http://apid:9010",
             url: '/v1/api/withdraw/fee/setting'
         }
+    },
+    {
+        url: '/backend/v1/missing/sites',
+        method: "GET",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: '/v1/backend/missing/sites'
+        }
+    },
+    {
+        url: '/backend/v1/missing/site/:siteId',
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://site:8080",
+            url: (req) => {
+                return `/v1/backend/missing/site/${req.params.siteId}`
+            }
+        }
     }
 ]
 

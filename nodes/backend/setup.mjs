@@ -28,7 +28,7 @@ function setupDoc(app) {
                 version: '1.0.0',
             },
         },
-        apis: ['./backend/doc/*.mjs']
+        apis: ['./nodes/backend/doc/*.mjs']
     }
 
     const swaggerSpec = swaggerJsdoc(jsdocOpt)

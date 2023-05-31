@@ -22,6 +22,8 @@ import {routeAddMissing} from "./handlers/addMissing.mjs";
 import {routeGetMissing} from "./handlers/getMissing.mjs";
 import {routeAddSite} from "./handlers/addSite.mjs";
 import {routePutSite} from "./handlers/putSite.mjs";
+import {routeGetMissings} from "./handlers/getMissings.mjs";
+import {routePutMissing} from "./handlers/putMissing.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -50,6 +52,8 @@ export function setup(app, {setup, teardown}) {
     routeGetMissing(router)
     routeAddSite(router)
     routePutSite(router)
+    routeGetMissings(router)
+    routePutMissing(router)
 
     teardown(router)
 }
