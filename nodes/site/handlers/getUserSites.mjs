@@ -8,6 +8,7 @@ export function routeGetUserSites(router) {
         const dbRes = await req.context.mongo.getUserSites(req.headers.id)
         // console.log(`getUserSites, dbRes: ${JSON.stringify(dbRes)}`)
         for (const userSite of dbRes) {
+            replaceId(userSite)
             delete userSite.userId
             userSite.setting.schedule.forEach(s => {
                 if (s.activated === undefined) {
@@ -15,8 +16,13 @@ export function routeGetUserSites(router) {
                 }
             })
             const site = await req.context.mongo.getSite(userSite.site.id)
-            // console.log(`site: ${JSON.stringify(site)}`)
-            userSite.site = site
+            console.log(`site: ${JSON.stringify(site)}`)
+            if (site !== null && site !== undefined) {
+                site.id = site._id
+                delete site._id
+                userSite.site = site
+                console.log(`updated site: ${JSON.stringify(site)}`)
+            }
         }
         // console.log(`getUserSites, dbRes: ${JSON.stringify(dbRes)}`)
         res.tkResponse(TKResponse.Success({

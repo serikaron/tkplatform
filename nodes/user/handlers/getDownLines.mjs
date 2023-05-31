@@ -1,7 +1,7 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {getValueNumber, getValueString} from "../../common/utils.mjs";
+import {getValueNumber, getValueString, replaceId} from "../../common/utils.mjs";
 
 export const routeGetDownLines = router => {
     router.get("/user/downLines", async (req, res, next) => {
@@ -29,12 +29,19 @@ export const routeGetDownLines = router => {
                 data: {
                     withdraw: 0,
                     items: r.items.map(x => {
-                        if (!x.hasOwnProperty("alias")) {
-                            x.alias = ""
+                        replaceId(x)
+                        for (const downLine of downLines) {
+                            if (x.id.toString() === downLine.id.toString()) {
+                                x.alias = downLine.hasOwnProperty("alias") ? downLine.alias : ""
+                                x.claimed = downLine.hasOwnProperty("claimed") ? downLine.claimed : false
+                            }
                         }
-                        if (!x.hasOwnProperty("claimed")) {
-                            x.claimed = false
-                        }
+                        // if (!x.hasOwnProperty("alias")) {
+                        //     x.alias = ""
+                        // }
+                        // if (!x.hasOwnProperty("claimed")) {
+                        //     x.claimed = false
+                        // }
                         x.lastLoginAt = 0
                         return x
                     }),

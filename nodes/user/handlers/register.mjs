@@ -53,6 +53,7 @@ async function getConfig(req) {
     req.config = (Object.keys(response.data).length === 0) ? {
         daysForRegister: 7, daysForInvite: 3
     } : response.data
+    console.log(`${JSON.stringify(req.config)}`)
 }
 
 async function verifySms(req) {

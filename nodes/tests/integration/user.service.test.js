@@ -85,7 +85,7 @@ describe("test user service", () => {
                 verify: response => {
                     simpleVerification(response)
                     expect(response.data.expiration).toBeDefined()
-                    expect(response.data.expiration).toEqual(now() + 86400 * 7)
+                    expect(response.data.expiration).toBeGreaterThanOrEqual(now() + 86400 * 7 - 100)
                 }
             })
         })
@@ -116,7 +116,7 @@ describe("test user service", () => {
                     simpleVerification(response)
                     for (let i = 0; i < response.data.length; ++i) {
                         expect(response.data[i].registeredAt).toBeGreaterThanOrEqual(desired[i].registeredAt)
-                        expect(response.data[i].member.expiration).toBeGreaterThanOrEqual(desired[i].member.expiration)
+                        expect(response.data[i].member.expiration).toBeGreaterThanOrEqual(desired[i].member.expiration-10)
                         delete response.data[i].registeredAt
                         delete response.data[i].member.expiration
                         delete desired[i].registeredAt

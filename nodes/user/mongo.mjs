@@ -156,7 +156,7 @@ export async function setupMongo(req) {
             const l = await collection.users
                 .find(filter,
                     {
-                        projection: {_id: 0, phone: 1, registeredAt: 1, name: 1, member: 1}
+                        projection: {_id: 1, phone: 1, registeredAt: 1, name: 1, member: 1}
                     })
                 .skip(offset)
                 .limit(limit)
