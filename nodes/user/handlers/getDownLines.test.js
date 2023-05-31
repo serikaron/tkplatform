@@ -71,7 +71,7 @@ test("get downlines", async () => {
             })
         }
     }))
-    expect(getDownLines).toHaveBeenCalledWith(`${userId}`)
+    expect(getDownLines).toHaveBeenCalledWith(`${userId}`, 0, 50, null)
     expect(getDownLineInfo).toHaveBeenNthCalledWith(1, downLineIds[0])
     expect(getDownLineInfo).toHaveBeenNthCalledWith(2, downLineIds[1])
 })
@@ -114,6 +114,6 @@ describe.each([
                 items: []
             }
         }))
-        expect(getDownLines).toHaveBeenCalledWith(`${userId}`)
+        expect(getDownLines).toHaveBeenCalledWith(`${userId}`, 0, 50, null)
     })
 })

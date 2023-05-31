@@ -1,11 +1,16 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {getValueNumber, getValueString} from "../../common/utils.mjs";
 
 export const routeGetDownLines = router => {
     router.get("/user/downLines", async (req, res, next) => {
-        const downLines = await req.context.mongo.getDownLines(req.headers.id)
-        // console.log(`downlines: ${JSON.stringify(downLines)}`)
+        const offset = getValueNumber(req.query, "offset", 0)
+        const limit = getValueNumber(req.query, "limit", 50)
+        const phone = getValueString(req.query, "phone", null)
+
+        const downLines = await req.context.mongo.getDownLines(req.headers.id, offset, limit, phone)
+        console.log(`downLines: ${JSON.stringify(downLines)}`)
         if (downLines === null
             || downLines === undefined
             || downLines === []) {
@@ -18,22 +23,22 @@ export const routeGetDownLines = router => {
                 }
             }))
         } else {
-            for (const downLine of downLines) {
-                const info = await req.context.mongo.getDownLineInfo(downLine.id)
-                Object.assign(downLine, info)
-                if (!downLine.hasOwnProperty("alias")) {
-                    downLine.alias = ""
-                }
-                if (!downLine.hasOwnProperty("claimed")) {
-                    downLine.claimed = false
-                }
-                downLine.lastLoginAt = 0
-            }
+            const r = await req.context.mongo.getDownLineInfos(downLines.map(x => x.id), offset, limit, phone)
+            console.log(`downLines: ${JSON.stringify(r)}`)
             res.tkResponse(TKResponse.Success({
                 data: {
                     withdraw: 0,
-                    total: downLines.length,
-                    items: downLines
+                    items: r.items.map(x => {
+                        if (!x.hasOwnProperty("alias")) {
+                            x.alias = ""
+                        }
+                        if (!x.hasOwnProperty("claimed")) {
+                            x.claimed = false
+                        }
+                        x.lastLoginAt = 0
+                        return x
+                    }),
+                    total: r.count
                 }
             }))
         }

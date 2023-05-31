@@ -145,6 +145,24 @@ export async function setupMongo(req) {
                     projection: {_id: 0, phone: 1, registeredAt: 1, name: 1, member: 1}
                 })
         },
+        getDownLineInfos: async (uidList, offset, limit, phone) => {
+            const filter = {_id: {$in: uidList}}
+            if (phone !== null && phone !== undefined) {
+                const regex = `.*${phone}.*`
+                filter.phone = {$regex: regex}
+            }
+            const c = await collection.users
+                .countDocuments(filter)
+            const l = await collection.users
+                .find(filter,
+                    {
+                        projection: {_id: 0, phone: 1, registeredAt: 1, name: 1, member: 1}
+                    })
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+            return {count: c, items: l}
+        },
         updateDownLine: async (userId, downLineUserId, update) => {
             await collection.users
                 .updateOne({
