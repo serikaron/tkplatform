@@ -23,6 +23,12 @@ const routeBackend = router => {
         const limit = getValueNumber(req.query, "limit", 50)
         const r = await req.context.mongo.backendGetReports(offset, limit)
         const c = await req.context.mongo.backendCountReports()
+
+        for (const report of r) {
+            const user = await req.context.mongo.getUserById(report.userId.toString())
+            report.phone = user === null ? "" : user.phone
+        }
+
         res.tkResponse(TKResponse.Success({
             data: {
                 total: c,

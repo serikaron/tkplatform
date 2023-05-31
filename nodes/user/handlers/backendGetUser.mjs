@@ -26,6 +26,12 @@ export const routeBackendGetUser = backendRouter => {
             throw new NotFound()
         }
 
+        const downLines = []
+        for (const downLine of r.downLines) {
+            downLines.push(await req.context.mongo.getUserById(downLine.id))
+        }
+        r.downLines = downLines
+
         res.tkResponse(TKResponse.Success({
             data: replaceId(r)
         }))

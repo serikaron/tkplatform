@@ -30,6 +30,11 @@ const routeBackendGetUserMessages = router => {
         const r = await req.context.mongo.backendGetMessages(offset, limit)
         const c = await req.context.mongo.backendCountMessages()
 
+        for (const message of r) {
+            const user = await req.context.mongo.getUserById(message.userId.toString())
+            message.phone = user === null ? "" : user.phone
+        }
+
         res.tkResponse(TKResponse.Success({
             data: {
                 total: c,
