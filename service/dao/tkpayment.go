@@ -510,7 +510,7 @@ func GetCommissionItems(db *mongo.Database) []*model.CommissionItem {
 	_ = cur.Close(context.Background())
 
 	for _, one := range all {
-		log.Println("CommissionType:", one.CommissionType, " - Rate:", one.Rate, " - level:", one.Level, " - PeopleNumber:", one.PeopleNumber)
+		log.Println("CommissionType:", one.CommissionType, " - Rate1:", one.Rate1, " - level:", one.Level, " - PeopleNumber:", one.PeopleNumber)
 	}
 	return all
 }
@@ -523,7 +523,9 @@ func AddCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		CommissionType int                `bson:"commissionType"`
 		Level          int                `bson:"level"`
 		PeopleNumber   int                `bson:"peopleNumber"`
-		Rate           int                `bson:"rate"`
+		Rate1          int                `bson:"rate1"` //1层级分成比例
+		Rate2          int                `bson:"rate2"` //2层级分成比例
+		Rate3          int                `bson:"rate3"` //3层级分成比例
 	}
 
 	newItem := CommissionItemDb{
@@ -531,7 +533,9 @@ func AddCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		CommissionType: m.CommissionType,
 		Level:          m.Level,
 		PeopleNumber:   m.PeopleNumber,
-		Rate:           m.Rate,
+		Rate1:          m.Rate1,
+		Rate2:          m.Rate2,
+		Rate3:          m.Rate3,
 	}
 	objId, err := collection.InsertOne(context.TODO(), newItem)
 	if err != nil {
@@ -549,7 +553,9 @@ func UpdateCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		{"commissionType", m.CommissionType},
 		{"level", m.Level},
 		{"peopleNumber", m.PeopleNumber},
-		{"rate", m.Rate},
+		{"rate1", m.Rate1},
+		{"rate2", m.Rate2},
+		{"rate3", m.Rate3},
 	}}})
 	if err != nil {
 		logger.Error(err)

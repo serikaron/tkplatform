@@ -105,7 +105,9 @@ type CommissionItem struct {
 	CommissionType int    `bson:"commissionType"`
 	Level          int    `bson:"level"`
 	PeopleNumber   int    `bson:"peopleNumber"`
-	Rate           int    `bson:"rate"`
+	Rate1          int    `bson:"rate1"` //1层级分成比例
+	Rate2          int    `bson:"rate2"` //2层级分成比例
+	Rate3          int    `bson:"rate3"` //3层级分成比例
 }
 
 type WithdrawFeeSetting struct {

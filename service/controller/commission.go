@@ -36,7 +36,9 @@ func PromotionCommissionListHandler(c *gin.Context) {
 			CommissionType: item.CommissionType,
 			Level:          item.Level,
 			PeopleNumber:   item.PeopleNumber,
-			Rate:           item.Rate,
+			Rate1:          item.Rate1,
+			Rate2:          item.Rate2,
+			Rate3:          item.Rate3,
 		})
 	}
 
@@ -54,7 +56,9 @@ func PromotionCommissionAddHandler(c *gin.Context) {
 		CommissionType int `json:"commissionType"`
 		Level          int `json:"level"`
 		PeopleNumber   int `json:"peopleNumber"`
-		Rate           int `json:"rate"`
+		Rate1          int `json:"rate1"`
+		Rate2          int `json:"rate2"`
+		Rate3          int `json:"rate3"`
 	}
 
 	var p param
@@ -80,7 +84,9 @@ func PromotionCommissionAddHandler(c *gin.Context) {
 		CommissionType: p.CommissionType,
 		Level:          p.Level,
 		PeopleNumber:   p.PeopleNumber,
-		Rate:           p.Rate,
+		Rate1:          p.Rate1,
+		Rate2:          p.Rate2,
+		Rate3:          p.Rate3,
 	})
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)
@@ -102,7 +108,9 @@ func PromotionCommissionUpdateHandler(c *gin.Context) {
 		CommissionType int    `json:"commissionType"`
 		Level          int    `json:"level"`
 		PeopleNumber   int    `json:"peopleNumber"`
-		Rate           int    `json:"rate"`
+		Rate1          int    `json:"rate1"`
+		Rate2          int    `json:"rate2"`
+		Rate3          int    `json:"rate3"`
 	}
 
 	var p param
@@ -128,7 +136,9 @@ func PromotionCommissionUpdateHandler(c *gin.Context) {
 		CommissionType: p.CommissionType,
 		Level:          p.Level,
 		PeopleNumber:   p.PeopleNumber,
-		Rate:           p.Rate,
+		Rate1:          p.Rate1,
+		Rate2:          p.Rate2,
+		Rate3:          p.Rate3,
 	})
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)

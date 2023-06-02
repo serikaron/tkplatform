@@ -104,7 +104,9 @@ type CommissionItemResp struct {
 	CommissionType int    `json:"commissionType"`
 	Level          int    `json:"level"`
 	PeopleNumber   int    `json:"peopleNumber"`
-	Rate           int    `json:"rate"`
+	Rate1          int    `json:"rate1"` //1层级分成比例
+	Rate2          int    `json:"rate2"` //2层级分成比例
+	Rate3          int    `json:"rate3"` //3层级分成比例
 }
 
 type MemberItemResp struct {
