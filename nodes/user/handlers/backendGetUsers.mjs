@@ -5,11 +5,13 @@ import {getValueNumber, getValueString, replaceId} from "../../common/utils.mjs"
 
 const getDownLines = async (req, users) => {
     for (const user of users) {
-        const downLines = []
-        for (const downLine of user.downLines) {
-            downLines.push(await req.context.mongo.getUserById(downLine.id))
+        if (user.downLines !== null && user.downLines !== undefined) {
+            const downLines = []
+            for (const downLine of user.downLines) {
+                downLines.push(await req.context.mongo.getUserById(downLine.id))
+            }
+            user.downLines = downLines
         }
-        user.downLines = downLines
     }
 }
 
