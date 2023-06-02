@@ -128,7 +128,7 @@ const routeInfo = [
     {
         url: '/backend/v1/system/versions',
         method: 'GET',
-        needAuth: true,
+        needAuth: false,
         service: {baseURL: 'http://system:8080', url: '/v1/system/versions/all'}
     },
     {
