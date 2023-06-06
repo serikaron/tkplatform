@@ -33,7 +33,7 @@ export async function setupMongo(req) {
         getUsers: async (offset, limit) => {
             return await collection.users
                 .find()
-                .sort({registerAt: 1})
+                .sort({registeredAt: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
