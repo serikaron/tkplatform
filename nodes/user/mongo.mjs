@@ -46,6 +46,7 @@ export async function setupMongo(req) {
                 )
             const l = await collection.users
                 .find({phone: {$regex: regex}})
+                .sort({registeredAt: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
