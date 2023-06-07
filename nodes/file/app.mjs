@@ -7,10 +7,13 @@ import fs from "fs";
 import {TKResponse} from "../common/TKResponse.mjs";
 import {NeedAuth} from "../common/errors/00000-basic.mjs";
 import {axiosCall} from "../common/call.mjs";
+import cors from "cors";
 
 const app = express()
 
 dotenv.config()
+
+app.use(cors({origin: "*"}))
 
 const verifyToken = async (token) => {
     if (token === "") {
@@ -60,7 +63,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage})
 
 app.post('/v1/file',
-    upload.single('image'),
+    upload.single('image'), upload.single('file'),
     (req, res) => {
         console.log(req.file, req.body)
         const fullPath = `${process.env.HOST_NAME}/file/${req.dir}/${req.filename}`
