@@ -14,7 +14,6 @@ const app = express()
 dotenv.config()
 
 app.use(cors({origin: "*"}))
-
 const verifyToken = async (token) => {
     if (token === "") {
         console.log("empty token")
@@ -63,7 +62,7 @@ const storage = multer.diskStorage({
 const upload = multer({storage: storage})
 
 app.post('/v1/file',
-    upload.single('image'), upload.single('file'),
+    upload.single('image'),
     (req, res) => {
         console.log(req.file, req.body)
         const fullPath = `${process.env.HOST_NAME}/file/${req.dir}/${req.filename}`
