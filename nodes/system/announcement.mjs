@@ -20,7 +20,7 @@ const getAnnouncement = (router) => {
         res.tkResponse(TKResponse.Success({
             data: {
                 announcement: announcement === null ? "" : announcement.value,
-                versionLog: log
+                updateLog: log
             }
         }))
 
