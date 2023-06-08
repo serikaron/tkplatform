@@ -12,6 +12,13 @@ export const routeGetMissings = (router) => {
 
         // console.log(`missing sites rsp: ${JSON.stringify(r)}`)
 
+        for (const x of r.items) {
+            const userRsp = await req.context.stubs.user.getUser(x.userId)
+            if (userRsp.isSuccess()) {
+                x.phone = userRsp.data.phone
+            }
+        }
+
         res.tkResponse(TKResponse.Success({
             data: {
                 total: r.count,
@@ -19,6 +26,7 @@ export const routeGetMissings = (router) => {
                     let out = {}
                     Object.assign(out, x.missing)
                     out.id = x._id
+                    out.phone = x.phone
                     return out
                 }),
                 offset, limit

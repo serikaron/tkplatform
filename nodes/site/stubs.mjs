@@ -17,6 +17,16 @@ export async function setupStubs(req) {
                     headers: {id: userId}
                 })
             }
+        },
+        user: {
+            getUser: async (userId) => {
+                return await axiosCall({
+                    url: `/v1/backend/user/${userId}`,
+                    baseURL: "http://user:8080",
+                    method: 'get',
+                    headers: {id: userId}
+                })
+            }
         }
     }
 }
