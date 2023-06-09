@@ -1,8 +1,8 @@
 'use strict'
 
-import {replaceId} from "../../common/utils.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {NotFound} from "../../common/errors/00000-basic.mjs";
+import {makeUserSite} from "../helper.mjs";
 
 export const routeGetUserSite = router => {
     router.get("/user/site/:siteId", async (req, res, next) => {
@@ -12,8 +12,8 @@ export const routeGetUserSite = router => {
             throw new NotFound()
         }
 
-        delete site.userId
-        replaceId(site)
+        await makeUserSite(req, site)
+
         res.tkResponse(TKResponse.Success({
             data: site
         }))
