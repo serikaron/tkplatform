@@ -15,7 +15,8 @@ export const makeUserSite = async (req, userSite) => {
     if (site !== null && site !== undefined) {
         site.id = site._id
         delete site._id
-        userSite.site = site
+        Object.assign(userSite.site, site)
+        // userSite.site = site
         console.log(`updated site: ${JSON.stringify(site)}`)
     }
 }
