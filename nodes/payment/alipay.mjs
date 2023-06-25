@@ -11,7 +11,7 @@ export const setupAlipay = (req) => {
     req.context.alipay = {
         getConfig: async () => {
             const privateKey = await fs.readFile(process.env.ALIPAY_PRIVATE_KEY, 'ascii')
-            const alipaySDK = new AlipaySdk.constructor({
+            return new AlipaySdk.constructor({
                 appId: process.env.ALIPAY_APP_ID,
                 privateKey: privateKey,
                 alipayRootCertPath: process.env.ALIPAY_ROOT_CERT,
@@ -19,7 +19,6 @@ export const setupAlipay = (req) => {
                 appCertPath: process.env.ALIPAY_APP_CERT,
                 gateway: process.env.ALIPAY_GATEWAY
             })
-            return alipaySDK.config
         }
     }
 }

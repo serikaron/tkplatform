@@ -21,14 +21,12 @@ export const routePay = (router) => {
             // })
 
             const alipayConfig = await req.context.alipay.getConfig()
-            const data = sign(method, {
+            console.log(`alipayConfig: ${JSON.stringify(alipayConfig)}`)
+            const data = await sign(method, {
                 bizContent,
             }, alipayConfig)
 
             const payInfo = new URLSearchParams(data).toString()
-
-            console.log("payInfo")
-            console.log(payInfo)
 
             res.tkResponse(TKResponse.Success({
                 data: {orderStr: payInfo},

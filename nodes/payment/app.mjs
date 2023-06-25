@@ -5,7 +5,7 @@ import {setup} from "./setup.mjs";
 import diContainer from "../common/dicontainer.mjs";
 import {makeMiddleware} from "../common/flow.mjs";
 import {cleanMongo, setupMongo} from "./mongo.mjs";
-import setupAlipay from "./alipay.js";
+import setupAlipay from "./alipay.cjs";
 
 const app = createApp()
 
