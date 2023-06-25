@@ -6,6 +6,7 @@ import {routeGetWallet} from "./handlers/getWallet.mjs";
 import {routePostWallet} from "./handlers/postWallet.mjs";
 import {routeGetWalletDetail} from "./handlers/getWalletDetail.mjs";
 import {routeGetWalletOverview} from "./handlers/getWalletOverview.mjs";
+import {routePay} from "./handlers/pay.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -20,4 +21,10 @@ export function setup(app, {setup, teardown}) {
     routeGetWalletOverview(router)
 
     teardown(router)
+
+    const routerV2 = express.Router()
+    app.use("/v2", routerV2)
+    setup(routerV2)
+    routePay(routerV2)
+    teardown(routerV2)
 }
