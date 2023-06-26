@@ -1,24 +1,15 @@
 'use strict'
 
-import AlipaySdk from "alipay-sdk";
-import fs from "fs/promises"
+import {sign} from "alipay-sdk/lib/util.js";
 
-export const setupAlipay = (req) => {
-    if (req.context === undefined) {
-        req.context = {}
-    }
+export const callAlipay = async (context, method, bizContent) => {
+    const alipayConfig = await context.alipay.getConfig()
+    console.log(`alipayConfig: ${JSON.stringify(alipayConfig)}`)
+    const data = await sign(method, {
+        bizContent,
+    }, alipayConfig)
+}
 
-    req.context.alipay = {
-        getConfig: async () => {
-            const privateKey = await fs.readFile(process.env.ALIPAY_PRIVATE_KEY, 'ascii')
-            return new AlipaySdk.constructor({
-                appId: process.env.ALIPAY_APP_ID,
-                privateKey: privateKey,
-                alipayRootCertPath: process.env.ALIPAY_ROOT_CERT,
-                alipayPublicCertPath: process.env.ALIPAY_PUBLIC_CERT,
-                appCertPath: process.env.ALIPAY_APP_CERT,
-                gateway: process.env.ALIPAY_GATEWAY
-            })
-        }
-    }
+export const alipayTrade = async (context, bizContent) => {
+    return await callAlipay(context, "alipay.trade.app.pay", bizContent)
 }

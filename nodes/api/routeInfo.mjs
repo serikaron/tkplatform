@@ -178,15 +178,50 @@ const routeInfo = [
     {url: "/v1/journal/entries/count", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
     {url: "/v1/site/:userSiteId/recommend", method: "GET", needAuth: true, service: {baseURL: "http://ledger:8080"}},
 
-    {url: "/v1/store/member/items", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/store/member/items"}},
-    {url: "/v1/store/rice/items", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/store/rice/items"}},
+    {
+        url: "/v1/store/member/items",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/store/member/items"}
+    },
+    {
+        url: "/v1/store/rice/items",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/store/rice/items"}
+    },
     // {url: "/v1/store/member/items", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080", url: '/v1/store/member/items'}},
     // {url: "/v1/store/rice/items", method: "GET", needAuth: true, service: {baseURL: "http://payment:8080", url: '/v1/store/rice/items'}},
-    {url: "/v1/wallet", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet"}},
-    {url: "/v1/wallet/detail", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/detail"}},
-    {url: "/v1/wallet/overview", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/overview"}},
-    {url: "/v1/wallet/withdraw/records", method: "GET", needAuth: true, service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/withdraw/records"}},
-    {url: '/v1/wallet/recharge', method: "POST", needAuth: true, service: {baseURL: "http://apid:9010", url: '/v1/api/user/wallet/recharge'}},
+    {
+        url: "/v1/wallet",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet"}
+    },
+    {
+        url: "/v1/wallet/detail",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/detail"}
+    },
+    {
+        url: "/v1/wallet/overview",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/overview"}
+    },
+    {
+        url: "/v1/wallet/withdraw/records",
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/withdraw/records"}
+    },
+    {
+        url: '/v1/wallet/recharge',
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://apid:9010", url: '/v1/api/user/wallet/recharge'}
+    },
 
     {
         url: "/v1/search/external/account",
@@ -244,6 +279,13 @@ const routeInfo = [
 
     // v2 - payment
     {url: '/v2/alipay', method: 'POST', needAuth: true, service: {baseURL: "http://payment:8080"}},
+    // alipay callback 不经api service
+    // {
+    //     url: '/alipay/callback',
+    //     method: 'POST',
+    //     needAuth: false,
+    //     service: {baseURL: "http://payment:8080", url: '/v2/alipay/callback'}
+    // }
 ]
 
 export default routeInfo

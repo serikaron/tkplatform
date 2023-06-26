@@ -6,6 +6,14 @@ import {InternalError} from "../../common/errors/00000-basic.mjs";
 import fs from 'fs/promises'
 import {sign} from "alipay-sdk/lib/util.js";
 
+const buildMemberItem = async () => {
+
+}
+
+const buildItem = async () => {
+
+}
+
 export const routePay = (router) => {
     router.post('/alipay', async (req, res, next) => {
         try {
@@ -23,6 +31,7 @@ export const routePay = (router) => {
             const alipayConfig = await req.context.alipay.getConfig()
             console.log(`alipayConfig: ${JSON.stringify(alipayConfig)}`)
             const data = await sign(method, {
+                notifyUrl: "http://tk.haikuotiank.com:9000/alipay/callback",
                 bizContent,
             }, alipayConfig)
 

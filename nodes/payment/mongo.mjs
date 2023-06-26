@@ -16,6 +16,7 @@ export async function setupMongo(req) {
         memberItems: payment.db.collection("memberItems"),
         riceItems: payment.db.collection("riceItems"),
         wallets: payment.db.collection("wallets"),
+        payLogs: payment.db.collection("payLogs"),
     }
     req.context.mongo = {
         client: payment.client, db: payment.db, collection,
@@ -37,6 +38,14 @@ export async function setupMongo(req) {
                     {$inc: update},
                     {upsert: true}
                 )
+        },
+        addPayLog: async (userId, amount, itemType, item) => {
+            const r = await collection.payLogs
+                .insertOne({
+                    userId: new ObjectId(userId),
+                    amount, itemType, item
+                })
+            return r.insertedId
         }
     }
 }
