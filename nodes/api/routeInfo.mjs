@@ -279,7 +279,7 @@ const routeInfo = [
 
     // v2 - payment
     {url: '/v2/alipay', method: 'POST', needAuth: true, service: {baseURL: "http://payment:8080"}},
-    {url: '/v1/wallet', method: 'POST', needAuth: true, service: {baseURL: "http://payment:8080"}},
+    // {url: '/v1/wallet', method: 'POST', needAuth: true, service: {baseURL: "http://payment:8080"}},
     // alipay callback 不经api service
     // {
     //     url: '/alipay/callback',
