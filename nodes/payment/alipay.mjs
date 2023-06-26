@@ -6,6 +6,7 @@ export const callAlipay = async (context, method, bizContent) => {
     const alipayConfig = await context.alipay.getConfig()
     console.log(`alipayConfig: ${JSON.stringify(alipayConfig)}`)
     const data = await sign(method, {
+        notifyUrl: "http://tk.haikuotiank.com:9000/alipay/callback",
         bizContent,
     }, alipayConfig)
 }

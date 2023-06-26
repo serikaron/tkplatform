@@ -23,8 +23,18 @@ export async function setupMongo(req) {
         getMemberItems: async () => {
             return await collection.memberItems.find().toArray()
         },
+        getMemberItem: async (id) => {
+            return await collection.memberItems.findOne({
+                _id: new ObjectId(id)
+            })
+        },
         getRiceItems: async () => {
             return await collection.riceItems.find().toArray()
+        },
+        getRiceItem: async (id) => {
+            return await collection.riceItems.findOne({
+                _id: new ObjectId(id)
+            })
         },
         getWallet: async (userId) => {
             return await collection.wallets.findOne({userId: new ObjectId(userId)})

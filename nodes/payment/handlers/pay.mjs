@@ -2,20 +2,85 @@
 
 import {ObjectId} from "mongodb";
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {InternalError} from "../../common/errors/00000-basic.mjs";
+import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import fs from 'fs/promises'
 import {sign} from "alipay-sdk/lib/util.js";
+import {ItemNotFound} from "../../common/errors/40000-payment.mjs";
+import {alipayTrade} from "../alipay.mjs";
 
-const buildMemberItem = async () => {
+const buildMemberItem = async (req) => {
+    const memberItem = req.context.mongo.getMemberItem(req.body.productId)
+    if (memberItem === null) {
+        throw new ItemNotFound()
+    }
 
+    req.bill = {
+        log: {
+            amount: memberItem.price,
+            item: {
+                id: memberItem._id,
+                days: memberItem.days,
+            }
+        },
+        bizContent: {
+            total_amount: memberItem.price.toString(),
+            subject: memberItem.name
+        }
+    }
 }
 
-const buildItem = async () => {
+const buildRiceItem = async (req) => {
+    const riceItem = req.context.mongo.getRiceItem(req.body.productId)
+    if (riceItem === null) {
+        throw new ItemNotFound()
+    }
 
+    req.bill = {
+        log: {
+            amount: riceItem.price,
+            item: {
+                id: riceItem._id,
+                rice: riceItem.rice,
+            }
+        },
+        bizContent: {
+            total_amount: riceItem.price.toString(),
+            subject: riceItem.name
+        }
+    }
+}
+
+const buildItem = async (req, res, next) => {
+    switch (req.body.productType) {
+        case 1: buildMemberItem(req)
+        case 2: buildRiceItem(req)
+        default: throw new InvalidArgument()
+    }
+    next()
+}
+
+const addLog = async (req, res, next) => {
+    req.bizContent.out_trade_no = await req.context.mongo.addPayLog(req.headers.id, req.bill.log.amount, req.body.productType, req.bill.log.item)
+    next()
+}
+
+const pay = async (req, res, next) => {
+    const data = await alipayTrade(req.context, req.bill.bizContent)
+    console.log(JSON.stringify(data))
+
+    res.tkResponse(TKResponse.Success({
+        orderStr: new URLSearchParams(data).toString(),
+        orderId: req.bill.bizContent.out_trade_no
+    }))
+
+    next()
 }
 
 export const routePay = (router) => {
-    router.post('/alipay', async (req, res, next) => {
+    router.post('/alipay', ...[
+        buildItem, addLog, pay
+    ])
+    const f = async(req, res, next) => {
         try {
             const tradeId = new ObjectId()
             const method = "alipay.trade.app.pay"
@@ -47,5 +112,5 @@ export const routePay = (router) => {
             res.tkResponse(TKResponse.fromError(new InternalError()))
         }
         next()
-    })
+    }
 }

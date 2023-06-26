@@ -13,3 +13,13 @@ export class NotEnoughRice extends TKError {
         });
     }
 }
+
+export class ItemNotFound extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase -1,
+            msg: "物品不存在"
+        });
+    }
+}
