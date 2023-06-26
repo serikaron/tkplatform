@@ -43,10 +43,10 @@ export async function setupMongo(req) {
         // payWithRices: async (userId, price) => {
         // },
         updateWallet: async (userId, update) => {
-            await updateWallet(collection, userId, update)
+            await updateWallet(collection.wallets, userId, update)
         },
         addRice: async (userId, rice) => {
-            await updateWallet(collection, userId, {rice: rice})
+            await updateWallet(collection.wallets, userId, {rice: rice})
         },
         addPayLog: async (userId, amount, itemType, item) => {
             const r = await collection.payLogs

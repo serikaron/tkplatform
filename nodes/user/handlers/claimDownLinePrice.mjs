@@ -42,6 +42,7 @@ const updateClaimed = async (req) => {
 const updateWallet = async (req) => {
     const r = await req.context.stubs.payment.updateWallet(req.headers.id, {invitePoint: req.price})
     if (r.isError()) {
+        console.log(`ERROR, updateWallet, ${r.msg}`)
         throw new InternalError()
     }
 }
