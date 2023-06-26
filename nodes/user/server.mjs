@@ -29,6 +29,7 @@ import {routeDelMessages} from "./handlers/delMessages.mjs";
 import {routeIdentification} from "./handlers/identification.mjs";
 import {routeGetIdentification} from "./handlers/getIdentification.mjs";
 import {routeBackendPutReport} from "./handlers/backendPutReport.mjs";
+import {routeAddUserMember} from "./handlers/addUserMember.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -59,6 +60,7 @@ export function setup(app, {
     routeDelMessages(router)
     routeIdentification(router)
     routeGetIdentification(router)
+    routeAddUserMember(router)
 
     routeBackendLogin(router)
     routeBackendRegister(router)

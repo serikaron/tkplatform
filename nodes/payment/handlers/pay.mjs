@@ -7,9 +7,11 @@ import fs from 'fs/promises'
 import {sign} from "alipay-sdk/lib/util.js";
 import {ItemNotFound} from "../../common/errors/40000-payment.mjs";
 import {alipayTrade} from "../alipay.mjs";
+import {itemTypeMember, itemTypeRice} from "../itemType.mjs";
+import {makeMiddleware} from "../../common/flow.mjs";
 
 const buildMemberItem = async (req) => {
-    const memberItem = req.context.mongo.getMemberItem(req.body.productId)
+    const memberItem = await req.context.mongo.getMemberItem(req.body.productId)
     if (memberItem === null) {
         throw new ItemNotFound()
     }
@@ -30,7 +32,7 @@ const buildMemberItem = async (req) => {
 }
 
 const buildRiceItem = async (req) => {
-    const riceItem = req.context.mongo.getRiceItem(req.body.productId)
+    const riceItem = await req.context.mongo.getRiceItem(req.body.productId)
     if (riceItem === null) {
         throw new ItemNotFound()
     }
@@ -50,36 +52,38 @@ const buildRiceItem = async (req) => {
     }
 }
 
-const buildItem = async (req, res, next) => {
+const buildItem = async (req) => {
     switch (req.body.productType) {
-        case 1: buildMemberItem(req)
-        case 2: buildRiceItem(req)
+        case itemTypeMember: await buildMemberItem(req); break
+        case itemTypeRice: await buildRiceItem(req); break
         default: throw new InvalidArgument()
     }
-    next()
 }
 
-const addLog = async (req, res, next) => {
-    req.bizContent.out_trade_no = await req.context.mongo.addPayLog(req.headers.id, req.bill.log.amount, req.body.productType, req.bill.log.item)
-    next()
+const addLog = async (req) => {
+    const orderId = await req.context.mongo.addPayLog(req.headers.id, req.bill.log.amount, req.body.productType, req.bill.log.item)
+    req.bill.bizContent.out_trade_no = orderId.toString()
 }
 
-const pay = async (req, res, next) => {
+const pay = async (req, res) => {
     const data = await alipayTrade(req.context, req.bill.bizContent)
     console.log(JSON.stringify(data))
 
     res.tkResponse(TKResponse.Success({
-        orderStr: new URLSearchParams(data).toString(),
-        orderId: req.bill.bizContent.out_trade_no
+        data: {
+            orderStr: new URLSearchParams(data).toString(),
+            orderId: req.bill.bizContent.out_trade_no
+        }
     }))
-
-    next()
 }
 
 export const routePay = (router) => {
-    router.post('/alipay', ...[
-        buildItem, addLog, pay
-    ])
+    router.post('/alipay', async (req, res, next) => {
+        await buildItem(req)
+        await addLog(req)
+        await pay(req, res)
+        next()
+    })
     const f = async(req, res, next) => {
         try {
             const tradeId = new ObjectId()

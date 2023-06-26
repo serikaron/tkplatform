@@ -23,3 +23,13 @@ export class ItemNotFound extends TKError {
         });
     }
 }
+
+export class AlipayCallback extends TKError {
+    constructor(msg) {
+        super({
+            status: 500,
+            code: codeBase -1,
+            msg
+        });
+    }
+}

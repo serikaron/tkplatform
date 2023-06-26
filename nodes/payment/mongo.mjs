@@ -3,6 +3,7 @@
 import * as dotenv from 'dotenv'
 import {connectPayment} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
+import {pendingStatus} from "./logStatus.mjs";
 
 dotenv.config()
 
@@ -42,26 +43,45 @@ export async function setupMongo(req) {
         // payWithRices: async (userId, price) => {
         // },
         updateWallet: async (userId, update) => {
-            await collection.wallets
-                .updateOne(
-                    {userId: new ObjectId(userId)},
-                    {$inc: update},
-                    {upsert: true}
-                )
+            await updateWallet(collection, userId, update)
+        },
+        addRice: async (userId, rice) => {
+            await updateWallet(collection, userId, {rice: rice})
         },
         addPayLog: async (userId, amount, itemType, item) => {
             const r = await collection.payLogs
                 .insertOne({
                     userId: new ObjectId(userId),
+                    status: pendingStatus,
                     amount, itemType, item
                 })
             return r.insertedId
-        }
+        },
+        getPayLog: async (id) => {
+            return await collection.payLogs.findOne({
+                _id: new ObjectId(id)
+            })
+        },
+        updateLogStatus: async (id, status) => {
+            await collection.payLogs.updateOne(
+                {_id: id},
+                {$set: {status: status}}
+            )
+        },
     }
 }
 
 export async function cleanMongo(req) {
     await req.context.mongo.client.close()
+}
+
+async function updateWallet(wallets, userId, update) {
+    await wallets
+        .updateOne(
+            {userId: new ObjectId(userId)},
+            {$inc: update},
+            {upsert: true}
+        )
 }
 
 // async function payWithRices(client, collection, userId, price) {
