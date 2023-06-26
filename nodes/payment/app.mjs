@@ -6,8 +6,11 @@ import diContainer from "../common/dicontainer.mjs";
 import {makeMiddleware} from "../common/flow.mjs";
 import {cleanMongo, setupMongo} from "./mongo.mjs";
 import setupAlipay from "./alipay.cjs";
+import express from "express";
 
 const app = createApp()
+
+app.use(express.urlencoded())
 
 setup(app, {
     setup: diContainer.setup(makeMiddleware([
