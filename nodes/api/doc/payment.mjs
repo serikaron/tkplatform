@@ -309,6 +309,17 @@
  * /v2/alipay(支付):
  *   post:
  *     tags: ["payment(支付/商城)", "v2"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productType:
+ *                 type: number
+ *                 example: 1-会员充值，2-米粒购买
+ *               productId:
+ *                 type: string
  *     responses:
  *       200:
  *         content:
@@ -317,6 +328,8 @@
  *               type: object
  *               properties:
  *                 orderStr:
- *                 type: string
- *                 example: 客户端支付宝sdk拉起所需参数
+ *                   type: string
+ *                   example: 客户端支付宝sdk拉起所需参数
+ *                 orderId:
+ *                   type: string
  */
