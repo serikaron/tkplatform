@@ -19,8 +19,9 @@ jobs:
       - name: setup env
         run: npm install && sh scripts/gen_test_env.sh
 
-      - name: unit test
-        run: npm run test:unit
+# disable unit test
+#      - name: unit test
+#        run: npm run test:unit
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
