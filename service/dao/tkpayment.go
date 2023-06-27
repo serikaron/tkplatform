@@ -54,7 +54,7 @@ func UserWalletCashWithdraw(db *mongo.Database, userId string, cash int64) error
 	return nil
 }
 
-func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64, typ int) []*model.UserWalletRecord {
+func GetUserWalletRecords(db *mongo.Database, userId, phone string, offset, limit int64, typ int) []*model.UserWalletRecord {
 	collection := db.Collection("walletRecords")
 	var findOptions options.FindOptions
 	if limit > 0 {
@@ -62,10 +62,14 @@ func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64
 		findOptions.SetSkip(offset)
 	}
 	var m bson.M
-	if typ == 0 {
+	if typ > 0 && typ <= 5 {
+		m = bson.M{"type": typ}
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
-	} else if typ > 0 && typ <= 5 {
-		m = bson.M{"userId": userId, "type": typ}
+	}
+	if phone != "" {
+		m = bson.M{"phone": phone}
 	}
 	cur, err := collection.Find(context.Background(), m, &findOptions)
 	if err != nil {
@@ -85,10 +89,13 @@ func GetUserWalletRecords(db *mongo.Database, userId string, offset, limit int64
 	return all
 }
 
-func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *model.Member, withdraw *model.Withdraw, downLine *model.DownLine, activity *model.Activity, rice *model.Rice) error {
+func AddUserWalletRecord(db *mongo.Database, userId, phone, name, idNo string, typ int, member *model.Member, withdraw *model.Withdraw, downLine *model.DownLine, activity *model.Activity, rice *model.Rice) error {
 	type UserWalletRecordDb struct {
 		Id        primitive.ObjectID `bson:"_id"`
 		UserId    string             `bson:"userId"`
+		Phone     string             `bson:"phone"`
+		IdNo      string             `bson:"idNo"`
+		Name      string             `bson:"name"`
 		Type      int                `bson:"type"`
 		Member    *model.Member      `bson:"member"`
 		Withdraw  *model.Withdraw    `bson:"withdraw"`
@@ -102,6 +109,9 @@ func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *mod
 
 	newItem.Id = primitive.NewObjectID()
 	newItem.UserId = userId
+	newItem.Phone = phone
+	newItem.Name = name
+	newItem.IdNo = idNo
 	newItem.Type = typ
 	newItem.CreatedAt = time.Now().Unix()
 
@@ -128,12 +138,16 @@ func AddUserWalletRecord(db *mongo.Database, userId string, typ int, member *mod
 	return nil
 }
 
-func CountUserWalletRecords(db *mongo.Database, userId string, typ int) int64 {
+func CountUserWalletRecords(db *mongo.Database, userId, phone string, typ int) int64 {
 	var m bson.M
-	if typ == 0 {
+	if typ > 0 && typ <= 5 {
+		m = bson.M{"type": typ}
+	}
+	if userId != "" {
 		m = bson.M{"userId": userId}
-	} else if typ > 0 && typ <= 5 {
-		m = bson.M{"userId": userId, "type": typ}
+	}
+	if phone != "" {
+		m = bson.M{"phone": phone}
 	}
 	collection := db.Collection("walletRecords")
 	count, err := collection.CountDocuments(context.Background(), m)
@@ -163,6 +177,9 @@ func AddUserWalletWithdrawRecord(db *mongo.Database, m model.UserWalletWithdrawR
 	type UserWalletWithdrawRecordDb struct {
 		Id        primitive.ObjectID `bson:"_id"`
 		UserId    string             `bson:"userId"`
+		Phone     string             `bson:"phone"`
+		IdNo      string             `bson:"idNo"`
+		Name      string             `bson:"name"`
 		Comment   string             `bson:"comment"`
 		Amount    int64              `bson:"amount"`
 		Fee       int64              `bson:"fee"`
@@ -173,6 +190,9 @@ func AddUserWalletWithdrawRecord(db *mongo.Database, m model.UserWalletWithdrawR
 	newItem := UserWalletWithdrawRecordDb{
 		Id:        primitive.NewObjectID(),
 		UserId:    m.UserId,
+		Phone:     m.Phone,
+		Name:      m.Name,
+		IdNo:      m.IdNo,
 		Comment:   m.Comment,
 		Amount:    m.Amount,
 		Fee:       m.Fee,
@@ -490,7 +510,7 @@ func GetCommissionItems(db *mongo.Database) []*model.CommissionItem {
 	_ = cur.Close(context.Background())
 
 	for _, one := range all {
-		log.Println("CommissionType:", one.CommissionType, " - Rate:", one.Rate, " - level:", one.Level, " - PeopleNumber:", one.PeopleNumber)
+		log.Println("CommissionType:", one.CommissionType, " - Rate1:", one.Rate1, " - level:", one.Level, " - PeopleNumber:", one.PeopleNumber)
 	}
 	return all
 }
@@ -503,7 +523,9 @@ func AddCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		CommissionType int                `bson:"commissionType"`
 		Level          int                `bson:"level"`
 		PeopleNumber   int                `bson:"peopleNumber"`
-		Rate           int                `bson:"rate"`
+		Rate1          int                `bson:"rate1"` //1层级分成比例
+		Rate2          int                `bson:"rate2"` //2层级分成比例
+		Rate3          int                `bson:"rate3"` //3层级分成比例
 	}
 
 	newItem := CommissionItemDb{
@@ -511,7 +533,9 @@ func AddCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		CommissionType: m.CommissionType,
 		Level:          m.Level,
 		PeopleNumber:   m.PeopleNumber,
-		Rate:           m.Rate,
+		Rate1:          m.Rate1,
+		Rate2:          m.Rate2,
+		Rate3:          m.Rate3,
 	}
 	objId, err := collection.InsertOne(context.TODO(), newItem)
 	if err != nil {
@@ -529,7 +553,9 @@ func UpdateCommissionItems(db *mongo.Database, m model.CommissionItem) error {
 		{"commissionType", m.CommissionType},
 		{"level", m.Level},
 		{"peopleNumber", m.PeopleNumber},
-		{"rate", m.Rate},
+		{"rate1", m.Rate1},
+		{"rate2", m.Rate2},
+		{"rate3", m.Rate3},
 	}}})
 	if err != nil {
 		logger.Error(err)
@@ -554,5 +580,47 @@ func DeleteCommissionItems(db *mongo.Database, id string) error {
 	}
 	log.Println("删除数据成功:", deleteResult)
 
+	return nil
+}
+
+func GetWithdrawFeeSetting(db *mongo.Database) (amount, fee int64) {
+	collection := db.Collection("withdrawFeeSetting")
+	cur, err := collection.Find(context.Background(), bson.M{})
+	if err != nil {
+		logger.Error(err)
+		return 0, 0
+	}
+	var all []*model.WithdrawFeeSetting
+	err = cur.All(context.Background(), &all)
+	if err != nil {
+		log.Fatal(err)
+	}
+	_ = cur.Close(context.Background())
+
+	for _, one := range all {
+		log.Println("FeeType:", one.FeeType, " - Amount:", one.Amount, " - Fee:", one.Fee, " - Rate:", one.Rate)
+		if one.FeeType == 1 {
+			amount = one.Amount
+			fee = one.Fee
+		}
+	}
+	return amount, fee
+}
+
+func UpdateWithdrawFeeSetting(db *mongo.Database, m model.WithdrawFeeSetting) error {
+	collection := db.Collection("withdrawFeeSetting")
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"feeType": 1}, bson.D{{"$set", bson.D{
+		{"amount", m.Amount},
+		{"fee", m.Fee},
+	}}})
+	if err != nil {
+		logger.Error(err)
+		return err
+	}
+	log.Println("collection.UpdateOne: ", updateResult.MatchedCount)
+
+	if updateResult.MatchedCount != 1 {
+		return errors.New("更新失败")
+	}
 	return nil
 }

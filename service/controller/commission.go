@@ -10,6 +10,7 @@ import (
 	"service/dao"
 	"service/logger"
 	"service/model"
+	"service/util"
 )
 
 // @Route: [POST] /v1/api/promotion/commission/list
@@ -35,7 +36,9 @@ func PromotionCommissionListHandler(c *gin.Context) {
 			CommissionType: item.CommissionType,
 			Level:          item.Level,
 			PeopleNumber:   item.PeopleNumber,
-			Rate:           item.Rate,
+			Rate1:          item.Rate1,
+			Rate2:          item.Rate2,
+			Rate3:          item.Rate3,
 		})
 	}
 
@@ -53,7 +56,9 @@ func PromotionCommissionAddHandler(c *gin.Context) {
 		CommissionType int `json:"commissionType"`
 		Level          int `json:"level"`
 		PeopleNumber   int `json:"peopleNumber"`
-		Rate           int `json:"rate"`
+		Rate1          int `json:"rate1"`
+		Rate2          int `json:"rate2"`
+		Rate3          int `json:"rate3"`
 	}
 
 	var p param
@@ -79,7 +84,9 @@ func PromotionCommissionAddHandler(c *gin.Context) {
 		CommissionType: p.CommissionType,
 		Level:          p.Level,
 		PeopleNumber:   p.PeopleNumber,
-		Rate:           p.Rate,
+		Rate1:          p.Rate1,
+		Rate2:          p.Rate2,
+		Rate3:          p.Rate3,
 	})
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)
@@ -101,7 +108,9 @@ func PromotionCommissionUpdateHandler(c *gin.Context) {
 		CommissionType int    `json:"commissionType"`
 		Level          int    `json:"level"`
 		PeopleNumber   int    `json:"peopleNumber"`
-		Rate           int    `json:"rate"`
+		Rate1          int    `json:"rate1"`
+		Rate2          int    `json:"rate2"`
+		Rate3          int    `json:"rate3"`
 	}
 
 	var p param
@@ -127,7 +136,9 @@ func PromotionCommissionUpdateHandler(c *gin.Context) {
 		CommissionType: p.CommissionType,
 		Level:          p.Level,
 		PeopleNumber:   p.PeopleNumber,
-		Rate:           p.Rate,
+		Rate1:          p.Rate1,
+		Rate2:          p.Rate2,
+		Rate3:          p.Rate3,
 	})
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)
@@ -167,6 +178,74 @@ func PromotionCommissionDeleteHandler(c *gin.Context) {
 	mongoDb := db.Database("tkpayment")
 
 	err = dao.DeleteCommissionItems(mongoDb, p.Id)
+	if err != nil {
+		constant.ErrMsg(c, constant.OperateWrong)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": nil,
+	})
+}
+
+// @Route: [POST] /v1/api/withdraw/fee/setting
+// @Description: 获取提现手续费设置
+func WithdrawFeeSettingHandler(c *gin.Context) {
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	amount, fee := dao.GetWithdrawFeeSetting(mongoDb)
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": constant.Success,
+		"msg":  "ok",
+		"data": gin.H{
+			"amount": util.Int64ConvertString(amount),
+			"fee":    util.Int64ConvertString(fee),
+		},
+	})
+}
+
+// @Route: [POST] /v1/api/withdraw/fee/setting
+// @Description: 设置提现手续费
+func WithdrawFeeSettingUpdateHandler(c *gin.Context) {
+	type param struct {
+		Amount int64 `bson:"amount"` //固定金额
+		Fee    int64 `bson:"fee"`    //手续费
+	}
+
+	var p param
+	var err error
+	if err = c.BindJSON(&p); err != nil {
+		logger.Info("Invalid request param ", err)
+		return
+	}
+	logger.Debug("api param:", p)
+	if config.GetClientId() != ClientId || config.GetClientSecret() != ClientSecret {
+		constant.ErrMsg(c, constant.BadParameter, "client error")
+		return
+	}
+
+	userId := c.Request.Header.Get("id")
+	logger.Debug("userId:", userId)
+
+	db := c.MustGet(constant.ContextMongoPaymentDb).(*mongo.Client)
+	mongoDb := db.Database("tkpayment")
+
+	err = dao.UpdateWithdrawFeeSetting(mongoDb, model.WithdrawFeeSetting{
+		Amount: p.Amount * 100,
+		Fee:    p.Fee * 100,
+	})
 	if err != nil {
 		constant.ErrMsg(c, constant.OperateWrong)
 		return

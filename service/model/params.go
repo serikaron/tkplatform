@@ -65,6 +65,9 @@ type RicePo struct {
 type UserWalletRecordResp struct {
 	Id        string      `json:"id"`
 	UserId    string      `json:"userId"`
+	Phone     string      `json:"phone"`
+	IdNo      string      `json:"idNo"`
+	Name      string      `json:"name"`
 	Type      int         `json:"type"`
 	Member    *MemberPo   `json:"member"`
 	Withdraw  *WithdrawPo `json:"withdraw"`
@@ -77,6 +80,9 @@ type UserWalletRecordResp struct {
 type UserWalletWithdrawRecordResp struct {
 	Id        string `json:"id"`
 	UserId    string `json:"userId"`
+	Phone     string `json:"phone"`
+	IdNo      string `json:"idNo"`
+	Name      string `json:"name"`
 	Comment   string `json:"comment"`
 	Amount    int64  `json:"amount"`
 	Fee       int64  `json:"fee"`
@@ -98,7 +104,9 @@ type CommissionItemResp struct {
 	CommissionType int    `json:"commissionType"`
 	Level          int    `json:"level"`
 	PeopleNumber   int    `json:"peopleNumber"`
-	Rate           int    `json:"rate"`
+	Rate1          int    `json:"rate1"` //1层级分成比例
+	Rate2          int    `json:"rate2"` //2层级分成比例
+	Rate3          int    `json:"rate3"` //3层级分成比例
 }
 
 type MemberItemResp struct {

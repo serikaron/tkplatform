@@ -49,6 +49,9 @@ type Rice struct {
 type UserWalletRecord struct {
 	Id        string    `bson:"_id"`
 	UserId    string    `bson:"userId"`
+	Phone     string    `bson:"phone"`
+	IdNo      string    `bson:"idNo"`
+	Name      string    `bson:"name"`
 	Type      int       `bson:"type"`
 	Member    *Member   `bson:"member"`
 	Withdraw  *Withdraw `bson:"withdraw"`
@@ -69,6 +72,9 @@ const (
 type UserWalletWithdrawRecord struct {
 	Id        string `bson:"_id"`
 	UserId    string `bson:"userId"`
+	Phone     string `bson:"phone"`
+	IdNo      string `bson:"idNo"`
+	Name      string `bson:"name"`
 	Comment   string `bson:"comment"`
 	Amount    int64  `bson:"amount"`
 	Fee       int64  `bson:"fee"`
@@ -99,5 +105,15 @@ type CommissionItem struct {
 	CommissionType int    `bson:"commissionType"`
 	Level          int    `bson:"level"`
 	PeopleNumber   int    `bson:"peopleNumber"`
-	Rate           int    `bson:"rate"`
+	Rate1          int    `bson:"rate1"` //1层级分成比例
+	Rate2          int    `bson:"rate2"` //2层级分成比例
+	Rate3          int    `bson:"rate3"` //3层级分成比例
+}
+
+type WithdrawFeeSetting struct {
+	Id      string `bson:"_id"`
+	FeeType int    `bson:"feeType"` //1-每X元固定金额手续费，2-比例
+	Amount  int64  `bson:"amount"`  //固定金额
+	Fee     int64  `bson:"fee"`     //手续费
+	Rate    int    `bson:"rate"`
 }
