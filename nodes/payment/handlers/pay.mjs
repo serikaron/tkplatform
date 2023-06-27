@@ -10,8 +10,22 @@ import {alipayTrade} from "../alipay.mjs";
 import {itemTypeMember, itemTypeRice, itemTypeSearch} from "../itemType.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 
+const getStoreItem = async (stubFn, userId, itemId) => {
+    const itemRsp = await stubFn(userId)
+    if (itemRsp.isError()) {
+        return null
+    }
+
+    for (const item of itemRsp.data) {
+        if (item.id === itemId) {
+            return item
+        }
+    }
+
+    return null
+}
 const buildMemberItem = async (req) => {
-    const memberItem = await req.context.mongo.getMemberItem(req.body.productId)
+    const memberItem = await getStoreItem(req.context.stubs.apid.getMemberItems, req.headers.id, req.body.productId)
     if (memberItem === null) {
         throw new ItemNotFound()
     }
@@ -32,7 +46,7 @@ const buildMemberItem = async (req) => {
 }
 
 const buildRiceItem = async (req) => {
-    const riceItem = await req.context.mongo.getRiceItem(req.body.productId)
+    const riceItem = await getStoreItem(req.context.stubs.apid.getRiceItems, req.headers.id, req.body.productId)
     if (riceItem === null) {
         throw new ItemNotFound()
     }
