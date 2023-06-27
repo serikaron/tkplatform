@@ -7,7 +7,7 @@ import fs from 'fs/promises'
 import {sign} from "alipay-sdk/lib/util.js";
 import {ItemNotFound} from "../../common/errors/40000-payment.mjs";
 import {alipayTrade} from "../alipay.mjs";
-import {itemTypeMember, itemTypeRice} from "../itemType.mjs";
+import {itemTypeMember, itemTypeRice, itemTypeSearch} from "../itemType.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 
 const buildMemberItem = async (req) => {
@@ -52,10 +52,24 @@ const buildRiceItem = async (req) => {
     }
 }
 
+const buildSearchItem = async (req) => {
+    req.bill = {
+        log: {
+            amount: "0.1",
+            item: {}
+        },
+        bizContent: {
+            total_amount: "0.1",
+            subject: "查号"
+        }
+    }
+}
+
 const buildItem = async (req) => {
     switch (req.body.productType) {
         case itemTypeMember: await buildMemberItem(req); break
         case itemTypeRice: await buildRiceItem(req); break
+        case itemTypeSearch: await buildSearchItem(req); break
         default: throw new InvalidArgument()
     }
 }

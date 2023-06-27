@@ -8,6 +8,7 @@ import {routeGetWalletDetail} from "./handlers/getWalletDetail.mjs";
 import {routeGetWalletOverview} from "./handlers/getWalletOverview.mjs";
 import {routePay} from "./handlers/pay.mjs";
 import {routeAlipayCallback} from "./handlers/alipayCallback.mjs";
+import {routeCheckPayLog} from "./handlers/checkPayLog.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -28,5 +29,6 @@ export function setup(app, {setup, teardown}) {
     setup(routerV2)
     routePay(routerV2)
     routeAlipayCallback(routerV2)
+    routeCheckPayLog(routerV2)
     teardown(routerV2)
 }

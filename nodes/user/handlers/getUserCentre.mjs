@@ -10,9 +10,14 @@ export const routeGetUserCentre = router => {
         delete centre._id
         centre.notice = []
         centre.identified = centre.hasOwnProperty("identification")
-        centre.wallet = {
-            cash: 0,
-            rice: 0
+        const walletRsp = await req.context.stubs.payment.getWallet(req.headers.id)
+        if (walletRsp.isError()) {
+            centre.wallet = {
+                cash: 0,
+                rice: 0
+            }
+        } else {
+            centre.wallet = walletRsp.data
         }
 
         res.tkResponse(TKResponse.Success({data: centre}))

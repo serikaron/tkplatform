@@ -27,6 +27,25 @@ export async function setupStubs(req) {
                     headers: {id: userId}
                 })
             }
+        },
+        payment: {
+            checkPayed: async (logId) => {
+                return await axiosCall({
+                    url: `/v2/log/${logId}/payed`,
+                    baseURL: "http://payment:8080",
+                    method: 'get',
+                })
+            }
+        },
+        apid: {
+            search: async (body) => {
+                return await axiosCall({
+                    url: '/v1/api/check',
+                    baseURL: "http://apid:9010",
+                    method: 'post',
+                    data: body
+                })
+            }
         }
     }
 }

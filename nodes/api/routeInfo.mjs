@@ -230,6 +230,12 @@ const routeInfo = [
         service: {baseURL: "http://apid:9010", url: '/v1/api/check'}
     },
     {
+        url: "/v2/search/external/account",
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://site:8080"}
+    },
+    {
         url: "/v1/search/recently",
         method: "GET",
         needAuth: true,

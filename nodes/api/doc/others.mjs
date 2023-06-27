@@ -14,6 +14,9 @@
  *             properties:
  *               wang_wang_account:
  *                 type: string
+ *               orderId:
+ *                 type: string
+ *                 example: pay接口返回
  *     responses:
  *       200:
  *         content:

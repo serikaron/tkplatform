@@ -1,8 +1,8 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {completedStatus, isPendingStatus} from "../logStatus.mjs";
-import {itemTypeMember, itemTypeRice} from "../itemType.mjs";
+import {completedStatus, isPendingStatus, payedStatus} from "../logStatus.mjs";
+import {itemTypeMember, itemTypeRice, itemTypeSearch} from "../itemType.mjs";
 import {AlipayCallback} from "../../common/errors/40000-payment.mjs";
 
 const memberPayed = async (req, log) => {
@@ -16,6 +16,10 @@ const memberPayed = async (req, log) => {
 const ricePayed = async (req, log) => {
     await req.context.mongo.addRice(log.userId, log.item.rice)
     await req.context.mongo.updateLogStatus(log._id, completedStatus)
+}
+
+const searchPayed = async (req, log) => {
+    await req.context.mongo.updateLogStatus(log._id, payedStatus)
 }
 
 const handleCallback = async (req) => {
@@ -35,6 +39,7 @@ const handleCallback = async (req) => {
     switch (log.itemType) {
         case itemTypeMember: await memberPayed(req, log); break
         case itemTypeRice: await ricePayed(req, log); break
+        case itemTypeSearch: await searchPayed(req, log); break
         default:
             throw new AlipayCallback(`invalid itemType:${log.itemType}, orderId:${orderId}`)
     }
