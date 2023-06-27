@@ -434,7 +434,8 @@ describe("test user service", () => {
                             notice: [],
                             wallet: {
                                 cash: 0,
-                                rice: 0
+                                rice: 0,
+                                invitePoint: 0
                             }
                         }
                     )
