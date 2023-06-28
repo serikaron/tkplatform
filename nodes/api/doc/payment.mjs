@@ -317,7 +317,7 @@
  *             properties:
  *               productType:
  *                 type: number
- *                 example: 1-会员充值，2-米粒购买
+ *                 example: 0-支付测试，1-会员充值，2-米粒购买
  *               productId:
  *                 type: string
  *     responses:

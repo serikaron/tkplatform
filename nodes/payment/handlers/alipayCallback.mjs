@@ -2,7 +2,7 @@
 
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {completedStatus, isPendingStatus, payedStatus} from "../logStatus.mjs";
-import {itemTypeMember, itemTypeRice, itemTypeSearch} from "../itemType.mjs";
+import {itemTypeMember, itemTypeRice, itemTypeSearch, itemTypeTest} from "../itemType.mjs";
 import {AlipayCallback} from "../../common/errors/40000-payment.mjs";
 import {UserNotExists} from "../../common/errors/10000-user.mjs";
 import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
@@ -123,6 +123,10 @@ const searchPayed = async (req, log) => {
     await req.context.mongo.updateLogStatus(log._id, payedStatus)
 }
 
+const testPayed = async (req, log) => {
+    await req.context.mongo.updateLogStatus(log._id, payedStatus)
+}
+
 const handleCallback = async (req) => {
     console.log(`alipay callback: ${JSON.stringify(req.body)}`)
     const orderId = req.body.out_trade_no
@@ -138,6 +142,7 @@ const handleCallback = async (req) => {
     }
 
     switch (log.itemType) {
+        case itemTypeTest: await testPayed(req, log); break
         case itemTypeMember: await memberPayed(req, log); break
         case itemTypeRice: await ricePayed(req, log); break
         case itemTypeSearch: await searchPayed(req, log); break

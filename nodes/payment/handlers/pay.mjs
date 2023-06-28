@@ -7,9 +7,21 @@ import fs from 'fs/promises'
 import {sign} from "alipay-sdk/lib/util.js";
 import {ItemNotFound} from "../../common/errors/40000-payment.mjs";
 import {alipayTrade} from "../alipay.mjs";
-import {itemTypeMember, itemTypeRice, itemTypeSearch} from "../itemType.mjs";
+import {itemTypeMember, itemTypeRice, itemTypeSearch, itemTypeTest} from "../itemType.mjs";
 import {makeMiddleware} from "../../common/flow.mjs";
 
+const buildTestItem = (req) => {
+    req.bill = {
+        log: {
+            amount: "0.01",
+            item: {}
+        },
+        bizContent: {
+            total_amount: "0.01",
+            subject: "测试支付"
+        }
+    }
+}
 const getStoreItem = async (stubFn, userId, itemId) => {
     const itemRsp = await stubFn(userId)
     if (itemRsp.isError()) {
@@ -81,6 +93,7 @@ const buildSearchItem = async (req) => {
 
 const buildItem = async (req) => {
     switch (req.body.productType) {
+        case itemTypeTest: buildTestItem(req); break
         case itemTypeMember: await buildMemberItem(req); break
         case itemTypeRice: await buildRiceItem(req); break
         case itemTypeSearch: await buildSearchItem(req); break
