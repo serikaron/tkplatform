@@ -2,17 +2,28 @@
 
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {completedStatus, isPendingStatus, payedStatus} from "../logStatus.mjs";
-import {itemTypeMember, itemTypeRice, itemTypeSearch, itemTypeTest} from "../itemType.mjs";
+import {
+    itemTypeMember,
+    itemTypeRice,
+    itemTypeSearch,
+    itemTypeTest,
+    recordTypeMember,
+    recordTypeRice
+} from "../itemType.mjs";
 import {AlipayCallback} from "../../common/errors/40000-payment.mjs";
 import {UserNotExists} from "../../common/errors/10000-user.mjs";
 import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
 
 const getRate = (setting, level) => {
     switch (level) {
-        case 1: return setting.rate1
-        case 2: return setting.rate2
-        case 3: return setting.rate3
-        default: return null
+        case 1:
+            return setting.rate1
+        case 2:
+            return setting.rate2
+        case 3:
+            return setting.rate3
+        default:
+            return null
     }
 }
 
@@ -47,11 +58,15 @@ const getPlusRate = async (req, settings, level, userId) => {
 
     const upLine = upLineRsp.data
     const downLineCount = upLine.downLines.length
-    const l = settings.filter( x => x.commissionType === 2)
-        .filter( x => x.peopleNumber <= downLineCount)
+    const l = settings.filter(x => x.commissionType === 2)
+        .filter(x => x.peopleNumber <= downLineCount)
         .sort((a, b) => {
-            if (a.peopleNumber > b.peopleNumber) { return -1 }
-            if (a.peopleNumber < b.peopleNumber) { return 1 }
+            if (a.peopleNumber > b.peopleNumber) {
+                return -1
+            }
+            if (a.peopleNumber < b.peopleNumber) {
+                return 1
+            }
             return 0
         })
 
@@ -89,7 +104,7 @@ const updateCommission = async (req, price, userId, level, settings) => {
     await req.context.mongo.addCash(user.upLine, commission)
 
     if (level !== 3) {
-        await updateCommission(req, price, user.upLine, level+1, settings)
+        await updateCommission(req, price, user.upLine, level + 1, settings)
     }
 }
 
@@ -104,6 +119,51 @@ const handleCommission = async (req, price, userId) => {
     await updateCommission(req, price, userId, 1, settingsRsp.data)
 }
 
+const buildWalletRecord = async (req, log, recordSubItemBuilder) => {
+    const userRsp = await req.context.stubs.user.getUser(log.userId)
+    if (userRsp.isError()) {
+        throw new InternalError()
+    }
+
+    const user = userRsp.data
+    const record = {
+        userId: log.userId.toString(),
+        phone: user.phone,
+        idNo: user.identity,
+        name: user.name,
+    }
+
+    await recordSubItemBuilder(record, req, log)
+
+    return record
+}
+
+const memberRecordBuilder = async (record, req, log) => {
+    record.type = recordTypeMember
+    const priceNum = isNaN(Number(log.amount)) ? 0 : Number(log.amount) * 100
+    record.member = {
+        title: log.item.title,
+        price: priceNum,
+        remainDays: log.days,
+    }
+}
+
+const riceRecordBuilder = async (record, req, log) => {
+    record.type = recordTypeRice
+    const priceNum = isNaN(Number(log.amount)) ? 0 : Number(log.amount) * 100
+    record.rice = {
+        title: log.item.title,
+        price: priceNum,
+        remainDays: log.days,
+    }
+}
+
+const addWalletRecord = async (req, log, builder) => {
+    const record = await buildWalletRecord(req, log, builder)
+    console.log(`addMemberRecord: ${JSON.stringify(record)}`)
+    await req.context.mongo.addWalletRecord(record)
+}
+
 const memberPayed = async (req, log) => {
     const rsp = await req.context.stubs.user.addMember(log.userId, log.item.days)
     if (rsp.isError()) {
@@ -111,12 +171,14 @@ const memberPayed = async (req, log) => {
     }
     await handleCommission(req, log.amount, log.userId)
     await req.context.mongo.updateLogStatus(log._id, completedStatus)
+    await addWalletRecord(req, log, memberRecordBuilder)
 }
 
 const ricePayed = async (req, log) => {
     await req.context.mongo.addRice(log.userId, log.item.rice)
     await handleCommission(req, log.amount, log.userId)
     await req.context.mongo.updateLogStatus(log._id, completedStatus)
+    await addWalletRecord(req, log, riceRecordBuilder)
 }
 
 const searchPayed = async (req, log) => {
@@ -142,10 +204,18 @@ const handleCallback = async (req) => {
     }
 
     switch (log.itemType) {
-        case itemTypeTest: await testPayed(req, log); break
-        case itemTypeMember: await memberPayed(req, log); break
-        case itemTypeRice: await ricePayed(req, log); break
-        case itemTypeSearch: await searchPayed(req, log); break
+        case itemTypeTest:
+            await testPayed(req, log);
+            break
+        case itemTypeMember:
+            await memberPayed(req, log);
+            break
+        case itemTypeRice:
+            await ricePayed(req, log);
+            break
+        case itemTypeSearch:
+            await searchPayed(req, log);
+            break
         default:
             throw new AlipayCallback(`invalid itemType:${log.itemType}, orderId:${orderId}`)
     }

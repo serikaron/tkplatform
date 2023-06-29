@@ -18,6 +18,7 @@ export async function setupMongo(req) {
         riceItems: payment.db.collection("riceItems"),
         wallets: payment.db.collection("wallets"),
         payLogs: payment.db.collection("payLogs"),
+        walletRecords: payment.db.collection("walletRecords"),
     }
     req.context.mongo = {
         client: payment.client, db: payment.db, collection,
@@ -71,6 +72,9 @@ export async function setupMongo(req) {
                 {$set: {status: status}}
             )
         },
+        addWalletRecord: async (record) => {
+            await collection.walletRecords.insertOne(record)
+        }
     }
 }
 

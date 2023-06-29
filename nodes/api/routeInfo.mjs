@@ -202,7 +202,7 @@ const routeInfo = [
         url: "/v1/wallet/detail",
         method: "GET",
         needAuth: true,
-        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/detail"}
+        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/records"}
     },
     {
         url: "/v1/wallet/overview",

@@ -46,8 +46,9 @@ const buildMemberItem = async (req) => {
         log: {
             amount: memberItem.price,
             item: {
-                id: memberItem._id,
+                id: memberItem.id,
                 days: memberItem.days,
+                title: memberItem.name,
             }
         },
         bizContent: {
@@ -67,8 +68,9 @@ const buildRiceItem = async (req) => {
         log: {
             amount: riceItem.price,
             item: {
-                id: riceItem._id,
+                id: riceItem.id,
                 rice: riceItem.rice,
+                title: riceItem.name
             }
         },
         bizContent: {

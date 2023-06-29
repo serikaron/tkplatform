@@ -54,6 +54,18 @@ export function setupStub(req) {
                     method: 'GET',
                 })
             },
+            recharge: async (userId, rechargeType, productId) => {
+                return await axiosCall({
+                    url: '/v1/api/user/wallet/recharge',
+                    baseURL: 'http://apid:9010',
+                    method: 'POST',
+                    data: {
+                        recharge_type: rechargeType,
+                        product_id: productId,
+                    },
+                    headers: {id: userId}
+                })
+            }
         }
     }
 }

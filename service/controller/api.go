@@ -535,10 +535,10 @@ func UserWalletRecordsHandler(c *gin.Context) {
 		}
 		if record.Rice != nil {
 			item.Rice = &model.RicePo{
-				Title:      record.Member.Title,
-				Price:      record.Member.Price,
-				RemainDays: record.Member.RemainDays,
-				CreatedAt:  record.Member.CreatedAt,
+				Title:      record.Rice.Title,
+				Price:      record.Rice.Price,
+				RemainDays: record.Rice.RemainDays,
+				CreatedAt:  record.Rice.CreatedAt,
 			}
 		}
 

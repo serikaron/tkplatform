@@ -7,7 +7,7 @@ export const isPendingStatus = (status) => {
 
 export const failedStatus= 1
 export const isFailedStatus = (status) => {
-    return status === failedStatus1
+    return status === failedStatus
 }
 
 export const payedStatus= 2
