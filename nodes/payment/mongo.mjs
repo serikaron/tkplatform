@@ -77,7 +77,7 @@ export async function setupMongo(req) {
         },
         getWalletRecordWithType: async (userId, type) => {
             return await collection.walletRecords.find({
-                userId: new ObjectId(userId),
+                userId: userId,
                 type: type
             })
                 .toArray()

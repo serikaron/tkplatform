@@ -5,6 +5,7 @@ import {recordTypeDownLine, recordTypeMember, recordTypeRice, recordTypeWithdraw
 
 const sumWallet = async (req, type, fn) => {
     const records = await req.context.mongo.getWalletRecordWithType(req.headers.id, type)
+    console.log(`records: ${JSON.stringify(records)}`)
     return records.reduce((prev, curr) => {
         return prev + fn(curr)
     }, 0)
