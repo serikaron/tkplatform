@@ -74,6 +74,13 @@ export async function setupMongo(req) {
         },
         addWalletRecord: async (record) => {
             await collection.walletRecords.insertOne(record)
+        },
+        getWalletRecordWithType: async (userId, type) => {
+            return await collection.walletRecords.find({
+                userId: new ObjectId(userId),
+                type: type
+            })
+                .toArray()
         }
     }
 }

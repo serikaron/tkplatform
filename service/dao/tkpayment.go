@@ -17,7 +17,14 @@ import (
 func GetUserWallet(db *mongo.Database, userId string) *model.UserWallet {
 	var wallet model.UserWallet
 	collection := db.Collection("wallets")
-	err := collection.FindOne(context.Background(), bson.M{"userId": userId}).Decode(&wallet)
+
+	objID, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+
+	err = collection.FindOne(context.Background(), bson.M{"userId": objID}).Decode(&wallet)
 	if err != nil {
 		logger.Error(err)
 		return nil
@@ -28,7 +35,14 @@ func GetUserWallet(db *mongo.Database, userId string) *model.UserWallet {
 
 func UserWalletRiceRecharge(db *mongo.Database, userId string, rice int64) error {
 	collection := db.Collection("wallets")
-	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"userId": userId}, bson.D{{"$set", bson.D{{"rice", rice}}}})
+
+	objID, err := primitive.ObjectIDFromHex(userId)
+	if err != nil {
+		logger.Error(err)
+		return nil
+	}
+
+	updateResult, err := collection.UpdateOne(context.Background(), bson.M{"userId": objID}, bson.D{{"$set", bson.D{{"rice", rice}}}})
 	if err != nil {
 		logger.Error(err)
 		return nil
@@ -61,15 +75,15 @@ func GetUserWalletRecords(db *mongo.Database, userId, phone string, offset, limi
 		findOptions.SetLimit(limit)
 		findOptions.SetSkip(offset)
 	}
-	var m bson.M
+	m := bson.M{}
 	if typ > 0 && typ <= 5 {
-		m = bson.M{"type": typ}
+		m["type"] = typ
 	}
 	if userId != "" {
-		m = bson.M{"userId": userId}
+		m["userId"] = userId
 	}
 	if phone != "" {
-		m = bson.M{"phone": phone}
+		m["phone"] = phone
 	}
 	cur, err := collection.Find(context.Background(), m, &findOptions)
 	if err != nil {
@@ -139,15 +153,15 @@ func AddUserWalletRecord(db *mongo.Database, userId, phone, name, idNo string, t
 }
 
 func CountUserWalletRecords(db *mongo.Database, userId, phone string, typ int) int64 {
-	var m bson.M
+	m := bson.M{}
 	if typ > 0 && typ <= 5 {
-		m = bson.M{"type": typ}
+		m["type"] = typ
 	}
 	if userId != "" {
-		m = bson.M{"userId": userId}
+		m["userId"] = userId
 	}
 	if phone != "" {
-		m = bson.M{"phone": phone}
+		m["phone"] = phone
 	}
 	collection := db.Collection("walletRecords")
 	count, err := collection.CountDocuments(context.Background(), m)
