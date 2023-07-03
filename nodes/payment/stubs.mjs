@@ -18,8 +18,7 @@ export function setupStub(req) {
                     url: "/v1/user/member",
                     baseURL: "http://user:8080",
                     method: 'post',
-                    data: {days},
-                    headers: {id: userId},
+                    data: {days, userId},
                 })
             },
             getUser: async (userId) => {

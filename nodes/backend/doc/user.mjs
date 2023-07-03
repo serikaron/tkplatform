@@ -712,3 +712,21 @@
  *                       example: 0-超级权限，1-用户权限，2-财务权限，3-站点权限，4-系统权限
  *
  */
+
+/**
+ * @swagger
+ * /backend/v2/user/member(添加会员):
+ *   post:
+ *     tags: ["user(用户相关)", "v2"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               days:
+ *                 type: number
+ *
+ */

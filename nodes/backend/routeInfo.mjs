@@ -377,11 +377,14 @@ const routeInfo = [
         url: '/backend/v2/wallet/cash',
         method: "POST",
         needAuth: true,
-        service: {
-            baseURL: "http://payment:8080",
-            url: '/v1/wallet/cash',
-        }
+        service: {baseURL: "http://payment:8080", url: '/v1/wallet/cash'}
     },
+    {
+        url: '/backend/v2/user/member',
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://user:8080", url: '/v1/user/member'}
+    }
 ]
 
 export default routeInfo
