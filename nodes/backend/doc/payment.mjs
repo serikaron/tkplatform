@@ -492,3 +492,20 @@
  *                 fee:
  *                   type: string
  */
+
+/**
+ * @swagger
+ * /backend/v2/wallet/cash(添加用户余额):
+ *   post:
+ *     tags: ["商城", "v2"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               cash:
+ *                 type: number
+ */

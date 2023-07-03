@@ -372,7 +372,16 @@ const routeInfo = [
                 return `/v1/backend/missing/site/${req.params.siteId}`
             }
         }
-    }
+    },
+    {
+        url: '/backend/v2/wallet/cash',
+        method: "POST",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: '/v1/wallet/cash',
+        }
+    },
 ]
 
 export default routeInfo

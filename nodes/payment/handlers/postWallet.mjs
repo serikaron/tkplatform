@@ -9,4 +9,10 @@ export const routePostWallet = router => {
         res.tkResponse(TKResponse.Success())
         next()
     })
+
+    router.post("/wallet/cash", async (req, res, next) => {
+        await req.context.mongo.addCash(req.body.userId, req.body.cash)
+        res.tkResponse(TKResponse.Success())
+        next()
+    })
 }
