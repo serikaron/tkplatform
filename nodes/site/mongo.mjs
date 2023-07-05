@@ -30,6 +30,7 @@ export async function setupMongo(req) {
                 filter.name = {$regex: regex}
             }
             return await collection.sites.find(filter)
+                .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
@@ -45,6 +46,7 @@ export async function setupMongo(req) {
                 )
             const l = await collection.sites
                 .find({name: {$regex: regex}})
+                .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
@@ -52,6 +54,7 @@ export async function setupMongo(req) {
         },
         getSitesForBackend: async (offset, limit) => {
             return await collection.sites.find()
+                .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()

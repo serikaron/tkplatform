@@ -5,7 +5,7 @@ import crypto from "crypto";
 
 export function sign(url, body, timestamp, secretKey) {
     const hmac = crypto.createHmac('sha256', secretKey)
-    const source = url + serialize(body) + `${timestamp}`
+    const source = decodeURI(url) + serialize(body) + `${timestamp}`
     hmac.update(source)
     const signature = hmac.digest('hex');
     return {source, signature}
