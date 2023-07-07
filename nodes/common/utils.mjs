@@ -133,3 +133,11 @@ export const base64Encode = (str) => {
 export const base64Decode = (str) => {
     return new Buffer(str, 'base64').toString()
 }
+
+export const isTestEnv = () => {
+    return process.env.hasOwnProperty("TEST_ENV") && process.env.TEST_ENV === "1"
+}
+
+export const isReleaseEnv = () => {
+    return !isTestEnv()
+}

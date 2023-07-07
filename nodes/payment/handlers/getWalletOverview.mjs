@@ -39,13 +39,22 @@ const sumRecharge = async (req) => {
 
 export const routeGetWalletOverview = router => {
     router.get('/wallet/overview', async (req, res, next) => {
-        res.tkResponse(TKResponse.Success({
-            data: {
-                income: await sumIncome(req),
-                withdraw: await sumWithdraw(req),
-                recharge: await sumRecharge(req)
-            }
-        }))
+        const wallet = await req.context.mongo.getWallet(req.headers.id)
+        const data = {
+            income: 0,
+            withdraw: 0,
+            recharge: 0,
+            rechargeCount: 0,
+        }
+        Object.assign(data, wallet === null ? {} : wallet.accumulated)
+        res.tkResponse(TKResponse.Success({data}))
+        // res.tkResponse(TKResponse.Success({
+        //     data: {
+        //         income: await sumIncome(req),
+        //         withdraw: await sumWithdraw(req),
+        //         recharge: await sumRecharge(req)
+        //     }
+        // }))
         next()
     })
 }

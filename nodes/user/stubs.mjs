@@ -67,14 +67,6 @@ export function setupStub(req) {
             }
         },
         payment: {
-            countRecharge: async (userId) => {
-                return await axiosCall({
-                    url: "/v1/recharge/count",
-                    baseURL: "http://payment:8080",
-                    method: "GET",
-                    headers: {id: userId}
-                })
-            },
             updateWallet: async (userId, update) => {
                 return await axiosCall({
                     url: "/v1/wallet",
@@ -87,6 +79,14 @@ export function setupStub(req) {
             getWallet: async (userId) => {
                 return await axiosCall({
                     url: '/v1/wallet',
+                    baseURL: "http://payment:8080",
+                    method: 'GET',
+                    headers: {id: userId},
+                })
+            },
+            getWalletOverview: async (userId) => {
+                return await axiosCall({
+                    url: "/v1/wallet/overview",
                     baseURL: "http://payment:8080",
                     method: 'GET',
                     headers: {id: userId},

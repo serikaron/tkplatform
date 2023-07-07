@@ -19,6 +19,7 @@ export async function setupMongo(req) {
         wallets: payment.db.collection("wallets"),
         payLogs: payment.db.collection("payLogs"),
         walletRecords: payment.db.collection("walletRecords"),
+        paymentRecords: payment.db.collection("paymentRecords"),
     }
     req.context.mongo = {
         client: payment.client, db: payment.db, collection,
@@ -52,6 +53,12 @@ export async function setupMongo(req) {
         addCash: async (userId, cash) => {
             await updateWallet(collection.wallets, userId, {cash})
         },
+        incRecharge: async (userId, amount) => {
+            await updateWallet(collection.wallets, userId, {
+                "accumulated.rechargeCount": 1,
+                "accumulated.recharge": amount
+            })
+        },
         addPayLog: async (userId, amount, itemType, item) => {
             const r = await collection.payLogs
                 .insertOne({
@@ -81,6 +88,9 @@ export async function setupMongo(req) {
                 type: type
             })
                 .toArray()
+        },
+        addPaymentRecord: async (record) => {
+            await collection.paymentRecords.insertOne(record)
         }
     }
 }
@@ -99,20 +109,20 @@ async function updateWallet(wallets, userId, update) {
 }
 
 // async function payWithRices(client, collection, userId, price) {
-    // const session = client.startSession()
-    // session.startTransaction()
-    // try {
-    //     const wallet = await getWallet(collection, userId)
-    //     if ()
-    //     await collection.users
-    //         .updateOne(inviter.filter, inviter.update)
-    //     await session.commitTransaction()
-    //     return result.insertedId
-    // } catch (error) {
-    //     await session.abortTransaction()
-    //     handlerError(error)
-    //     return null
-    // } finally {
-    //     await session.endSession()
-    // }
+// const session = client.startSession()
+// session.startTransaction()
+// try {
+//     const wallet = await getWallet(collection, userId)
+//     if ()
+//     await collection.users
+//         .updateOne(inviter.filter, inviter.update)
+//     await session.commitTransaction()
+//     return result.insertedId
+// } catch (error) {
+//     await session.abortTransaction()
+//     handlerError(error)
+//     return null
+// } finally {
+//     await session.endSession()
+// }
 // }

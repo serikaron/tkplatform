@@ -46,8 +46,8 @@ const getSites = async (req) => {
 }
 
 const countRecharge = async req => {
-    const r = await req.context.stubs.payment.countRecharge(req.usingId)
-    req.overview.rechargeCount = r.isError() ? 0 : r.data.count
+    const r = await req.context.stubs.payment.getWalletOverview(req.usingId)
+    req.overview.rechargeCount = r.isError() ? 0 : r.data.rechargeCount
 }
 
 const response = (req, res) => {

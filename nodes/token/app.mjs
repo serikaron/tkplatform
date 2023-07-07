@@ -2,6 +2,9 @@
 
 import express from "express"
 import {generate, refresh, verify} from "./logic.mjs";
+import dotenv from "dotenv";
+
+dotenv.config()
 
 const app = express()
 const port = 8080

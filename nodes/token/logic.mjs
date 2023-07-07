@@ -3,6 +3,7 @@
 import jwt from 'jsonwebtoken'
 import {v4 as uuidv4} from 'uuid'
 import {delToken, getToken, setToken} from "./redis.mjs";
+import {isReleaseEnv} from "../common/utils.mjs";
 
 const secretKey = process.env.SECRET_KEY
 
@@ -29,14 +30,17 @@ export async function generate(payload) {
 
 export async function verify(accessToken) {
     try {
+        console.log(`verify, token: ${accessToken}`)
         const payload = jwt.verify(accessToken, secretKey, {
             ignoreExpiration: true,
             algorithm: "HS256"
         })
 
-        const serverToken = await getToken(payload.id)
-        if (serverToken === "" || serverToken === null) {
-            return {code: -1, msg: "refresh token not found"}
+        if (isReleaseEnv()) {
+            const serverToken = await getToken(payload.id)
+            if (serverToken === "" || serverToken === null) {
+                return {code: -1, msg: "refresh token not found"}
+            }
         }
 
         return {

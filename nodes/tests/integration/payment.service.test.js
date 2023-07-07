@@ -67,3 +67,9 @@ test("member items", async () => {
     await check("/v1/store/member/items")
     await check("/v1/store/rice/items")
 })
+
+describe("购买会员", () => {
+    test("支付", async () => {
+
+    })
+})

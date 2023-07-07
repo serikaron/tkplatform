@@ -2,17 +2,11 @@
 
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {completedStatus, isPendingStatus, payedStatus} from "../logStatus.mjs";
-import {
-    itemTypeMember,
-    itemTypeRice,
-    itemTypeSearch,
-    itemTypeTest,
-    recordTypeMember,
-    recordTypeRice
-} from "../itemType.mjs";
+import {itemTypeMember, itemTypeRice, itemTypeSearch, itemTypeTest} from "../itemType.mjs";
 import {AlipayCallback} from "../../common/errors/40000-payment.mjs";
 import {UserNotExists} from "../../common/errors/10000-user.mjs";
-import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {InternalError} from "../../common/errors/00000-basic.mjs";
+import {addWalletRecord, memberRecordBuilder, riceRecordBuilder} from "../walletRecords.mjs";
 
 const getRate = (setting, level) => {
     switch (level) {
@@ -119,51 +113,6 @@ const handleCommission = async (req, price, userId) => {
     await updateCommission(req, price, userId, 1, settingsRsp.data)
 }
 
-const buildWalletRecord = async (req, log, recordSubItemBuilder) => {
-    const userRsp = await req.context.stubs.user.getUser(log.userId)
-    if (userRsp.isError()) {
-        throw new InternalError()
-    }
-
-    const user = userRsp.data
-    const record = {
-        userId: log.userId.toString(),
-        phone: user.phone,
-        idNo: user.identity,
-        name: user.name,
-    }
-
-    await recordSubItemBuilder(record, req, log)
-
-    return record
-}
-
-const memberRecordBuilder = async (record, req, log) => {
-    record.type = recordTypeMember
-    const priceNum = isNaN(Number(log.amount)) ? 0 : Number(log.amount) * 100
-    record.member = {
-        title: log.item.title,
-        price: priceNum,
-        remainDays: log.days,
-    }
-}
-
-const riceRecordBuilder = async (record, req, log) => {
-    record.type = recordTypeRice
-    const priceNum = isNaN(Number(log.amount)) ? 0 : Number(log.amount) * 100
-    record.rice = {
-        title: log.item.title,
-        price: priceNum,
-        remainDays: log.days,
-    }
-}
-
-const addWalletRecord = async (req, log, builder) => {
-    const record = await buildWalletRecord(req, log, builder)
-    console.log(`addMemberRecord: ${JSON.stringify(record)}`)
-    await req.context.mongo.addWalletRecord(record)
-}
-
 const memberPayed = async (req, log) => {
     const rsp = await req.context.stubs.user.addMember(log.userId, log.item.days)
     if (rsp.isError()) {
@@ -172,6 +121,7 @@ const memberPayed = async (req, log) => {
     await handleCommission(req, log.amount, log.userId)
     await req.context.mongo.updateLogStatus(log._id, completedStatus)
     await addWalletRecord(req, log, memberRecordBuilder)
+    await req.context.mongo.incRecharge(log.userId, Number(log.amount) * 100)
 }
 
 const ricePayed = async (req, log) => {
@@ -179,6 +129,7 @@ const ricePayed = async (req, log) => {
     await handleCommission(req, log.amount, log.userId)
     await req.context.mongo.updateLogStatus(log._id, completedStatus)
     await addWalletRecord(req, log, riceRecordBuilder)
+    await req.context.mongo.incRecharge(log.userId, Number(log.amount) * 100)
 }
 
 const searchPayed = async (req, log) => {

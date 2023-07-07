@@ -5,10 +5,11 @@ import {TKResponse} from "../../common/TKResponse.mjs";
 import {sign} from "./sign.mjs";
 import * as dotenv from 'dotenv'
 import {simpleVerification} from "./verification.mjs";
+import {token} from "./token.mjs";
 
 dotenv.config()
 
-const baseURL = "http://localhost:9000/"
+export const baseURL = "http://localhost:9000/"
 
 function url(path, query) {
     if (query === undefined) {
@@ -91,4 +92,26 @@ export async function requireAuthenticatedClient(phone) {
     authenticatedClient.accessToken = registerResponse.data.accessToken
     authenticatedClient.refreshToken = registerResponse.data.refreshToken
     return authenticatedClient
+}
+
+class ApiError extends Error {
+    constructor(tkResponse) {
+        super();
+        this._r = tkResponse
+    }
+
+    toString() {
+        return `{status:${this._r.status}, code:${this._r.code}, msg:${this._r.msg}}`
+    }
+}
+export async function call2({path, query, body, authentication, method}) {
+    if (authentication === undefined || authentication === null) {
+        authentication = token.default
+    }
+    const r = await call({path, query, body, authentication, method})
+    if (r.isError()) {
+        console.log(r.toString())
+        throw new ApiError(r)
+    }
+    return r.data
 }
