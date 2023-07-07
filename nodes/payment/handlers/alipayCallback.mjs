@@ -93,7 +93,7 @@ const updateCommission = async (req, price, userId, level, settings) => {
         throw new InternalError()
     }
 
-    const commission = Math.floor(priceNum * rate) / 100
+    const commission = Math.floor(priceNum * rate)
     console.log(`updateCommission, price:${price}, baseRate:${baseRate}, plusRate:${plusRate}, commission:${commission}`)
     await req.context.mongo.addCash(user.upLine, commission)
 

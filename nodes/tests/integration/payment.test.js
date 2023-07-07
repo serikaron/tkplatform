@@ -2,8 +2,9 @@
 
 import {token} from "./token.mjs";
 import {call2} from "./api.mjs";
-import {getMemberItems, getWalletOverview, payMember} from "./payment.mjs";
+import {getMemberItems, getWallet, getWalletOverview, payMember} from "./payment.mjs";
 import {getOverview} from "./user.mjs";
+import {getCommissionConfig} from "./backend.mjs";
 
 describe("购买会员", () => {
     const box = {}
@@ -22,6 +23,14 @@ describe("购买会员", () => {
         box.walletOverview = {
             recharge: r.recharge,
             rechargeCount: r.rechargeCount
+        }
+    })
+
+    test("查询上线", async () => {
+        box.cash = []
+        for (const i in token.upLines) {
+            const r = await getWallet(token.upLines[i])
+            box.cash.push(r.hasOwnProperty("cash") ? r.cash : 0)
         }
     })
 
@@ -46,5 +55,22 @@ describe("购买会员", () => {
         const r = await getWalletOverview()
         expect(r.recharge).toBe(box.walletOverview.recharge + Number(box.item.price) * 100)
         expect(r.rechargeCount).toBe(box.walletOverview.rechargeCount + 1)
+    })
+
+    test("检查上线分成", async () => {
+        // 只检查三级分成，按人数的加成没检查
+        const config = await getCommissionConfig()
+        for (const c of config) {
+            if (c.commissionType === 1) {
+                box.rateList = [c.rate1, c.rate2, c.rate3]
+                break
+            }
+        }
+
+        for (const i in token.upLines) {
+            const r = await getWallet(token.upLines[i])
+            const commission = Number(box.item.price) * box.rateList[i]
+            expect(r.cash).toBe(box.cash[i] + commission)
+        }
     })
 })

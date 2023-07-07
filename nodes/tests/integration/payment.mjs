@@ -36,3 +36,11 @@ export const getWalletOverview = async () => {
         path: "/v1/wallet/overview"
     })
 }
+
+export const getWallet = async (authentication) => {
+    return await call2({
+        method: "GET",
+        path: '/v1/wallet',
+        authentication
+    })
+}

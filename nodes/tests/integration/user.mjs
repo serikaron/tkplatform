@@ -3,7 +3,7 @@
 import {call2} from "./api.mjs";
 
 export const register = async (phone, inviter) => {
-    const r = await call2({
+    const config = {
         path: "/v1/user/register",
         method: "POST",
         body: {
@@ -11,7 +11,11 @@ export const register = async (phone, inviter) => {
             password: "123456",
             smsCode: "2065"
         },
-    })
+    }
+    if (inviter !== undefined) {
+        config.body.inviter = {id: inviter}
+    }
+    const r = await call2(config)
     return r.accessToken
 }
 
@@ -36,4 +40,12 @@ export const getOverview = async (userId) => {
         config.query = {id: userId}
     }
     return await call2(config)
+}
+
+export const getUserCentre = async (authentication) => {
+    return await call2({
+        method: "GET",
+        path: "/v1/user/centre",
+        authentication
+    })
 }
