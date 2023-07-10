@@ -7,6 +7,7 @@ import {AlipayCallback} from "../../common/errors/40000-payment.mjs";
 import {UserNotExists} from "../../common/errors/10000-user.mjs";
 import {InternalError} from "../../common/errors/00000-basic.mjs";
 import {addWalletRecord, memberRecordBuilder, riceRecordBuilder} from "../walletRecords.mjs";
+import {addPaymentRecordCommission, addPaymentRecordMember} from "../backendRecords.mjs";
 
 const getRate = (setting, level) => {
     switch (level) {
@@ -71,7 +72,7 @@ const getPlusRate = async (req, settings, level, userId) => {
     const rate = getRate(l[0], level)
     return rate === null ? 0 : rate
 }
-const updateCommission = async (req, price, userId, level, settings) => {
+const updateCommission = async (req, price, userId, level, settings, contributor) => {
     const userRsp = await req.context.stubs.user.getUser(userId)
     if (userRsp.isError()) {
         throw new UserNotExists()
@@ -94,11 +95,12 @@ const updateCommission = async (req, price, userId, level, settings) => {
     }
 
     const commission = Math.floor(priceNum * rate)
-    console.log(`updateCommission, price:${price}, baseRate:${baseRate}, plusRate:${plusRate}, commission:${commission}`)
+    // console.log(`updateCommission, price:${price}, baseRate:${baseRate}, plusRate:${plusRate}, commission:${commission}`)
     await req.context.mongo.addCash(user.upLine, commission)
+    await addPaymentRecordCommission(req.context, user.upLine, commission, level, contributor)
 
     if (level !== 3) {
-        await updateCommission(req, price, user.upLine, level + 1, settings)
+        await updateCommission(req, price, user.upLine, level + 1, settings, contributor)
     }
 }
 
@@ -109,8 +111,13 @@ const handleCommission = async (req, price, userId) => {
         throw new InternalError()
     }
 
-    console.log(`settings: ${JSON.stringify(settingsRsp.data)}`)
-    await updateCommission(req, price, userId, 1, settingsRsp.data)
+    const userRsp = await req.context.stubs.user.getUser(userId)
+    if (userRsp.isError()) {
+        throw new UserNotExists()
+    }
+
+    // console.log(`settings: ${JSON.stringify(settingsRsp.data)}`)
+    await updateCommission(req, price, userId, 1, settingsRsp.data, userRsp.data.phone)
 }
 
 const memberPayed = async (req, log) => {
@@ -118,10 +125,11 @@ const memberPayed = async (req, log) => {
     if (rsp.isError()) {
         throw new AlipayCallback(`add user member failed, orderId:${log._id}, userId:${log.userId}`)
     }
-    await handleCommission(req, log.amount, log.userId)
     await req.context.mongo.updateLogStatus(log._id, completedStatus)
     await addWalletRecord(req, log, memberRecordBuilder)
     await req.context.mongo.incRecharge(log.userId, Number(log.amount) * 100)
+    await addPaymentRecordMember(req.context, log.userId, Number(log.amount) * 100)
+    await handleCommission(req, log.amount, log.userId)
 }
 
 const ricePayed = async (req, log) => {

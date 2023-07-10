@@ -141,3 +141,11 @@ export const isTestEnv = () => {
 export const isReleaseEnv = () => {
     return !isTestEnv()
 }
+
+export const formatMoney = (num) => {
+    return (num / 100).toFixed(2)
+}
+
+export const parseMoney = (str) => {
+    return Number(str) * 100
+}

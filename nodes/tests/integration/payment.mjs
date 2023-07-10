@@ -44,3 +44,12 @@ export const getWallet = async (authentication) => {
         authentication
     })
 }
+
+export const getPaymentRecord = async ({phone, offset, limit}) => {
+    const config = {
+        method: "GET",
+        path: '/backend/v2/payment/records',
+        query: {phone, offset, limit}
+    }
+    return await call2(config)
+}

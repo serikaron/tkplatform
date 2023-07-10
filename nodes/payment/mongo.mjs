@@ -91,6 +91,26 @@ export async function setupMongo(req) {
         },
         addPaymentRecord: async (record) => {
             await collection.paymentRecords.insertOne(record)
+        },
+        getPaymentRecords: async (offset, limit, {phone, id}) => {
+            const filter = {}
+            if (phone !== undefined && phone !== null) {
+                filter.phone = {$regex: `.*${phone}.*`}
+            }
+            if (id !== undefined && id !== null) {
+                filter._id = id
+            }
+
+            console.log(`filter: ${JSON.stringify(filter)}`)
+
+            const items = await collection.paymentRecords.find(filter)
+                .sort({_id: -1})
+                .skip(offset)
+                .limit(limit)
+                .toArray()
+
+            const count = await collection.paymentRecords.countDocuments(filter)
+            return {count, items}
         }
     }
 }

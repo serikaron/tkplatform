@@ -509,3 +509,71 @@
  *               cash:
  *                 type: number
  */
+
+/**
+ * @swagger
+ * /backend/v2/payment/records(资金明细v2):
+ *   get:
+ *     tags: ["商城", "v2"]
+ *     parameters:
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: phone
+ *       schema:
+ *         type: String
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: String
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: String
+ *                       phone:
+ *                         type: String
+ *                       type:
+ *                         type: Number
+ *                         example: 1-收入 2-支出
+ *                       income:
+ *                         type: String
+ *                         example: 支出
+ *                       outcome:
+ *                         type: String
+ *                         example: 收入
+ *                       balance:
+ *                         type: String
+ *                         example: 余额
+ *                       createAt:
+ *                         type: Number
+ *                         example: timestamp
+ *                       contributor:
+ *                         type: String
+ *                         example: 贡献人
+ *                       remark:
+ *                         type: String
+ *                         example: 备注
+ *
+ */

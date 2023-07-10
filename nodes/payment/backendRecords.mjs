@@ -34,6 +34,7 @@ const paymentRecordType = {income: 1, outcome: 2}
 
 const paymentRecordCategory = {
     member: {category: 0, desc: "购买会员"},
+    commission: {category: 1, desc: "下级提成奖励"}
 }
 
 export const addPaymentRecord = async (context, userId, fillFn) => {
@@ -41,17 +42,48 @@ export const addPaymentRecord = async (context, userId, fillFn) => {
     await fillUserFiled(context, record, userId)
     record.createdAt = now()
     Object.assign(record, await fillFn(record))
+    // console.log(`addPaymentRecord: ${JSON.stringify(record)}`)
     await context.mongo.addPaymentRecord(record)
 }
 
 export const addPaymentRecordMember = async (context, userId, amount) => {
+    const wallet = context.mongo.getWallet(userId)
+    const balance = wallet !== null && wallet.hasOwnProperty("cash") ?
+        wallet.cash : 0
     await addPaymentRecord(context, userId, (record) => {
         return {
             type: paymentRecordType.outcome,
             outcome: amount,
             category: paymentRecordCategory.member.category,
             categoryDescription: paymentRecordCategory.member.desc,
-            remark: `${record.phone}购买会员`
+            remark: `${record.phone}购买会员`,
+            balance: balance
+        }
+    })
+}
+
+export const addPaymentRecordCommission = async (context, userId, amount, level, contributor) => {
+    const wallet = await context.mongo.getWallet(userId)
+    const balance = wallet !== null && wallet.hasOwnProperty("cash") ?
+        wallet.cash : 0
+    // console.log(`addPaymentRecordCommission, userId: ${userId}, wallet: ${JSON.stringify(wallet)}`)
+    const remark = (level) => {
+        switch (level) {
+            case 1: return `${contributor}购买会员提成一级奖励`
+            case 2: return `${contributor}购买会员提成二级奖励`
+            case 3: return `${contributor}购买会员提成三级奖励`
+            default: return ""
+        }
+    }
+    await addPaymentRecord(context, userId, (record) => {
+        return {
+            type: paymentRecordType.income,
+            income: amount,
+            category: paymentRecordCategory.commission.category,
+            categoryDescription: paymentRecordCategory.commission.desc,
+            remark: remark(level),
+            balance: balance,
+            contributor: contributor
         }
     })
 }

@@ -384,7 +384,13 @@ const routeInfo = [
         method: "POST",
         needAuth: true,
         service: {baseURL: "http://user:8080", url: '/v1/user/member'}
-    }
+    },
+    {
+        url: '/backend/v2/payment/records',
+        method: 'GET',
+        needAuth: true,
+        service: {baseURL: "http://payment:8080", url: "/v2/payment/records"}
+    },
 ]
 
 export default routeInfo
