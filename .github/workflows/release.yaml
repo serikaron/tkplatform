@@ -46,7 +46,7 @@ jobs:
           done
       - name: prepare user
         run: docker compose logs api && node ./nodes/tests/integration/prepare.mjs && cat ./nodes/tests/integration/client.json
-      - name: prepare user
+      - name: prepare user 2
         run: node ./nodes/tests/integration/prepare2.mjs && cat ./nodes/tests/integration/token.mjs
       - name: integration test
         run: npm run test:integration

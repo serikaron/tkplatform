@@ -39,3 +39,26 @@ SMSBAO_USER=111
 SMSBAO_KEY=222
 EOF
 
+cat << EOF > go-config.json
+{
+  "production_env": "test",
+  "web_root": "../",
+  "bind_port": 9010,
+  "bind_addr": "http://localhost:9010",
+  "storage_root": "../file/",
+  "storage_tmp": "../tmp/",
+  "db_name": "mongo",
+  "db_source": "localhost:27017",
+  "logger_level": 0,
+  "mongo_user_source": "user_db:27017",
+  "mongo_user": "tkuser",
+  "mongo_user_password": "tkuser",
+  "mongo_payment_source": "payment_db:27017",
+  "mongo_payment": "tkpayment",
+  "mongo_payment_password": "tkpayment",
+  "client_id": "tkplatform",
+  "client_secret": "mkl23sml8sx9k02DxQkd5M32LkB6ux",
+  "enable_orm_log": true,
+  "enable_http_log": true
+}
+EOF
