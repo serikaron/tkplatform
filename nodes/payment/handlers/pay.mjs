@@ -112,7 +112,7 @@ const addLog = async (req) => {
 
 const pay = async (req, res) => {
     console.log('pay, pay')
-    const data = await alipayTrade(req.context, req.bill.bizContent)
+    const data = process.env.MOCK_PAY ? "" : await alipayTrade(req.context, req.bill.bizContent)
     console.log(JSON.stringify(data))
 
     res.tkResponse(TKResponse.Success({
@@ -128,6 +128,7 @@ export const routePay = (router) => {
         await buildItem(req)
         await addLog(req)
         await pay(req, res)
+        console.log("pay, end")
         next()
     })
     const f = async(req, res, next) => {
