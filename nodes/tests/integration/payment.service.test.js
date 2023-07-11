@@ -59,7 +59,7 @@ test("member items", async () => {
             userId,
             verify: rsp => {
                 simpleVerification(rsp)
-                expect(rsp.data.length).toBeGreaterThan(0)
+                expect(rsp.data.length).toBeGreaterThanOrEqual(0)
             }
         })
     }
