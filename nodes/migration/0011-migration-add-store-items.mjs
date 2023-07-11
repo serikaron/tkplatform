@@ -5,66 +5,64 @@ export const version = "0011"
 export async function migrate(mongoClient) {
     await mongoClient.payment.db
         .collection("memberItems")
-        .insertMany([
-            {
-                name: "VIP周卡",
-                days: 7,
-                price: 10,
-                originalPrice: 10,
-                promotion: false
-            },
-            {
-                name: "VIP月卡",
-                days: 30,
-                price: 30,
-                originalPrice: 30,
-                promotion: false
-            },
-            {
-                name: "VIP季卡",
-                days: 90,
-                price: 85.5,
-                originalPrice: 90,
-                promotion: true
-            },
-            {
-                name: "VIP月卡",
-                days: 180,
-                price: 162,
-                originalPrice: 180,
-                promotion: true
-            },
-            {
-                name: "VIP年卡",
-                days: 360,
-                price: 288,
-                originalPrice: 360,
-                promotion: true
-            },
-        ])
+        .insertMany([{
+            _id: ObjectId("642f925807fdf4a11a3fbaf5"),
+            name: 'VIP周卡',
+            days: 7,
+            price: 1000,
+            originalPrice: 1000,
+            promotion: false
+        }, {
+            _id: ObjectId("642f92b407fdf4a11a3fbaf8"),
+            name: 'VIP月卡',
+            days: 30,
+            price: 3000,
+            originalPrice: 3000,
+            promotion: false
+        }, {
+            _id: ObjectId("642f92f307fdf4a11a3fbafa"),
+            name: 'VIP季卡',
+            days: Long("90"),
+            price: Long("8500"),
+            originalPrice: Long("9000"),
+            promotion: true
+        }, {
+            _id: ObjectId("642f932607fdf4a11a3fbafc"),
+            name: 'VIP半年卡',
+            days: Long("180"),
+            price: Long("16200"),
+            originalPrice: Long("18000"),
+            promotion: true
+        }, {
+            _id: ObjectId("642f934307fdf4a11a3fbafe"),
+            name: 'VIP年卡',
+            days: 360,
+            price: 28800,
+            originalPrice: 36000,
+            promotion: true
+        }])
     await mongoClient.payment.db
         .collection('riceItems')
-        .insertMany([
-            {
-                name: "30天米粒",
-                rice: 450,
-                price: 45,
-                originPrice: 45,
-                promotion: false
-            },
-            {
-                name: "90天米粒",
-                rice: 1350,
-                price: 128,
-                originPrice: 135,
-                promotion: true
-            },
-            {
-                name: "180天米粒",
-                rice: 2700,
-                price: 240,
-                originPrice: 270,
-                promotion: true
-            },
-        ] )
+        .insertMany([{
+            _id: ObjectId("642f938a07fdf4a11a3fbb01"),
+            name: '30天米粒',
+            rice: Long("450"),
+            price: Long("4500"),
+            originalPrice: Long("4500"),
+            promotion: true
+        }, {
+            _id: ObjectId("642f93a707fdf4a11a3fbb03"),
+            name: '90天米粒',
+            rice: 1350,
+            price: 12800,
+            originalPrice: 13500,
+            promotion: true
+        }, {
+            _id: ObjectId("642f93c907fdf4a11a3fbb05"),
+            name: '180天米粒',
+            rice: 2700,
+            price: 24000,
+            originalPrice: 27000,
+            promotion: true
+        }])
 }
