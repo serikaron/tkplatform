@@ -39,6 +39,8 @@ SMSBAO_USER=111
 SMSBAO_KEY=222
 EOF
 
+cat .env
+
 cat << EOF > go-config.json
 {
   "production_env": "test",
@@ -62,3 +64,5 @@ cat << EOF > go-config.json
   "enable_http_log": true
 }
 EOF
+
+cat go-config.json
