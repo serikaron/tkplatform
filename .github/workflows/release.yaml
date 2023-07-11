@@ -53,7 +53,7 @@ jobs:
 
       - name: show logs when failed
         if: failure()
-        run: docker compose logs
+        run: docker compose logs apid
 
       - name: push image
         run: sh scripts/push_image.sh
