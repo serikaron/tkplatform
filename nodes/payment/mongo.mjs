@@ -19,7 +19,6 @@ export async function setupMongo(req) {
         wallets: payment.db.collection("wallets"),
         payLogs: payment.db.collection("payLogs"),
         walletRecords: payment.db.collection("walletRecords"),
-        paymentRecords: payment.db.collection("paymentRecords"),
     }
     req.context.mongo = {
         client: payment.client, db: payment.db, collection,
@@ -90,9 +89,12 @@ export async function setupMongo(req) {
                 .toArray()
         },
         addPaymentRecord: async (record) => {
-            await collection.paymentRecords.insertOne(record)
+            await payment.db.collection("paymentRecords").insertOne(record)
         },
-        getPaymentRecords: async (offset, limit, {phone, id}) => {
+        addRiceRecord: async (record) => {
+            await payment.db.collection("riceRecords").insertOne(record)
+        },
+        getRecords: async (collectionName, offset, limit, {phone, id}) => {
             const filter = {}
             if (phone !== undefined && phone !== null) {
                 filter.phone = {$regex: `.*${phone}.*`}
@@ -103,13 +105,15 @@ export async function setupMongo(req) {
 
             console.log(`filter: ${JSON.stringify(filter)}`)
 
-            const items = await collection.paymentRecords.find(filter)
+            const items = await payment.db.collection(collectionName)
+                .find(filter)
                 .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
 
-            const count = await collection.paymentRecords.countDocuments(filter)
+            const count = await payment.db.collection(collectionName)
+                .countDocuments(filter)
             return {count, items}
         }
     }

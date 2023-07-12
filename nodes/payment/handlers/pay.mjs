@@ -8,7 +8,6 @@ import {sign} from "alipay-sdk/lib/util.js";
 import {ItemNotFound} from "../../common/errors/40000-payment.mjs";
 import {alipayTrade} from "../alipay.mjs";
 import {itemTypeMember, itemTypeRice, itemTypeSearch, itemTypeTest} from "../itemType.mjs";
-import {makeMiddleware} from "../../common/flow.mjs";
 
 const buildTestItem = (req) => {
     req.bill = {
@@ -94,7 +93,6 @@ const buildSearchItem = async (req) => {
 }
 
 const buildItem = async (req) => {
-    console.log("pay, buildItem")
     switch (req.body.productType) {
         case itemTypeTest: buildTestItem(req); break
         case itemTypeMember: await buildMemberItem(req); break
@@ -105,13 +103,11 @@ const buildItem = async (req) => {
 }
 
 const addLog = async (req) => {
-    console.log('pay, addLog')
     const orderId = await req.context.mongo.addPayLog(req.headers.id, req.bill.log.amount, req.body.productType, req.bill.log.item)
     req.bill.bizContent.out_trade_no = orderId.toString()
 }
 
 const pay = async (req, res) => {
-    console.log('pay, pay')
     const data = process.env.MOCK_PAY ? "" : await alipayTrade(req.context, req.bill.bizContent)
     console.log(JSON.stringify(data))
 

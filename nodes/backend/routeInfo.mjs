@@ -391,6 +391,12 @@ const routeInfo = [
         needAuth: true,
         service: {baseURL: "http://payment:8080", url: "/v2/payment/records"}
     },
+    {
+        url: '/backend/v2/rice/records',
+        method: 'GET',
+        needAuth: true,
+        service: {baseURL: "http://payment:8080", url: "/v2/rice/records"}
+    },
 ]
 
 export default routeInfo

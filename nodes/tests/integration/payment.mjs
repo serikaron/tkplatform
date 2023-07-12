@@ -1,7 +1,6 @@
 'use strict'
 
 import {baseURL, call2} from "./api.mjs";
-import {token} from "./token.mjs";
 import axios from "axios";
 
 const callAlipay = async (productType, productId) => {
@@ -23,10 +22,22 @@ export const payMember = async (productId) => {
     await alipayCallback(r.orderId)
 }
 
+export const payRice = async (produceId) => {
+    const r = await callAlipay(2, produceId)
+    await alipayCallback(r.orderId)
+}
+
 export const getMemberItems = async () => {
     return await call2({
         method: "GET",
         path: "/v1/store/member/items",
+    })
+}
+
+export const getRiceItems = async () => {
+    return await call2({
+        method: "GET",
+        path: '/v1/store/rice/items',
     })
 }
 
@@ -46,10 +57,17 @@ export const getWallet = async (authentication) => {
 }
 
 export const getPaymentRecord = async ({phone, offset, limit}) => {
-    const config = {
+    return await call2({
         method: "GET",
         path: '/backend/v2/payment/records',
         query: {phone, offset, limit}
-    }
-    return await call2(config)
+    })
+}
+
+export const getRiceRecord = async ({phone, offset, limit}) => {
+    return await call2({
+        method: "GET",
+        path: '/backend/v2/rice/records',
+        query: {phone, offset, limit}
+    })
 }

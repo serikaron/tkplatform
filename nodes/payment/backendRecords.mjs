@@ -14,13 +14,22 @@ const fillUserFiled = async (context, record, userId) => {
     record.phone = userRsp.data.phone
 }
 
+const recordType = {income: 1, outcome: 2}
+
+const recordCategory = {
+    member: {category: 0, desc: "购买会员"},
+    commission: {category: 1, desc: "下级提成奖励"},
+    rice: {category: 2, desc: "购买米粒"}
+}
+
 /**
+ * 资金明细
  * paymentRecord
  * _id: string - order id
  * userId: ObjectId
  * phone: string - user phone
- * type: int - 1:income 2:outcome
- * category: int 1：购买会员，2：管理员减少...
+ * type: recordType
+ * category: recordCategory
  * categoryDescription: string
  * income: int
  * outcome: int
@@ -30,14 +39,7 @@ const fillUserFiled = async (context, record, userId) => {
  * remark: string
  */
 
-const paymentRecordType = {income: 1, outcome: 2}
-
-const paymentRecordCategory = {
-    member: {category: 0, desc: "购买会员"},
-    commission: {category: 1, desc: "下级提成奖励"}
-}
-
-export const addPaymentRecord = async (context, userId, fillFn) => {
+const addPaymentRecord = async (context, userId, fillFn) => {
     const record = {}
     await fillUserFiled(context, record, userId)
     record.createdAt = now()
@@ -47,43 +49,108 @@ export const addPaymentRecord = async (context, userId, fillFn) => {
 }
 
 export const addPaymentRecordMember = async (context, userId, amount) => {
-    const wallet = context.mongo.getWallet(userId)
+    const wallet = await context.mongo.getWallet(userId)
     const balance = wallet !== null && wallet.hasOwnProperty("cash") ?
         wallet.cash : 0
     await addPaymentRecord(context, userId, (record) => {
         return {
-            type: paymentRecordType.outcome,
+            type: recordType.outcome,
             outcome: amount,
-            category: paymentRecordCategory.member.category,
-            categoryDescription: paymentRecordCategory.member.desc,
-            remark: `${record.phone}购买会员`,
+            category: recordCategory.member.category,
+            categoryDescription: recordCategory.member.desc,
+            remark: `${record.phone}${recordCategory.member.desc}`,
             balance: balance
         }
     })
 }
 
-export const addPaymentRecordCommission = async (context, userId, amount, level, contributor) => {
+const addPaymentRecordCommission = async (context, userId, amount, level, contributor, payRecordCategory) => {
     const wallet = await context.mongo.getWallet(userId)
     const balance = wallet !== null && wallet.hasOwnProperty("cash") ?
         wallet.cash : 0
     // console.log(`addPaymentRecordCommission, userId: ${userId}, wallet: ${JSON.stringify(wallet)}`)
-    const remark = (level) => {
+    const remark = (level, category) => {
         switch (level) {
-            case 1: return `${contributor}购买会员提成一级奖励`
-            case 2: return `${contributor}购买会员提成二级奖励`
-            case 3: return `${contributor}购买会员提成三级奖励`
+            case 1: return `${contributor}${category.desc}提成一级奖励`
+            case 2: return `${contributor}${category.desc}提成二级奖励`
+            case 3: return `${contributor}${category.desc}提成三级奖励`
             default: return ""
         }
     }
     await addPaymentRecord(context, userId, (record) => {
         return {
-            type: paymentRecordType.income,
+            type: recordType.income,
             income: amount,
-            category: paymentRecordCategory.commission.category,
-            categoryDescription: paymentRecordCategory.commission.desc,
-            remark: remark(level),
+            category: recordCategory.commission.category,
+            categoryDescription: recordCategory.commission.desc,
+            remark: remark(level, payRecordCategory),
             balance: balance,
             contributor: contributor
+        }
+    })
+}
+
+export const addPaymentRecordCommissionMember = async (context, userId, amount, level, contributor) => {
+    await addPaymentRecordCommission(context, userId, amount, level, contributor, recordCategory.member)
+}
+
+export const addPaymentRecordCommissionRice = async (context, userId, amount, level, contributor) => {
+    await addPaymentRecordCommission(context, userId, amount, level, contributor, recordCategory.rice)
+}
+
+export const addPaymentRecordRice = async (context, userId, amount) => {
+    const wallet = await context.mongo.getWallet(userId)
+    const balance = wallet !== null && wallet.hasOwnProperty("cash") ?
+        wallet.cash : 0
+    await addPaymentRecord(context, userId, (record) => {
+        return {
+            type: recordType.outcome,
+            outcome: amount,
+            category: recordCategory.rice.category,
+            categoryDescription: recordCategory.rice.desc,
+            remark: `${record.phone}购买米粒`,
+            balance: balance
+        }
+    })
+}
+
+/**
+ * 米粒明细
+ * riceRecord
+ * _id: string - order id
+ * userId: ObjectId
+ * phone: string - user phone
+ * type: recordType
+ * category: recordCategory
+ * categoryDescription: string
+ * income: int
+ * outcome: int
+ * balance: int
+ * createdAt: timestamp
+ * remark: string
+ */
+
+const addRiceRecord = async (context, userId, fillFn) => {
+    const record = {}
+    await fillUserFiled(context, record, userId)
+    record.createdAt = now()
+    Object.assign(record, await fillFn(record))
+    console.log(`addRiceRecord: ${JSON.stringify(record)}`)
+    await context.mongo.addRiceRecord(record)
+}
+
+export const addRiceRecordRice = async (context, userId, rice) => {
+    const wallet = await context.mongo.getWallet(userId)
+    const balance = wallet !== null && wallet.hasOwnProperty("rice") ?
+        wallet.rice : 0
+    await addRiceRecord(context, userId, (record) => {
+        return {
+            type: recordType.income,
+            income: rice,
+            category: recordCategory.rice.category,
+            categoryDescription: recordCategory.rice.desc,
+            remark: `${record.phone}购买米粒`,
+            balance: balance
         }
     })
 }
