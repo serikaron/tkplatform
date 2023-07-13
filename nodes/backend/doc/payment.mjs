@@ -577,3 +577,68 @@
  *                         example: 备注
  *
  */
+
+/**
+ * @swagger
+ * /backend/v2/rice/records(米粒明细v2):
+ *   get:
+ *     tags: ["商城", "v2"]
+ *     parameters:
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: phone
+ *       schema:
+ *         type: String
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: String
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: String
+ *                       phone:
+ *                         type: String
+ *                       type:
+ *                         type: Number
+ *                         example: 1-增加 2-减少
+ *                       income:
+ *                         type: String
+ *                         example: 增加
+ *                       outcome:
+ *                         type: String
+ *                         example: 减少
+ *                       balance:
+ *                         type: String
+ *                         example: 余额
+ *                       createAt:
+ *                         type: Number
+ *                         example: timestamp
+ *                       remark:
+ *                         type: String
+ *                         example: 备注
+ *
+ */
