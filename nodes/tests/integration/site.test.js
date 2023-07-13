@@ -1,18 +1,81 @@
 'use restrict'
 
-import client from "./client.json" assert {type: "json"}
-import {runTest} from "./api.mjs";
+// import client from "./client.json" assert {type: "json"}
+// import {runTest} from "./api.mjs";
+import {addSite, getSites} from "./backend.mjs";
 
 // no concurrent
-test.each([
-    {name: "Get system sites", method: "GET", path: "/v1/sites"},
-    {name: "Get system sites with params", method: "GET", path: "/v1/sites?keyword=&offset=0&limit=10"},
-])("$name ($path) should ok", async ({method, path, verify, body}) => {
-    await runTest({
-        authentication: client,
-        method,
-        path,
-        body,
-        verify,
+// test.each([
+//     {name: "Get system sites", method: "GET", path: "/v1/sites"},
+//     {name: "Get system sites with params", method: "GET", path: "/v1/sites?keyword=&offset=0&limit=10"},
+// ])("$name ($path) should ok", async ({method, path, verify, body}) => {
+//     await runTest({
+//         authentication: client,
+//         method,
+//         path,
+//         body,
+//         verify,
+//     })
+// })
+
+const defaultSite = {
+    name: "正常站点",
+    icon: "",
+    status: 1,
+    rates: {
+        hot: 4.4,
+        quality: 3.3
+    },
+    isFree: true,
+    added: false,
+    disabled: false,
+    url: "www.baidu.com",
+    downloadUrl: "www.baidu.com/download",
+    type: "123"
+}
+
+describe("添加站点", () => {
+    const test = async (inputSite, expectSite) => {
+        const r = await addSite(inputSite)
+        const id = r.id
+
+        const r1 = await getSites({offset: 0, limit: 1})
+        expectSite.id = id
+        expect(r1.items.length).toBe(1)
+        expect(r1.items[0]).toStrictEqual(expectSite)
+    }
+    it("正常添加", async () => {
+        await test(defaultSite, {
+            name: "正常站点",
+            icon: "",
+            status: 1,
+            rates: {
+                hot: 4.4,
+                quality: 3.3
+            },
+            isFree: true,
+            added: false,
+            disabled: false,
+            url: "www.baidu.com",
+            downloadUrl: "www.baidu.com/download",
+            type: "123"
+        })
+    })
+    it("非法hot", async () => {
+        const testHot = async (inputHot, expectHot) => {
+            const inputSite = JSON.parse(JSON.stringify(defaultSite))
+            inputSite.name = "非法hot"
+            inputSite.rates.hot = inputHot
+            const expectSite = JSON.parse(JSON.stringify(defaultSite))
+            expectSite.name = "非法hot"
+            expectSite.rates.hot = expectHot
+            console.log(JSON.stringify(inputSite))
+            console.log(JSON.stringify(expectSite))
+            await test(inputSite, expectSite)
+        }
+
+        await testHot("invalidHot", 0)
+        await testHot(-1, 0)
+        await testHot(5.5, 5)
     })
 })

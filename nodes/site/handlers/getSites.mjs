@@ -2,6 +2,25 @@
 
 import {getValueNumber, getValueString, replaceId} from "../../common/utils.mjs";
 
+const fixRates = (site) => {
+    const fix = (input) => {
+        const num = Number(input)
+        return isNaN(num) ?
+            Math.floor(Math.random() * 501) / 100 :
+            num
+    }
+
+    site.rates.hot = fix(site.rates.hot)
+    site.rates.quality = fix(site.rates.quality)
+    return site
+}
+
+const fixSite = (site) => {
+    replaceId(site)
+    fixRates(site)
+    return site
+}
+
 const getUserSites = router => {
     router.get('/sites', async (req, res, next) => {
         const offset = getValueNumber(req.query, "offset", 0)
@@ -9,7 +28,7 @@ const getUserSites = router => {
         const keyword = getValueString(req.query, "keyword", null)
         const sites = await req.context.mongo.getSites(offset, limit, keyword)
         res.response({
-            data: sites.map(replaceId)
+            data: sites.map(fixSite)
         })
         next()
     })
@@ -29,7 +48,7 @@ const getBackendSites = router => {
                 data: {
                     total: count,
                     offset, limit,
-                    items: sites.map(replaceId)
+                    items: sites.map(fixSite)
                 }
             })
         } else {
@@ -39,7 +58,7 @@ const getBackendSites = router => {
                 data: {
                     total: r.total,
                     offset, limit,
-                    items: r.list.map(replaceId)
+                    items: r.list.map(fixSite)
                 }
             })
         }

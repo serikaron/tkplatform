@@ -40,3 +40,21 @@ export const getCommissionConfig = async () => {
         path: '/backend/v1/api/promotion/commission/list',
     })
 }
+
+// ------------  site  ----------------
+
+export const addSite = async (site) => {
+    return await backendCall({
+        method: "POST",
+        path: '/backend/v1/site',
+        body: site
+    })
+}
+
+export const getSites = async ({keyword, offset, limit} = {}) => {
+    return await backendCall({
+        method: "GET",
+        path: '/backend/v1/sites',
+        query: {keyword, offset, limit}
+    })
+}
