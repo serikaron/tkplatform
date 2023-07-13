@@ -6,12 +6,15 @@ const fixRates = (site) => {
     const fix = (input) => {
         const num = Number(input)
         return isNaN(num) ?
-            Math.floor(Math.random() * 501) / 100 :
+            5 :
+            // Math.floor(Math.random() * 501) / 100 :
             num
     }
 
-    site.rates.hot = fix(site.rates.hot)
-    site.rates.quality = fix(site.rates.quality)
+    if (site.hasOwnProperty("rates")) {
+        site.rates.hot = fix(site.rates.hot)
+        site.rates.quality = fix(site.rates.quality)
+    }
     return site
 }
 
