@@ -71,10 +71,14 @@ const addPaymentRecordCommission = async (context, userId, amount, level, contri
     // console.log(`addPaymentRecordCommission, userId: ${userId}, wallet: ${JSON.stringify(wallet)}`)
     const remark = (level, category) => {
         switch (level) {
-            case 1: return `${contributor}${category.desc}提成一级奖励`
-            case 2: return `${contributor}${category.desc}提成二级奖励`
-            case 3: return `${contributor}${category.desc}提成三级奖励`
-            default: return ""
+            case 1:
+                return `${contributor}${category.desc}提成一级奖励`
+            case 2:
+                return `${contributor}${category.desc}提成二级奖励`
+            case 3:
+                return `${contributor}${category.desc}提成三级奖励`
+            default:
+                return ""
         }
     }
     await addPaymentRecord(context, userId, (record) => {
@@ -135,7 +139,6 @@ const addRiceRecord = async (context, userId, fillFn) => {
     await fillUserFiled(context, record, userId)
     record.createdAt = now()
     Object.assign(record, await fillFn(record))
-    console.log(`addRiceRecord: ${JSON.stringify(record)}`)
     await context.mongo.addRiceRecord(record)
 }
 
@@ -154,3 +157,45 @@ export const addRiceRecordRice = async (context, userId, rice) => {
         }
     })
 }
+
+/**
+ * 会员明细
+ * memberRecord
+ * _id: string - order id
+ * userId: ObjectId
+ * phone: string - user phone
+ * type: recordType
+ * category: recordCategory
+ * categoryDescription: string
+ * income: int
+ * outcome: int
+ * balance: int
+ * createdAt: timestamp
+ * remark: string
+ */
+
+const addMemberRecord = async (context, userId, fillFn) => {
+    const record = {}
+    await fillUserFiled(context, record, userId)
+    record.createdAt = now()
+    Object.assign(record, await fillFn(record))
+    await context.mongo.addMemberRecord(record)
+}
+
+export const addMemberRecordMember = async (context, userId, days) => {
+    const userRsp = await context.stubs.user.getUser(userId)
+    if (userRsp.isError()) {
+        throw new UserNotExists()
+    }
+    await addMemberRecord(context, userId, (record) => {
+        return {
+            type: recordType.income,
+            income: days,
+            category: recordCategory.member.category,
+            categoryDescription: recordCategory.member.desc,
+            remark: `${record.phone}${recordCategory.member.desc}`,
+            balance: userRsp.data.member.expiration
+        }
+    })
+}
+

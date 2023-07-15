@@ -48,6 +48,10 @@ const mapRiceRecord = (item) => {
     return out
 }
 
+const mapMemberRecord = (item) => {
+    return mapRiceRecord(item)
+}
+
 
 const makeHandler = (collectionName, mapFn) => {
     return async (req, res, next) => {
@@ -72,4 +76,5 @@ const makeHandler = (collectionName, mapFn) => {
 export const routeGetRecords = (router) => {
     router.get("/payment/records", makeHandler("paymentRecords", mapPaymentRecord))
     router.get("/rice/records", makeHandler("riceRecords", mapRiceRecord))
+    router.get('/member/records', makeHandler("memberRecords", mapMemberRecord))
 }

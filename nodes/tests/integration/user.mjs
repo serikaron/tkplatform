@@ -49,3 +49,19 @@ export const getUserCentre = async (authentication) => {
         authentication
     })
 }
+
+export const addSalesman = async (phone) => {
+    return await call2({
+        method: "POST",
+        path: "/v2/salesman",
+        body: {phone: phone, password: "123456"}
+    })
+}
+
+export const salesmanLogin = async (phone) => {
+    return await call2({
+        method: "POST",
+        path: "/v2/salesman",
+        body: {phone: phone, password: "123456"}
+    })
+}

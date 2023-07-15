@@ -94,6 +94,9 @@ export async function setupMongo(req) {
         addRiceRecord: async (record) => {
             await payment.db.collection("riceRecords").insertOne(record)
         },
+        addMemberRecord: async (record) => {
+            await payment.db.collection("memberRecords").insertOne(record)
+        },
         getRecords: async (collectionName, offset, limit, {phone, id}) => {
             const filter = {}
             if (phone !== undefined && phone !== null) {

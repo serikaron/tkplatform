@@ -8,6 +8,7 @@ import {UserNotExists} from "../../common/errors/10000-user.mjs";
 import {InternalError} from "../../common/errors/00000-basic.mjs";
 import {addWalletRecord, memberRecordBuilder, riceRecordBuilder} from "../walletRecords.mjs";
 import {
+    addMemberRecordMember,
     addPaymentRecordCommissionMember, addPaymentRecordCommissionRice,
     addPaymentRecordMember, addPaymentRecordRice, addRiceRecordRice,
 } from "../backendRecords.mjs";
@@ -75,53 +76,6 @@ const getPlusRate = async (req, settings, level, userId) => {
 
     const rate = getRate(l[0], level)
     return rate === null ? 0 : rate
-}
-const updateCommission = async (req, price, userId, level, settings, contributor) => {
-    // const userRsp = await req.context.stubs.user.getUser(userId)
-    // if (userRsp.isError()) {
-    //     throw new UserNotExists()
-    // }
-    //
-    // const user = userRsp.data
-    // if (user.upLine === null || user.upLine === undefined) {
-    //     console.log(`skip, user(${userId}) no up line`)
-    //     return
-    // }
-    //
-    // const baseRate = getBaseRate(settings, level)
-    // const plusRate = await getPlusRate(req, settings, level, user.upLine)
-    // const rate = baseRate + plusRate
-    //
-    // const priceNum = Number(price)
-    // if (isNaN(priceNum)) {
-    //     console.log(`ERROR, invalid price(${price})`)
-    //     throw new InternalError()
-    // }
-    //
-    // const commission = Math.floor(priceNum * rate)
-    // // console.log(`updateCommission, price:${price}, baseRate:${baseRate}, plusRate:${plusRate}, commission:${commission}`)
-    // await req.context.mongo.addCash(user.upLine, commission)
-    // await addPaymentRecordCommission(req.context, user.upLine, commission, level, contributor)
-    //
-    // if (level !== 3) {
-    //     await updateCommission(req, price, user.upLine, level + 1, settings, contributor)
-    // }
-}
-
-const handleCommission = async (req, price, userId, settings) => {
-    const settingsRsp = await req.context.stubs.apid.getCommissionList()
-    if (settingsRsp.isError()) {
-        console.log("ERROR, handleCommission, getCommissionList FAILED !!!")
-        throw new InternalError()
-    }
-
-    const userRsp = await req.context.stubs.user.getUser(userId)
-    if (userRsp.isError()) {
-        throw new UserNotExists()
-    }
-
-    // console.log(`settings: ${JSON.stringify(settingsRsp.data)}`)
-    await updateCommission(req, price, userId, 1, settingsRsp.data, userRsp.data.phone)
 }
 
 const buildCommissionInfo = async (req, userId, price, settings) => {
@@ -191,7 +145,7 @@ const addCommissionRecord = async (req, info, log) => {
     }
 }
 
-const handleCommission1 = async (req, log) => {
+const handleCommission = async (req, log) => {
     const settingsRsp = await req.context.stubs.apid.getCommissionList()
     if (settingsRsp.isError()) {
         console.log("ERROR, handleCommission, getCommissionList FAILED !!!")
@@ -213,7 +167,8 @@ const memberPayed = async (req, log) => {
     await addWalletRecord(req, log, memberRecordBuilder)
     await req.context.mongo.incRecharge(log.userId, Number(log.amount) * 100)
     await addPaymentRecordMember(req.context, log.userId, Number(log.amount) * 100)
-    await handleCommission1(req, log)
+    await addMemberRecordMember(req.context, log.userId, log.item.days)
+    await handleCommission(req, log)
 }
 
 const ricePayed = async (req, log) => {
@@ -223,7 +178,7 @@ const ricePayed = async (req, log) => {
     await req.context.mongo.incRecharge(log.userId, Number(log.amount) * 100)
     await addPaymentRecordRice(req.context, log.userId, parseMoney(log.amount))
     await addRiceRecordRice(req.context, log.userId, log.item.rice)
-    await handleCommission1(req, log)
+    await handleCommission(req, log)
 }
 
 const searchPayed = async (req, log) => {

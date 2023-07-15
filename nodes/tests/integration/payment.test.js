@@ -2,7 +2,7 @@
 
 import {token} from "./token.mjs";
 import {
-    getMemberItems,
+    getMemberItems, getMemberRecord,
     getPaymentRecord,
     getRiceItems,
     getRiceRecord,
@@ -68,6 +68,11 @@ describe("购买会员", () => {
                 const r = await storeRecord(token.upLines[i])
                 box.paymentRecords.commissions.push(r)
             }
+
+            const memberRecords = await getMemberRecord({
+                phone: box.userOverview.phone, offset: 0, limit: 1
+            })
+            box.memberRecords = memberRecords.items
         })
         test("记录分成比例", async () => {
             const r = await getCommissionConfig()
@@ -163,6 +168,28 @@ describe("购买会员", () => {
                         remark: `${box.userOverview.phone}购买会员${upLineRemark(level + 1)}`
                     })
                 }
+            })
+            test("会员明细", async () => {
+                const userOverview = await getOverview()
+                const records = await getMemberRecord({
+                    phone: box.userOverview.phone, offset: 0, limit: 2
+                })
+                expect(records.items.length).toBe(box.memberRecords.length + 1)
+                if (box.memberRecords.length > 0) {
+                    expect(box.memberRecords[0]).toStrictEqual(records.items[1])
+                }
+                const actually = records.items[0]
+                // ignore these fields
+                delete actually.id
+                delete actually.createdAt
+                expect(actually).toStrictEqual({
+                    phone: box.userOverview.phone,
+                    type: 1,
+                    category: "购买会员",
+                    income: box.item.days,
+                    balance: userOverview.member.expiration,
+                    remark: `${box.userOverview.phone}购买会员`
+                })
             })
         })
     })

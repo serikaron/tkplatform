@@ -71,3 +71,11 @@ export const getRiceRecord = async ({phone, offset, limit}) => {
         query: {phone, offset, limit}
     })
 }
+
+export const getMemberRecord = async ({phone, offset, limit}) => {
+    return await call2({
+        method: "GET",
+        path: '/backend/v2/member/records',
+        query: {phone, offset, limit}
+    })
+}
