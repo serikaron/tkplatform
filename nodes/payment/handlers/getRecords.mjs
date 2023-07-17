@@ -1,6 +1,6 @@
 'use strict'
 
-import {formatMoney, getValueNumber, getValueString} from "../../common/utils.mjs";
+import {formatMoney, getValueNumber, getValueString, replaceId} from "../../common/utils.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 
 const mapPaymentRecord = (item) => {
@@ -52,6 +52,10 @@ const mapMemberRecord = (item) => {
     return mapRiceRecord(item)
 }
 
+const mapWithdrawRecord = (item) => {
+    return replaceId(item)
+}
+
 
 const makeHandler = (collectionName, mapFn) => {
     return async (req, res, next) => {
@@ -77,4 +81,5 @@ export const routeGetRecords = (router) => {
     router.get("/payment/records", makeHandler("paymentRecords", mapPaymentRecord))
     router.get("/rice/records", makeHandler("riceRecords", mapRiceRecord))
     router.get('/member/records', makeHandler("memberRecords", mapMemberRecord))
+    router.get('/withdraw/records', makeHandler('withdrawRecords', mapWithdrawRecord))
 }

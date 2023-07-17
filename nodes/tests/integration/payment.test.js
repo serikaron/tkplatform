@@ -8,11 +8,12 @@ import {
     getRiceRecord,
     getWallet,
     getWalletOverview,
-    payMember, payRice
+    payMember, payRice, withdraw
 } from "./payment.mjs";
-import {getOverview, getUserCentre} from "./user.mjs";
-import {getCommissionConfig} from "./backend.mjs";
+import {getIdentification, getOverview, getUserCentre, setIdentification} from "./user.mjs";
+import {addCash, getCommissionConfig, getUsersBackend, getWithdrawFee, getWithdrawRecord} from "./backend.mjs";
 import {formatMoney, parseMoney} from "../../common/utils.mjs";
+import jwt from "jsonwebtoken";
 
 describe("购买会员", () => {
     const box = {}
@@ -374,6 +375,59 @@ describe("购买米粒", () => {
                     remark: `${box.userOverview.phone}购买米粒`
                 })
             })
+        })
+    })
+})
+
+describe("用户提现", () => {
+    it("添加余额", async () => {
+        const payload = jwt.verify(token.default.accessToken, "123456", {
+            ignoreExpiration: true,
+            algorithm: "HS256"
+        })
+        await addCash(payload.id, 10000)
+    })
+
+    it("实名认证", async () => {
+        const r = await getIdentification()
+        if (!r.identified) {
+            await setIdentification("123456", "张三")
+        }
+    })
+
+    it("提现申请", async () => {
+        await withdraw("fakeAlipayAccount", 5000)
+    })
+
+    it("检查提现列表", async () => {
+        const r = await getWithdrawRecord({
+            offset: 0, limit: 1
+        })
+        const record = r.items[0]
+        delete record.id
+        delete record.createdAt
+        delete record.userId
+
+        const userOverview = await getOverview()
+        const userCentre = await getUserCentre()
+
+        const feeSetting = await getWithdrawFee()
+        const getFee = () => {
+            const a = feeSetting.amount
+            return Math.floor(5000 / a) === (5000 / a) ?
+                Math.floor(5000 / a) * feeSetting.fee :
+                (Math.floor(5000 / a) + 1) * feeSetting.fee
+        }
+
+        expect(record).toStrictEqual({
+            phone: userOverview.phone,
+            type: "帐户余额",
+            method: "支付宝",
+            name: userCentre.identification.name,
+            alipayAccount: "fakeAlipayAccount",
+            amount: 5000,
+            fee: getFee(),
+            status: 0
         })
     })
 })

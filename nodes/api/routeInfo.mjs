@@ -300,6 +300,7 @@ const routeInfo = [
     //     needAuth: false,
     //     service: {baseURL: "http://payment:8080", url: '/v2/alipay/callback'}
     // }
+    {url: '/v2/withdraw', method: "POST", needAuth: true, service: {baseURL: "http://payment:8080"}}
 ]
 
 export default routeInfo

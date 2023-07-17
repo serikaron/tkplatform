@@ -15,10 +15,12 @@ export const routeIdentification = router => {
             throw new AlreadyIdentified()
         }
 
-        const r = await req.context.aliyun.identify(process.env.ALIYUN_APP_CODE, req.body.idNo, req.body.name)
-        console.log(`identify result ${JSON.stringify(r)}`)
-        if (r.error_code !== 0 || !r.result.isok) {
-            throw new IdentifyFailed()
+        if (!process.env.MOCK_IDENTIFICATION) {
+            const r = await req.context.aliyun.identify(process.env.ALIYUN_APP_CODE, req.body.idNo, req.body.name)
+            console.log(`identify result ${JSON.stringify(r)}`)
+            if (r.error_code !== 0 || !r.result.isok) {
+                throw new IdentifyFailed()
+            }
         }
 
         const update = {

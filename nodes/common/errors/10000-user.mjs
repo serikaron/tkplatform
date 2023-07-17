@@ -93,3 +93,13 @@ export class AlreadyIdentified extends TKError {
         });
     }
 }
+
+export class HaveNotIdentified extends TKError {
+    constructor() {
+        super({
+            status: 400,
+            code: codeBase - 10,
+            msg: "还未实名认证"
+        });
+    }
+}

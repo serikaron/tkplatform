@@ -49,4 +49,11 @@ export async function migrate(mongoClient) {
                 rate: 8
             }
         ])
+    await mongoClient.payment.db
+        .collection("withdrawFeeSetting")
+        .insertOne({
+            feeType: 1,
+            amount: Long("5000"),
+            fee: Long("600")
+        })
 }

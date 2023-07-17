@@ -97,6 +97,9 @@ export async function setupMongo(req) {
         addMemberRecord: async (record) => {
             await payment.db.collection("memberRecords").insertOne(record)
         },
+        addWithdrawRecord: async (record) => {
+            await payment.db.collection("withdrawRecords").insertOne(record)
+        },
         getRecords: async (collectionName, offset, limit, {phone, id}) => {
             const filter = {}
             if (phone !== undefined && phone !== null) {
@@ -118,7 +121,11 @@ export async function setupMongo(req) {
             const count = await payment.db.collection(collectionName)
                 .countDocuments(filter)
             return {count, items}
-        }
+        },
+        getFeeSetting: async () => {
+            return await payment.db.collection("withdrawFeeSetting")
+                .findOne()
+        },
     }
 }
 

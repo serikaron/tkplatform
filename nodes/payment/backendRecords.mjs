@@ -24,7 +24,7 @@ const recordCategory = {
 
 /**
  * 资金明细
- * paymentRecord
+ * db: paymentRecords
  * _id: string - order id
  * userId: ObjectId
  * phone: string - user phone
@@ -120,7 +120,7 @@ export const addPaymentRecordRice = async (context, userId, amount) => {
 
 /**
  * 米粒明细
- * riceRecord
+ * db: riceRecords
  * _id: string - order id
  * userId: ObjectId
  * phone: string - user phone
@@ -160,7 +160,7 @@ export const addRiceRecordRice = async (context, userId, rice) => {
 
 /**
  * 会员明细
- * memberRecord
+ * db: memberRecords
  * _id: string - order id
  * userId: ObjectId
  * phone: string - user phone
@@ -199,3 +199,19 @@ export const addMemberRecordMember = async (context, userId, days) => {
     })
 }
 
+/**
+ * 提现明细
+ * db: withdrawRecords
+ * _id: string - order id
+ * status: 0-待处理，1-处理中，2-已审核，3-已驳回
+ * userId: ObjectId
+ * phone: string - user phone
+ * type: 出款类型 - 帐户余额 （写死）
+ * method: 提现方式 - 支付宝 （写死）
+ * name: string
+ * alipayAccount: string
+ * amount: number
+ * fee: number
+ * createdAt: timestamp
+ * remark: string
+ */

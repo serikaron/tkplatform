@@ -65,3 +65,24 @@ export const salesmanLogin = async (phone) => {
         body: {phone: phone, password: "123456"}
     })
 }
+
+export const getIdentification = async () => {
+    return await call2({
+        method: 'GET',
+        path: '/v1/user/identification',
+    })
+}
+
+export const setIdentification = async (idNo, name) => {
+    return await call2({
+        method: "POST",
+        path: "/v1/user/identification",
+        body: {
+            idNo, name,
+            image: "",
+            wechat: "",
+            qq: "",
+            force: true
+        }
+    })
+}

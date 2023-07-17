@@ -64,6 +64,15 @@ export function setupStub(req) {
                     },
                     headers: {id: userId}
                 })
+            },
+            withdraw: async (userId, amount) => {
+                return await axiosCall({
+                    url: '/v1/api/user/wallet/withdraw',
+                    baseURL: 'http://apid:9010',
+                    method: 'POST',
+                    headers: {id: userId},
+                    data: {amount}
+                })
             }
         }
     }

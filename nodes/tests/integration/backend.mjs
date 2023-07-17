@@ -3,6 +3,15 @@
 import {call2} from "./api.mjs";
 import {token} from "./token.mjs";
 
+const backendCall = async ({method, path, query, body, authentication}) => {
+    if (authentication === undefined || authentication === null) {
+        authentication = token.adminToken
+    }
+    return await call2({path, query, body, authentication, method})
+}
+
+// ------------  user  ----------------
+
 export const adminRegister = async (username) => {
     const r = await call2({
         method: "POST",
@@ -27,17 +36,11 @@ export const adminLogin = async (username) => {
     return r.accessToken
 }
 
-const backendCall = async ({method, path, query, body, authentication}) => {
-    if (authentication === undefined || authentication === null) {
-        authentication = token.adminToken
-    }
-    return await call2({path, query, body, authentication, method})
-}
-
-export const getCommissionConfig = async () => {
-    return await backendCall({
-        method: "GET",
-        path: '/backend/v1/api/promotion/commission/list',
+export const getUsersBackend = async ({keyword, offset, limit}) => {
+    return await call2({
+        method: 'GET',
+        path: '/backend/v1/users',
+        query: {keyword, offset, limit}
     })
 }
 
@@ -56,5 +59,37 @@ export const getSites = async ({keyword, offset, limit} = {}) => {
         method: "GET",
         path: '/backend/v1/sites',
         query: {keyword, offset, limit}
+    })
+}
+
+// ------------  payment  ----------------
+
+export const addCash = async (userId, cash) => {
+    return await backendCall({
+        method: "POST",
+        path: "/backend/v2/wallet/cash",
+        body: {userId, cash}
+    })
+}
+
+export const getCommissionConfig = async () => {
+    return await backendCall({
+        method: "GET",
+        path: '/backend/v1/api/promotion/commission/list',
+    })
+}
+
+export const getWithdrawRecord = async ({orderId, phone, status, offset, limit}) => {
+    return await backendCall({
+        method: "GET",
+        path: "/backend/v2/withdraw/records",
+        query: {orderId, phone, status, offset, limit}
+    })
+}
+
+export const getWithdrawFee = async () => {
+    return await backendCall({
+        method: "GET",
+        path: '/backend/v1/api/withdraw/fee/setting'
     })
 }
