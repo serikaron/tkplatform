@@ -53,7 +53,7 @@ export async function migrate(mongoClient) {
         .collection("withdrawFeeSetting")
         .insertOne({
             feeType: 1,
-            amount: Long("5000"),
-            fee: Long("600")
+            amount: 5000,
+            fee: 600
         })
 }
