@@ -53,7 +53,11 @@ const mapMemberRecord = (item) => {
 }
 
 const mapWithdrawRecord = (item) => {
-    return replaceId(item)
+    replaceId(item)
+    item.netAmount = formatMoney(item.amount - item.fee)
+    item.amount = formatMoney(item.amount)
+    item.fee = formatMoney(item.fee)
+    return item
 }
 
 

@@ -580,6 +580,71 @@
 
 /**
  * @swagger
+ * /backend/v2/member/records(会员明细v2):
+ *   get:
+ *     tags: ["商城", "v2"]
+ *     parameters:
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: phone
+ *       schema:
+ *         type: String
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: String
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: String
+ *                       phone:
+ *                         type: String
+ *                       type:
+ *                         type: Number
+ *                         example: 1-增加 2-减少
+ *                       income:
+ *                         type: String
+ *                         example: 增加
+ *                       outcome:
+ *                         type: String
+ *                         example: 减少
+ *                       balance:
+ *                         type: timestamp
+ *                         example: 会员到期时间
+ *                       createAt:
+ *                         type: Number
+ *                         example: timestamp
+ *                       remark:
+ *                         type: String
+ *                         example: 备注
+ *
+ */
+
+/**
+ * @swagger
  * /backend/v2/rice/records(米粒明细v2):
  *   get:
  *     tags: ["商城", "v2"]
@@ -634,6 +699,79 @@
  *                       balance:
  *                         type: String
  *                         example: 余额
+ *                       createAt:
+ *                         type: Number
+ *                         example: timestamp
+ *                       remark:
+ *                         type: String
+ *                         example: 备注
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v2/withdraw/records(提现明细v2):
+ *   get:
+ *     tags: ["商城", "v2"]
+ *     parameters:
+ *     - in: path
+ *       name: offset
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: limit
+ *       schema:
+ *         type: Number
+ *     - in: path
+ *       name: phone
+ *       schema:
+ *         type: String
+ *     - in: path
+ *       name: id
+ *       schema:
+ *         type: String
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: number
+ *                 offset:
+ *                   type: number
+ *                 limit:
+ *                   type: number
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: String
+ *                       phone:
+ *                         type: String
+ *                       type:
+ *                         type: String
+ *                         example: "出款类型“
+ *                       method:
+ *                         type: String
+ *                         example: 提现方式
+ *                       name:
+ *                         type: String
+ *                       alipayAccount:
+ *                         type: String
+ *                         example: 支付宝帐号
+ *                       amount:
+ *                         type: String
+ *                         example: 提现金额 单位：元
+ *                       fee:
+ *                         type: String
+ *                         example: 手续费 单位：元
+ *                       netAmount:
+ *                         type: String
+ *                         example: 到帐金额 单位：元
  *                       createAt:
  *                         type: Number
  *                         example: timestamp

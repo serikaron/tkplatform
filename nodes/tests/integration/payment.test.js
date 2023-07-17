@@ -425,8 +425,9 @@ describe("用户提现", () => {
             method: "支付宝",
             name: userCentre.identification.name,
             alipayAccount: "fakeAlipayAccount",
-            amount: 5000,
-            fee: getFee(),
+            amount: "50.00",
+            fee: formatMoney(getFee()),
+            netAmount: formatMoney(5000 - getFee()),
             status: 0
         })
     })

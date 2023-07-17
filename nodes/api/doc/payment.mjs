@@ -289,7 +289,7 @@
 
 /**
  * @swagger
- * /v1/api/user/wallet/withdraw(用户提现):
+ * /v1/api/user/wallet/withdraw(废弃，使用/v2/withdraw):
  *   post:
  *     tags: ["payment(支付/商城)","个人中心"]
  *     requestBody:
@@ -302,6 +302,25 @@
  *                 type: number
  *                 example: 单位分
  *
+ */
+
+/**
+ * @swagger
+ * /v2/withdraw(用户提现v2):
+ *   post:
+ *     tags: ["payment(支付/商城)","个人中心", 'v2']
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               amount:
+ *                 type: number
+ *                 example: 单位分
+ *               alipayAccount:
+ *                 type: string
+ *                 example: 支付宝帐号
  */
 
 /**
