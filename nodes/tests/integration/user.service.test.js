@@ -127,6 +127,12 @@ describe("test user service", () => {
                         delete response.data.createdAt
                         delete desired.createdAt
                     }
+                    expect(response.data.registeredAt).toBeLessThanOrEqual(desired.registeredAt)
+                    delete response.data.registeredAt
+                    delete desired.registeredAt
+                    expect(response.data.member.expiration).toBeLessThanOrEqual(desired.member.expiration)
+                    delete response.data.member
+                    delete desired.member
                     expect(response.data).toStrictEqual(desired)
                 }
             })

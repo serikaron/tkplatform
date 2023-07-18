@@ -2,8 +2,8 @@
 
 // import client from "./client.json" assert {type: "json"}
 // import {runTest} from "./api.mjs";
-import {addSite, getSites, updateSite} from "./backend.mjs";
-import {addUserSite, delUserSite, getUserSite, getUserSites} from "./site.mjs";
+import {addSite, getSites} from "./backend.mjs";
+import {addUserSite, getUserSite, getUserSites} from "./site.mjs";
 
 // no concurrent
 // test.each([
@@ -110,6 +110,6 @@ test.each([
     const userSite = getUserSitesRsp.filter(x => { return x.id === userSiteId })[0]
     expect(userSite.site.type).toBe(id)
 
-    await updateSite(siteId, {disabled: true})
-    await delUserSite(userSiteId)
+    // await updateSite(siteId, {disabled: true})
+    // await delUserSite(userSiteId)
 })

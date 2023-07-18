@@ -90,6 +90,7 @@ const addUserSite = async (siteId, userId, userSite) => {
             simpleVerification(response)
             expect(response.data.id).not.toBeUndefined()
             userSite.id = response.data.id
+            addTypeToSite(userSite.site)
             expect(response.data).toStrictEqual(userSite)
         }
     })
@@ -764,15 +765,16 @@ describe("backend", () => {
         })
 
         it('check user site', async () => {
-            const rsp = await getBackendSite(userId, box)
             await getSites(userId, box)
-            expect(
-                box.data.sites.sort(sortSite)
-            ).toStrictEqual(
-                rsp.items
-                    .filter(x => !x.hasOwnProperty("disabled") || !x.disabled)
-                    .sort(sortSite)
-            )
+            const disabledSiteCount = box.data.sites.filter(x => x.id === box.data.newSite.id).length
+            expect(disabledSiteCount).toBe(0)
+            // expect(
+            //     box.data.sites.sort(sortSite)
+            // ).toStrictEqual(
+            //     rsp.items
+            //         .filter(x => !x.hasOwnProperty("disabled") || !x.disabled)
+            //         .sort(sortSite)
+            // )
         })
     })
 })

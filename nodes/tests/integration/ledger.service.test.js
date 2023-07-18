@@ -4,6 +4,7 @@ import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
 import {copy, dateToTimestamp, mergeObjects, now, today} from "../../common/utils.mjs";
 import {ObjectId} from "mongodb";
+import {addTypeToSite} from "../../site/helper.mjs";
 
 const baseURL = "http://localhost:9007"
 const siteBaseURL = "http://localhost:9006"
@@ -23,8 +24,10 @@ const entryFromDate = (date) => {
 }
 
 const getEmptyUserSite = (site) => {
+    const newSite = copy(site)
+    addTypeToSite(newSite)
     return {
-        site: copy(site),
+        site: newSite,
         "credential": {
             "account": "",
             "password": ""
@@ -75,6 +78,7 @@ const addUserSite = async (siteId, userId, userSite) => {
             simpleVerification(response)
             expect(response.data.id).not.toBeUndefined()
             userSite.id = response.data.id
+            addTypeToSite(userSite.site)
             expect(response.data).toStrictEqual(userSite)
         }
     })
