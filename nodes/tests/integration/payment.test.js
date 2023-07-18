@@ -15,7 +15,6 @@ import {
     addCash,
     auditWithdrawal,
     getCommissionConfig,
-    getUsersBackend,
     getWithdrawFee,
     getWithdrawRecord
 } from "./backend.mjs";
@@ -438,7 +437,7 @@ describe("提现测试", () => {
                 name: userCentre.identification.name,
                 alipayAccount: "fakeAlipayAccount",
                 amount: "50.00",
-                fee: formatMoney(getFee()),
+                fee: formatMoney(await getFee(5000)),
                 netAmount: formatMoney(5000 - await getFee(5000)),
                 status: 0
             })

@@ -116,11 +116,16 @@ describe("test user service", () => {
                     simpleVerification(response)
                     for (let i = 0; i < response.data.length; ++i) {
                         expect(response.data[i].registeredAt).toBeGreaterThanOrEqual(desired[i].registeredAt)
-                        expect(response.data[i].member.expiration).toBeGreaterThanOrEqual(desired[i].member.expiration-10)
+                        expect(response.data[i].member.expiration).toBeGreaterThanOrEqual(desired[i].member.expiration - 10)
                         delete response.data[i].registeredAt
                         delete response.data[i].member.expiration
                         delete desired[i].registeredAt
                         delete desired[i].member.expiration
+                    }
+                    if (desired.hasOwnProperty("createdAt")) {
+                        expect(response.data.createdAt).toBeLessThanOrEqual(desired.createdAt)
+                        delete response.data.createdAt
+                        delete desired.createdAt
                     }
                     expect(response.data).toStrictEqual(desired)
                 }
