@@ -93,3 +93,11 @@ export const getWithdrawFee = async () => {
         path: '/backend/v1/api/withdraw/fee/setting'
     })
 }
+
+export const auditWithdrawal = async (recordId, status) => {
+    return await backendCall({
+        method: "PUT",
+        path: `/backend/v2/withdraw/record/${recordId}`,
+        body: {status}
+    })
+}

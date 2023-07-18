@@ -409,6 +409,17 @@ const routeInfo = [
         needAuth: true,
         service: {baseURL: "http://payment:8080", url: "/v2/withdraw/records"}
     },
+    {
+        url: '/backend/v2/withdraw/record/:recordId',
+        method: "PUT",
+        needAuth: true,
+        service: {
+            baseURL: "http://payment:8080",
+            url: (req) => {
+                return `/v2/withdraw/record/${req.params.recordId}`
+            }
+        }
+    }
 ]
 
 export default routeInfo

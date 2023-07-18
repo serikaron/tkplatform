@@ -57,6 +57,7 @@ const mapWithdrawRecord = (item) => {
     item.netAmount = formatMoney(item.amount - item.fee)
     item.amount = formatMoney(item.amount)
     item.fee = formatMoney(item.fee)
+    delete item.userId
     return item
 }
 

@@ -754,7 +754,7 @@
  *                         type: String
  *                       type:
  *                         type: String
- *                         example: "出款类型“
+ *                         example: 出款类型
  *                       method:
  *                         type: String
  *                         example: 提现方式

@@ -122,6 +122,17 @@ export async function setupMongo(req) {
                 .countDocuments(filter)
             return {count, items}
         },
+        getWithdrawRecord: async (id) => {
+            return await payment.db.collection("withdrawRecords")
+                .findOne({_id: new ObjectId(id)})
+        },
+        updateWithdrawRecord: async (id, status, remark, auditedAt) => {
+            await payment.db.collection("withdrawRecords")
+                .updateOne(
+                    {_id: new ObjectId(id)},
+                    {$set: {status, remark, auditedAt}}
+                )
+        },
         getFeeSetting: async () => {
             return await payment.db.collection("withdrawFeeSetting")
                 .findOne()

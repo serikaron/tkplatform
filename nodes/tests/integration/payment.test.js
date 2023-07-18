@@ -11,8 +11,15 @@ import {
     payMember, payRice, withdraw
 } from "./payment.mjs";
 import {getIdentification, getOverview, getUserCentre, setIdentification} from "./user.mjs";
-import {addCash, getCommissionConfig, getUsersBackend, getWithdrawFee, getWithdrawRecord} from "./backend.mjs";
-import {formatMoney, parseMoney} from "../../common/utils.mjs";
+import {
+    addCash,
+    auditWithdrawal,
+    getCommissionConfig,
+    getUsersBackend,
+    getWithdrawFee,
+    getWithdrawRecord
+} from "./backend.mjs";
+import {formatMoney, now, parseMoney} from "../../common/utils.mjs";
 import jwt from "jsonwebtoken";
 
 describe("购买会员", () => {
@@ -379,80 +386,235 @@ describe("购买米粒", () => {
     })
 })
 
-describe("用户提现", () => {
-    const box = {}
-
-    it("钱包准备", async () => {
-        const payload = jwt.verify(token.default.accessToken, "123456", {
-            ignoreExpiration: true,
-            algorithm: "HS256"
-        })
-        await addCash(payload.id, 10000)
-        const wallet = await getWallet()
-        box.cash = wallet.cash
-    })
-
-    it("实名认证", async () => {
-        const r = await getIdentification()
-        if (!r.identified) {
-            await setIdentification("123456", "张三")
-        }
-    })
-
-    it("提现申请", async () => {
-        await withdraw("fakeAlipayAccount", 5000)
-    })
-
-    it("检查提现列表", async () => {
-        const r = await getWithdrawRecord({
-            offset: 0, limit: 1
-        })
-        const record = r.items[0]
-        delete record.id
-        delete record.createdAt
-        delete record.userId
-
-        const userOverview = await getOverview()
-        const userCentre = await getUserCentre()
-
+describe("提现测试", () => {
+    const getFee = async (amount) => {
         const feeSetting = await getWithdrawFee()
-        const getFee = () => {
-            const a = feeSetting.amount
-            return Math.floor(5000 / a) === (5000 / a) ?
-                Math.floor(5000 / a) * feeSetting.fee :
-                (Math.floor(5000 / a) + 1) * feeSetting.fee
-        }
+        const a = feeSetting.amount
+        return Math.floor(amount / a) === (amount / a) ?
+            Math.floor(amount / a) * feeSetting.fee :
+            (Math.floor(amount / a) + 1) * feeSetting.fee
+    }
 
-        expect(record).toStrictEqual({
-            phone: userOverview.phone,
-            type: "帐户余额",
-            method: "支付宝",
-            name: userCentre.identification.name,
-            alipayAccount: "fakeAlipayAccount",
-            amount: "50.00",
-            fee: formatMoney(getFee()),
-            netAmount: formatMoney(5000 - getFee()),
-            status: 0
+    describe("用户提现", () => {
+        const box = {}
+
+        it("钱包准备", async () => {
+            const payload = jwt.verify(token.default.accessToken, "123456", {
+                ignoreExpiration: true,
+                algorithm: "HS256"
+            })
+            await addCash(payload.id, 10000)
+            const wallet = await getWallet()
+            box.cash = wallet.cash
+        })
+
+        it("实名认证", async () => {
+            const r = await getIdentification()
+            if (!r.identified) {
+                await setIdentification("123456", "张三")
+            }
+        })
+
+        it("提现申请", async () => {
+            await withdraw("fakeAlipayAccount", 5000)
+        })
+
+        it("检查提现列表", async () => {
+            const r = await getWithdrawRecord({
+                offset: 0, limit: 1
+            })
+            const record = r.items[0]
+            delete record.id
+            delete record.createdAt
+            delete record.userId
+
+            const userOverview = await getOverview()
+            const userCentre = await getUserCentre()
+
+            expect(record).toStrictEqual({
+                phone: userOverview.phone,
+                type: "帐户余额",
+                method: "支付宝",
+                name: userCentre.identification.name,
+                alipayAccount: "fakeAlipayAccount",
+                amount: "50.00",
+                fee: formatMoney(getFee()),
+                netAmount: formatMoney(5000 - await getFee(5000)),
+                status: 0
+            })
+        })
+
+        it("资金明细", async () => {
+            const overview = await getOverview()
+            const r = await getPaymentRecord({
+                phone: overview.phone, offset: 0, limit: 1
+            })
+
+            const record = r.items[0]
+            delete record.id
+            delete record.createdAt
+
+            expect(record).toStrictEqual({
+                phone: overview.phone,
+                type: 2,
+                category: "提现冻结",
+                outcome: "50.00",
+                balance: formatMoney(box.cash - 5000),
+                remark: "申请提现，冻结金额"
+            })
         })
     })
 
-    it("资金明细", async () => {
-        const overview = await getOverview()
-        const r = await getPaymentRecord({
-            phone: overview.phone, offset: 0, limit: 1
+    describe("提现审核", () => {
+        const prepare = async () => {
+            const payload = jwt.verify(token.default.accessToken, "123456", {
+                ignoreExpiration: true,
+                algorithm: "HS256"
+            })
+            await addCash(payload.id, 10000)
+            await withdraw("fakeAlipayAccount", 5000)
+            const r = await getWithdrawRecord({
+                phone: payload.phone, offset: 0, limit: 1
+            })
+            return r.items[0].id
+        }
+
+        describe("通过", () => {
+            const box = {}
+            it("arrange", async () => {
+                box.recordId = await prepare()
+                box.auditedAt = now()
+                box.cash = (await getWallet()).cash
+            })
+
+            it("act", async () => {
+                await auditWithdrawal(box.recordId, 1)
+                await auditWithdrawal(box.recordId, 2)
+            })
+
+            describe("assert", () => {
+                it("检查提现记录", async () => {
+                    const r = await getWithdrawRecord({
+                        orderId: box.recordId
+                    })
+                    const record = r.items[0]
+                    expect(record.id).toBe(box.recordId)
+                    delete record.id
+                    expect(record.auditedAt).toBeGreaterThanOrEqual(box.auditedAt)
+                    expect(record.auditedAt).toBeLessThanOrEqual(now())
+                    delete record.auditedAt
+                    delete record.createdAt
+                    expect(record.remark).toBeFalsy()
+                    delete record.remark
+
+                    const overview = await getOverview()
+                    const userCentre = await getUserCentre()
+
+                    expect(record).toStrictEqual({
+                        phone: overview.phone,
+                        type: "帐户余额",
+                        method: "支付宝",
+                        name: userCentre.identification.name,
+                        alipayAccount: "fakeAlipayAccount",
+                        amount: "50.00",
+                        fee: formatMoney(await getFee(5000)),
+                        netAmount: formatMoney(5000 - await getFee(5000)),
+                        status: 2
+                    })
+                })
+
+                it("检查资金明细", async () => {
+                    const overview = await getOverview()
+                    const r = await getPaymentRecord({
+                        phone: overview.phone, offset: 0, limit: 1
+                    })
+
+                    const record = r.items[0]
+                    expect(record.id).toBeTruthy()
+                    delete record.id
+                    expect(record.createdAt).toBeGreaterThanOrEqual(box.auditedAt)
+                    expect(record.createdAt).toBeLessThanOrEqual(now())
+                    delete record.createdAt
+
+                    expect(record).toStrictEqual({
+                        phone: overview.phone,
+                        type: 2,
+                        category: "提现成功扣除",
+                        outcome: "50.00",
+                        balance: formatMoney(box.cash),
+                        remark: "提现成功，扣款金额"
+                    })
+                })
+            })
+        })
+        describe("驳回", () => {
+            const box = {}
+            it("arrange", async () => {
+                box.recordId = await prepare()
+                box.auditedAt = now()
+                box.cash = (await getWallet()).cash
+            })
+
+            it("act", async () => {
+                await auditWithdrawal(box.recordId, 1)
+                await auditWithdrawal(box.recordId, 3)
+            })
+
+            describe("assert", () => {
+                it("检查提现记录", async () => {
+                    const r = await getWithdrawRecord({
+                        orderId: box.recordId
+                    })
+                    const record = r.items[0]
+                    expect(record.id).toBe(box.recordId)
+                    delete record.id
+                    expect(record.auditedAt).toBeGreaterThanOrEqual(box.auditedAt)
+                    expect(record.auditedAt).toBeLessThanOrEqual(now())
+                    delete record.auditedAt
+                    delete record.createdAt
+                    expect(record.remark).toBeFalsy()
+                    delete record.remark
+
+                    const overview = await getOverview()
+                    const userCentre = await getUserCentre()
+
+                    expect(record).toStrictEqual({
+                        phone: overview.phone,
+                        type: "帐户余额",
+                        method: "支付宝",
+                        name: userCentre.identification.name,
+                        alipayAccount: "fakeAlipayAccount",
+                        amount: "50.00",
+                        fee: formatMoney(await getFee(5000)),
+                        netAmount: formatMoney(5000 - await getFee(5000)),
+                        status: 3
+                    })
+                })
+
+                it("检查资金明细", async () => {
+                    const overview = await getOverview()
+                    const r = await getPaymentRecord({
+                        phone: overview.phone, offset: 0, limit: 1
+                    })
+
+                    const record = r.items[0]
+                    expect(record.id).toBeTruthy()
+                    delete record.id
+                    expect(record.createdAt).toBeGreaterThanOrEqual(box.auditedAt)
+                    expect(record.createdAt).toBeLessThanOrEqual(now())
+                    delete record.createdAt
+
+                    expect(record).toStrictEqual({
+                        phone: overview.phone,
+                        type: 1,
+                        category: "提现解冻",
+                        income: "50.00",
+                        balance: formatMoney(box.cash + 5000),
+                        remark: "提现失败，解冻金额"
+                    })
+                })
+            })
         })
 
-        const record = r.items[0]
-        delete record.id
-        delete record.createdAt
-
-        expect(record).toStrictEqual({
-            phone: overview.phone,
-            type: 2,
-            category: "提现冻结",
-            outcome: "50.00",
-            balance: formatMoney(box.cash - 5000),
-            remark: "申请提现，冻结金额"
-        })
     })
 })

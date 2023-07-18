@@ -141,7 +141,7 @@ export const addPaymentRecordWithdrawFreeze = async (context, userId, amount) =>
     })
 }
 
-export const addPaymentRecordWithdrawUnFreeze = async (context, userId, amount) => {
+export const addPaymentRecordWithdrawUnfreeze = async (context, userId, amount) => {
     await addPaymentRecordWithdraw(context, userId, (record) => {
         return {
             type: recordType.income,
@@ -262,3 +262,10 @@ export const addMemberRecordMember = async (context, userId, days) => {
  * createdAt: timestamp
  * remark: string
  */
+
+export const withdrawRecordStatus = {
+    pending: 0,
+    processing: 1,
+    approved: 2,
+    rejected: 3
+}
