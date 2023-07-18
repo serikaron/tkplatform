@@ -4,6 +4,7 @@ import {runTest} from "./service.mjs";
 import {simpleVerification} from "./verification.mjs";
 import {ObjectId} from "mongodb";
 import {copy, mergeObjects, now} from "../../common/utils.mjs";
+import {addTypeToSite} from "../../site/helper.mjs";
 
 class Box {
     constructor() {
@@ -11,8 +12,10 @@ class Box {
     }
 
     getEmptyUserSite() {
+        const site = copy(this.data.site)
+        addTypeToSite(site)
         return {
-            site: copy(this.data.site),
+            site: site,
             "credential": {
                 "account": "",
                 "password": ""

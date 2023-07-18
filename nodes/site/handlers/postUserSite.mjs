@@ -5,6 +5,7 @@ import {isBadFieldString, replaceId} from "../../common/utils.mjs";
 import {InvalidArgument, NotFound} from "../../common/errors/00000-basic.mjs";
 import {ObjectId} from "mongodb";
 import {makeMiddleware} from "../../common/flow.mjs";
+import {addTypeToSite} from "../helper.mjs";
 
 const checkInput = (req) => {
     if (isBadFieldString(req.body.siteId)) {
@@ -24,6 +25,7 @@ const makeUserSite = async req => {
     }
     systemSite.id = systemSite._id
     delete systemSite._id
+    addTypeToSite(systemSite)
     req.userSite = {
         userId: new ObjectId(req.headers.id),
         site: systemSite,

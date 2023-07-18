@@ -62,6 +62,14 @@ export const getSites = async ({keyword, offset, limit} = {}) => {
     })
 }
 
+export const updateSite = async (siteId, site) => {
+    return await backendCall({
+        method: "PUT",
+        path: `/backend/v1/site/${siteId}`,
+        body: site
+    })
+}
+
 // ------------  payment  ----------------
 
 export const addCash = async (userId, cash) => {

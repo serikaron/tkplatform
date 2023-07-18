@@ -2,7 +2,8 @@
 
 // import client from "./client.json" assert {type: "json"}
 // import {runTest} from "./api.mjs";
-import {addSite, getSites} from "./backend.mjs";
+import {addSite, getSites, updateSite} from "./backend.mjs";
+import {addUserSite, delUserSite, getUserSite, getUserSites} from "./site.mjs";
 
 // no concurrent
 // test.each([
@@ -78,4 +79,37 @@ describe("添加站点", () => {
         await testHot(-1, 0)
         await testHot(5.5, 5)
     })
+})
+
+test.each([
+    { id: "6437d4c3b0d3db516ad9fd0d", name: "嗨推"},
+    { id: "6437d4dab0d3db516ad9fd0e", name: "新世界"},
+    { id: "643ca67884bb2a4465f4f047", name: "新日日升"},
+    { id: "643ca69884bb2a4465f4f048", name: "乐多多"},
+    { id: "643ca6b184bb2a4465f4f049", name: "快麦圈"},
+])("($#) 固定站点id测试", async ({id, name}) => {
+    const site = JSON.parse(JSON.stringify(defaultSite))
+    site.name = name
+
+    const addSiteRsp = await addSite(site)
+    // expect(addSiteRsp.templateId).toBe(id)
+    const siteId = addSiteRsp.id
+
+    // const getSitesRsp = await getSites()
+    // expect(getSitesRsp.items[0].templateId).toBe(id)
+
+    const addUserSiteRsp = await addUserSite(siteId)
+    expect(addUserSiteRsp.site.type).toBe(id)
+
+    const userSiteId = addUserSiteRsp.id
+
+    const getUserSiteRsp = await getUserSite(userSiteId)
+    expect(getUserSiteRsp.site.type).toBe(id)
+
+    const getUserSitesRsp = await getUserSites()
+    const userSite = getUserSitesRsp.filter(x => { return x.id === userSiteId })[0]
+    expect(userSite.site.type).toBe(id)
+
+    await updateSite(siteId, {disabled: true})
+    await delUserSite(userSiteId)
 })
