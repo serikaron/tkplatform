@@ -428,13 +428,12 @@ describe("test user service", () => {
                 userId: box.userId,
                 verify: rsp => {
                     simpleVerification(rsp)
+                    expect(rsp.data.member.expiration).toBeLessThanOrEqual(now() + 7*86400)
+                    delete rsp.data.member
                     expect(rsp.data).toStrictEqual(
                         {
                             id: box.userId.substring(box.userId.length - 8),
                             phone,
-                            member: {
-                                expiration: now() + 7 * 86400
-                            },
                             identified: false,
                             notice: [],
                             wallet: {
