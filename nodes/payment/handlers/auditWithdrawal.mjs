@@ -45,27 +45,17 @@ export const routeAuditWithdrawal = (router) => {
             console.log(`audit withdrawal, invalid input status ${req.body.status} for record ${JSON.stringify(record)}`)
             throw new InvalidArgument()
         }
-        console.log('status ok')
 
         await req.context.mongo.updateWithdrawRecord(req.params.recordId, req.body.status, req.body.remark, auditedAt(req.body.status))
-        console.log('record updated')
 
         if (req.body.status === withdrawRecordStatus.approved) {
-            console.log('approve')
             await addPaymentRecordWithdrawDone(req.context, record.userId, record.amount)
         }
 
-        console.log('audit')
-
         if (req.body.status === withdrawRecordStatus.rejected) {
-            console.log('reject')
             await req.context.mongo.addCash(record.userId, record.amount)
-            console.log('cash added')
             await addPaymentRecordWithdrawUnfreeze(req.context, record.userId, record.amount)
-            console.log('unfreeze')
         }
-
-        console.log('all done')
 
         res.tkResponse(TKResponse.Success())
         next()

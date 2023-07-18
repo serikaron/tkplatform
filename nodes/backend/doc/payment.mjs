@@ -730,6 +730,10 @@
  *       name: id
  *       schema:
  *         type: String
+ *     - in: status
+ *       name: id
+ *       schema:
+ *         type: String
  *     responses:
  *       200:
  *         content:
@@ -778,5 +782,25 @@
  *                       remark:
  *                         type: String
  *                         example: 备注
+ *                       status:
+ *                         type: number
+ *                         example: 0-待处理，1-处理中，2-已审核，3-已驳回
+ *
+ */
+
+/**
+ * @swagger
+ * /backend/v2/withdraw/record/:recordId(提现审核):
+ *   put:
+ *     tags: ["商城", "v2"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: number
+ *                 example: 0-待处理，1-处理中，2-已审核，3-已驳回
  *
  */
