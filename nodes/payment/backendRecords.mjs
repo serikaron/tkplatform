@@ -19,7 +19,10 @@ const recordType = {income: 1, outcome: 2}
 const recordCategory = {
     member: {category: 0, desc: "购买会员"},
     commission: {category: 1, desc: "下级提成奖励"},
-    rice: {category: 2, desc: "购买米粒"}
+    rice: {category: 2, desc: "购买米粒"},
+    withdrawFreeze: {category: 3, desc: "提现冻结"},
+    withdrawUnfreeze: {category: 4, desc: "提现解冻"},
+    withdrawDone: {category: 5, desc: "提现成功扣除"},
 }
 
 /**
@@ -114,6 +117,50 @@ export const addPaymentRecordRice = async (context, userId, amount) => {
             categoryDescription: recordCategory.rice.desc,
             remark: `${record.phone}购买米粒`,
             balance: balance
+        }
+    })
+}
+
+const addPaymentRecordWithdraw = async (context, userId, fn) => {
+    const wallet = await context.mongo.getWallet(userId)
+    const balance = wallet !== null && wallet.hasOwnProperty("cash") ? wallet.cash : 0
+    await addPaymentRecord(context, userId, (record) => {
+        return Object.assign(fn(record), {balance})
+    })
+}
+
+export const addPaymentRecordWithdrawFreeze = async (context, userId, amount) => {
+    await addPaymentRecordWithdraw(context, userId, (record) => {
+        return {
+            type: recordType.outcome,
+            outcome: amount,
+            category: recordCategory.withdrawFreeze.category,
+            categoryDescription: recordCategory.withdrawFreeze.desc,
+            remark: "申请提现，冻结金额",
+        }
+    })
+}
+
+export const addPaymentRecordWithdrawUnFreeze = async (context, userId, amount) => {
+    await addPaymentRecordWithdraw(context, userId, (record) => {
+        return {
+            type: recordType.income,
+            income: amount,
+            category: recordCategory.withdrawUnfreeze.category,
+            categoryDescription: recordCategory.withdrawUnfreeze.desc,
+            remark: "提现失败，解冻金额",
+        }
+    })
+}
+
+export const addPaymentRecordWithdrawDone = async (context, userId, amount) => {
+    await addPaymentRecordWithdraw(context, userId, (record) => {
+        return {
+            type: recordType.outcome,
+            outcome: amount,
+            category: recordCategory.withdrawDone.category,
+            categoryDescription: recordCategory.withdrawDone.desc,
+            remark: "提现成功，扣款金额",
         }
     })
 }

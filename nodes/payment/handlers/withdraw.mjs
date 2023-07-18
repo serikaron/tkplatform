@@ -5,6 +5,7 @@ import {HaveNotIdentified} from "../../common/errors/10000-user.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {NotEnoughCash} from "../../common/errors/40000-payment.mjs";
 import {now} from "../../common/utils.mjs";
+import {addPaymentRecordWithdrawFreeze} from "../backendRecords.mjs";
 
 const freeze = async (req) => {
     const wallet = await req.context.mongo.getWallet(req.headers.id)
@@ -58,6 +59,10 @@ const addRecordV2 = async (req, user, fee) => {
     await req.context.mongo.addWithdrawRecord(record)
 }
 
+const addPaymentRecord = async (req, amount) => {
+    await addPaymentRecordWithdrawFreeze(req.context, req.headers.id, amount)
+}
+
 export const routeWithdraw = (router) => {
     router.post('/withdraw', async (req, res, next) => {
         // const r = await req.context.stubs.apid.withdraw(req.headers.id, req.body.amount)
@@ -83,6 +88,7 @@ export const routeWithdraw = (router) => {
 
         await addRecordV1(req, user, fee, req.body.amount)
         await addRecordV2(req, user, fee)
+        await addPaymentRecord(req, req.body.amount)
 
         res.tkResponse(TKResponse.Success())
         next()

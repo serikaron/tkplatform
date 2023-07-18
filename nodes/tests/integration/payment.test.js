@@ -380,12 +380,16 @@ describe("购买米粒", () => {
 })
 
 describe("用户提现", () => {
-    it("添加余额", async () => {
+    const box = {}
+
+    it("钱包准备", async () => {
         const payload = jwt.verify(token.default.accessToken, "123456", {
             ignoreExpiration: true,
             algorithm: "HS256"
         })
         await addCash(payload.id, 10000)
+        const wallet = await getWallet()
+        box.cash = wallet.cash
     })
 
     it("实名认证", async () => {
@@ -429,6 +433,26 @@ describe("用户提现", () => {
             fee: formatMoney(getFee()),
             netAmount: formatMoney(5000 - getFee()),
             status: 0
+        })
+    })
+
+    it("资金明细", async () => {
+        const overview = await getOverview()
+        const r = await getPaymentRecord({
+            phone: overview.phone, offset: 0, limit: 1
+        })
+
+        const record = r.items[0]
+        delete record.id
+        delete record.createdAt
+
+        expect(record).toStrictEqual({
+            phone: overview.phone,
+            type: 2,
+            category: "提现冻结",
+            outcome: "50.00",
+            balance: formatMoney(box.cash - 5000),
+            remark: "申请提现，冻结金额"
         })
     })
 })
