@@ -66,9 +66,34 @@ const makeHandler = (collectionName, mapFn) => {
     return async (req, res, next) => {
         const offset = getValueNumber(req.query, "offset", 0)
         const limit = getValueNumber(req.query, "limit", 50)
-        const phone = getValueString(req.query, "phone", null)
-        const id = getValueString(req.query, "id", null)
-        const r = await req.context.mongo.getRecords(collectionName, offset, limit, {phone, id})
+
+        const filter = {}
+        const makeFilter = () => {
+            const plugStringFilter = (field) => {
+                const v = getValueString(req.query, field, "")
+                if (v !== "") {
+                    filter[field] = v
+                }
+            }
+
+            const plugNumberFilter = (field) => {
+                const v = getValueNumber(req.query, field, 0)
+                if (v !== 0) {
+                    filter[field] = v
+                }
+            }
+            plugStringFilter("phone")
+            plugStringFilter("id")
+            plugNumberFilter("status")
+            plugNumberFilter("startTime")
+            plugNumberFilter("endTime")
+            plugNumberFilter("type")
+        }
+        makeFilter()
+
+        console.log(`filter: ${JSON.stringify(filter)}`)
+
+        const r = await req.context.mongo.getRecords(collectionName, offset, limit, filter)
 
         res.tkResponse(TKResponse.Success({
             data: {

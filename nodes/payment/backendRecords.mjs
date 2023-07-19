@@ -249,8 +249,8 @@ export const addMemberRecordMember = async (context, userId, days) => {
 /**
  * 提现明细
  * db: withdrawRecords
- * _id: string - order id0-待处理，1-处理中，2-已审核，3-已驳回
- * status:
+ * _id: string - order id
+ * status: 0-待处理，1-处理中，2-已审核，3-已驳回
  * userId: ObjectId
  * phone: string - user phone
  * type: 出款类型 - 帐户余额 （写死）

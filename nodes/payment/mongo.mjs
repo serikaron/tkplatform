@@ -100,13 +100,28 @@ export async function setupMongo(req) {
         addWithdrawRecord: async (record) => {
             await payment.db.collection("withdrawRecords").insertOne(record)
         },
-        getRecords: async (collectionName, offset, limit, {phone, id}) => {
+        getRecords: async (collectionName, offset, limit, inputFilter) => {
             const filter = {}
-            if (phone !== undefined && phone !== null) {
-                filter.phone = {$regex: `.*${phone}.*`}
+            if (inputFilter.hasOwnProperty("phone")) {
+                filter.phone = {$regex: `.*${inputFilter.phone}.*`}
             }
-            if (id !== undefined && id !== null) {
-                filter._id = id
+            if (inputFilter.hasOwnProperty("id")) {
+                filter._id = inputFilter.id
+            }
+            if (inputFilter.hasOwnProperty("status")) {
+                filter.status = inputFilter.status
+            }
+            if (inputFilter.hasOwnProperty("type")) {
+                filter.type = inputFilter.type
+            }
+            if (inputFilter.hasOwnProperty("startTime") &&
+                inputFilter.hasOwnProperty("endTime")
+            ) {
+                filter.createdAt = {$gte: inputFilter.startTime, $lte: inputFilter.endTime}
+            } else if (inputFilter.hasOwnProperty("startTime")) {
+                filter.createdAt = {$gte: inputFilter.startTime}
+            } else if (inputFilter.hasOwnProperty("endTime")) {
+                filter.createdAt = {$lte: inputFilter.endTime}
             }
 
             console.log(`filter: ${JSON.stringify(filter)}`)
