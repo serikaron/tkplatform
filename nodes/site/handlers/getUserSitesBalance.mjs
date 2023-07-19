@@ -2,8 +2,10 @@
 
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {getValueString} from "../../common/utils.mjs";
+import {addTypeToSite} from "../helper.mjs";
 
 const siteBalance = userSite => {
+    addTypeToSite(userSite.site)
     return {
         id: userSite._id,
         site: userSite.site,
