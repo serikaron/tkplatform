@@ -44,6 +44,14 @@ export const getUsersBackend = async ({keyword, offset, limit}) => {
     })
 }
 
+export const addMember = async (userId, days) => {
+    return await backendCall({
+        method: "POST",
+        path: '/backend/v2/user/member',
+        body: {userId, days}
+    })
+}
+
 // ------------  site  ----------------
 
 export const addSite = async (site) => {
@@ -77,6 +85,14 @@ export const addCash = async (userId, cash) => {
         method: "POST",
         path: "/backend/v2/wallet/cash",
         body: {userId, cash}
+    })
+}
+
+export const addRice = async (userId, rice) => {
+    return await backendCall({
+        method: "POST",
+        path: '/backend/v2/wallet/rice',
+        body: {userId, rice}
     })
 }
 

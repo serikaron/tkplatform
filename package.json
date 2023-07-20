@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "test:unit": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.unit.config.js",
-    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest --config=jest.integration.config.js"
+    "test:integration": "node --experimental-vm-modules node_modules/.bin/jest -i --config=jest.integration.config.js"
   },
   "author": "",
   "license": "ISC",

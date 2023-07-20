@@ -380,10 +380,16 @@ const routeInfo = [
         service: {baseURL: "http://payment:8080", url: '/v1/wallet/cash'}
     },
     {
+        url: '/backend/v2/wallet/rice',
+        method: "POST",
+        needAuth: true,
+        service: {baseURL: "http://payment:8080", url: '/v1/wallet/rice'}
+    },
+    {
         url: '/backend/v2/user/member',
         method: "POST",
         needAuth: true,
-        service: {baseURL: "http://user:8080", url: '/v1/user/member'}
+        service: {baseURL: "http://user:8080", url: '/v1/backend/user/member'}
     },
     {
         url: '/backend/v2/payment/records',

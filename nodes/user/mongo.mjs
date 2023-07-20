@@ -202,6 +202,13 @@ export async function setupMongo(req) {
                     {$inc: {"member.expiration": days * 86400}}
                 )
         },
+        setUserMember: async (userId, expiration) => {
+            await collection.users
+                .updateOne(
+                    {_id: new ObjectId(userId)},
+                    {$set: {"member.expiration": expiration}}
+                )
+        },
         addBackendUser: async (user) => {
             const r = await collection.backendUsers
                 .insertOne(user)

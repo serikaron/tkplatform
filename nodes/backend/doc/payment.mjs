@@ -512,6 +512,23 @@
 
 /**
  * @swagger
+ * /backend/v2/wallet/rice(添加用户米粒):
+ *   post:
+ *     tags: ["商城", "v2"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               userId:
+ *                 type: string
+ *               rice:
+ *                 type: number
+ */
+
+/**
+ * @swagger
  * /backend/v2/payment/records(资金明细v2):
  *   get:
  *     tags: ["商城", "v2"]

@@ -73,7 +73,7 @@ export function setupStub(req) {
                     baseURL: "http://payment:8080",
                     method: "POST",
                     headers: {id: userId},
-                    body: update
+                    data: update
                 })
             },
             getWallet: async (userId) => {
@@ -91,7 +91,15 @@ export function setupStub(req) {
                     method: 'GET',
                     headers: {id: userId},
                 })
-            }
+            },
+            addBackendRecord: async (record) => {
+                return await axiosCall({
+                    url: "/v2/member/record",
+                    baseURL: "http://payment:8080",
+                    method: 'POST',
+                    data: record,
+                })
+            },
         }
     }
 
