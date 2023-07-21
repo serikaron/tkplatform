@@ -4,12 +4,12 @@ import {getMemberRecord, getPaymentRecord, getRiceRecord, getWallet} from "./pay
 import {addCash, addMember, addRice} from "./backend.mjs";
 import jwt from "jsonwebtoken";
 import {token} from "./token.mjs";
-import {formatMoney, now} from "../../common/utils.mjs";
+import {formatMoney, now, parseMoney} from "../../common/utils.mjs";
 import {getOverview} from "./user.mjs";
 
 describe.each([
-    {name: "添加余额", cash: 3000, record: {type: 1, category: "管理员手动增加", income: formatMoney(3000)}},
-    {name: "减少余额", cash: -3000, record: {type: 2, category: "管理员手动减少", outcome: formatMoney(3000)}},
+    {name: "添加余额", cash: "12.34", record: {type: 1, category: "管理员手动增加", income: "12.34"}},
+    {name: "减少余额", cash: "-12.34", record: {type: 2, category: "管理员手动减少", outcome: "12.34"}},
 ])("余额操作-$name", ({cash, record}) => {
     const box = {}
 
@@ -33,7 +33,7 @@ describe.each([
 
     it("assert", async () => {
         const wallet = await getWallet()
-        expect(wallet.cash).toBe(box.cash + cash)
+        expect(wallet.cash).toBe(box.cash + parseMoney(cash))
 
         const r = await getPaymentRecord({
             phone: box.phone, offset: 0, limit: 1

@@ -38,10 +38,11 @@ func CheckDailyBalanceHandler(c *gin.Context) {
 	userCount := dao.CountUserCheckDaily(mongoDb, userId)
 
 	balance := int64(0)
-	if userCount >= 3 {
+	maxBalance := int64(1)
+	if userCount >= maxBalance {
 		balance = 0
 	} else {
-		balance = 3 - userCount
+		balance = maxBalance - userCount
 	}
 
 	c.JSON(http.StatusOK, gin.H{

@@ -3,6 +3,7 @@
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {addPaymentRecordAdmin, addRiceRecordAdmin} from "../backendRecords.mjs";
 import {InvalidArgument} from "../../common/errors/00000-basic.mjs";
+import {parseMoney} from "../../common/utils.mjs";
 
 export const routePostWallet = router => {
     router.post("/wallet", async (req, res, next) => {
@@ -13,7 +14,7 @@ export const routePostWallet = router => {
     })
 
     router.post("/wallet/cash", async (req, res, next) => {
-        const cash = Number(req.body.cash)
+        const cash = parseMoney(req.body.cash)
         if (isNaN(cash)) {
             throw new InvalidArgument()
         }
