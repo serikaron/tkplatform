@@ -2,8 +2,11 @@
 
 import axios from "axios";
 
+// const host = "http://user.wawaq.cn"
+const host = "http://user.qeqed.cn"
+
 const login = async () => {
-    const r = await axios.post("http://user.wawaq.cn/ksy/api/shokey/login", {
+    const r = await axios.post(`${host}/ksy/api/shokey/login`, {
         "mobile": "13587021931",
         "password": "hxy197984"
     })
@@ -11,13 +14,13 @@ const login = async () => {
 }
 
 const getAccounts = async (userId) => {
-    const r = await axios.post("http://user.wawaq.cn/ksy/api/shokey/accountList", {
+    const r = await axios.post(`${host}/ksy/api/shokey/accountList`, {
         "userNo": "02261931"
     })
 }
 
 const task = async () => {
-    const r = await axios.post("http://user.wawaq.cn/ksy/api/shokey/task/matchOrder", {
+    const r = await axios.post(`${host}/ksy/api/shokey/task/matchOrder`, {
         "token": "2d550637cb4584d2a637321b0ce30193",
         "userNo": "02261931",
         "accId": null,

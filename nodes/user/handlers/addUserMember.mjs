@@ -56,6 +56,8 @@ export const routeAddUserMember = (router) => {
             throw new InvalidArgument()
         }
 
+        await req.context.mongo.addUserMember(req.body.userId, days)
+
         const record = await makeBackendRecord(req, days)
         await req.context.stubs.payment.addBackendRecord(record)
         res.tkResponse(TKResponse.Success())
