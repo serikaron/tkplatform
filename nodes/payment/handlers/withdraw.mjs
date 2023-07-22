@@ -83,7 +83,16 @@ export const routeWithdraw = (router) => {
 
         const user = userRsp.data
         if (!user.hasOwnProperty("identification")) {
-            throw new HaveNotIdentified()
+            // throw new HaveNotIdentified()
+            // res.tkResponse(TKResponse.fromError(new HaveNotIdentified()))
+            res.response({
+                status: 200,
+                code: -10010,
+                msg: "还未实名认证",
+                data: {}
+            })
+            next()
+            return
         }
 
         await addRecordV1(req, user, fee, req.body.amount)
