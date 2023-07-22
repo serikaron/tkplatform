@@ -13,7 +13,7 @@ import {
 import {getIdentification, getOverview, getUserCentre, setIdentification} from "./user.mjs";
 import {
     addCash,
-    auditWithdrawal,
+    auditWithdrawal, auditWithdrawals,
     getCommissionConfig,
     getWithdrawFee,
     getWithdrawRecord
@@ -487,8 +487,8 @@ describe("提现测试", () => {
             })
 
             it("act", async () => {
-                await auditWithdrawal(box.recordId, 1)
-                await auditWithdrawal(box.recordId, 2)
+                await auditWithdrawals([box.recordId], 1, "processing")
+                await auditWithdrawals([box.recordId], 2, "同意")
             })
 
             describe("assert", () => {
@@ -503,8 +503,6 @@ describe("提现测试", () => {
                     expect(record.auditedAt).toBeLessThanOrEqual(now())
                     delete record.auditedAt
                     delete record.createdAt
-                    expect(record.remark).toBeFalsy()
-                    delete record.remark
 
                     const overview = await getOverview()
                     const userCentre = await getUserCentre()
@@ -518,7 +516,8 @@ describe("提现测试", () => {
                         amount: "50.00",
                         fee: formatMoney(await getFee(5000)),
                         netAmount: formatMoney(5000 - await getFee(5000)),
-                        status: 2
+                        status: 2,
+                        remark: "同意"
                     })
                 })
 
@@ -555,8 +554,8 @@ describe("提现测试", () => {
             })
 
             it("act", async () => {
-                await auditWithdrawal(box.recordId, 1)
-                await auditWithdrawal(box.recordId, 3)
+                await auditWithdrawals([box.recordId], 1)
+                await auditWithdrawals([box.recordId], 3, "驳回")
             })
 
             describe("assert", () => {
@@ -571,8 +570,6 @@ describe("提现测试", () => {
                     expect(record.auditedAt).toBeLessThanOrEqual(now())
                     delete record.auditedAt
                     delete record.createdAt
-                    expect(record.remark).toBeFalsy()
-                    delete record.remark
 
                     const overview = await getOverview()
                     const userCentre = await getUserCentre()
@@ -586,7 +583,8 @@ describe("提现测试", () => {
                         amount: "50.00",
                         fee: formatMoney(await getFee(5000)),
                         netAmount: formatMoney(5000 - await getFee(5000)),
-                        status: 3
+                        status: 3,
+                        remark: "驳回"
                     })
                 })
 

@@ -125,3 +125,17 @@ export const auditWithdrawal = async (recordId, status) => {
         body: {status}
     })
 }
+
+export const auditWithdrawals = async (recordIds, status, remark) => {
+    const body = {
+        ids: recordIds, status
+    }
+    if (remark !== undefined && remark !== null) {
+        body.remark = remark
+    }
+    return await backendCall({
+        method: "PUT",
+        path: `/backend/v2/withdraw/records`,
+        body: body
+    })
+}

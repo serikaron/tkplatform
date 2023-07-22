@@ -28,7 +28,7 @@ function headers({url, body, authentication}) {
     const timestamp = Math.floor(Date.now() / 1000)
     const s = sign(url, body, timestamp, process.env.SECRET_KEY)
     // console.log(url)
-    // console.log(JSON.stringify(s))
+    console.log(JSON.stringify(s))
     return {
         timestamp,
         signature: s.signature,

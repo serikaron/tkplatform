@@ -34,27 +34,40 @@ const auditedAt = (inputStatus) => {
     }
 }
 
+const auditWithdrawal = async (req, recordId, status, remark) => {
+    const record = await req.context.mongo.getWithdrawRecord(recordId)
+    if (record === null) {
+        throw new NotFound()
+    }
+
+    if (!checkStatus(status, record.status)) {
+        console.log(`audit withdrawal, invalid input status ${req.body.status} for record ${JSON.stringify(record)}`)
+        throw new InvalidArgument()
+    }
+
+    await req.context.mongo.updateWithdrawRecord(recordId, status, remark, auditedAt(status))
+
+    if (req.body.status === withdrawRecordStatus.approved) {
+        await addPaymentRecordWithdrawDone(req.context, record.userId, record.amount)
+    }
+
+    if (req.body.status === withdrawRecordStatus.rejected) {
+        await req.context.mongo.addCash(record.userId, record.amount)
+        await addPaymentRecordWithdrawUnfreeze(req.context, record.userId, record.amount)
+    }
+}
+
 export const routeAuditWithdrawal = (router) => {
     router.put("/withdraw/record/:recordId", async (req, res, next) => {
-        const record = await req.context.mongo.getWithdrawRecord(req.params.recordId)
-        if (record === null) {
-            throw new NotFound()
-        }
+        await auditWithdrawal(req, req.params.recordId, req.body.status, req.body.remark)
 
-        if (!checkStatus(req.body.status, record.status)) {
-            console.log(`audit withdrawal, invalid input status ${req.body.status} for record ${JSON.stringify(record)}`)
-            throw new InvalidArgument()
-        }
+        res.tkResponse(TKResponse.Success())
+        next()
+    })
 
-        await req.context.mongo.updateWithdrawRecord(req.params.recordId, req.body.status, req.body.remark, auditedAt(req.body.status))
-
-        if (req.body.status === withdrawRecordStatus.approved) {
-            await addPaymentRecordWithdrawDone(req.context, record.userId, record.amount)
-        }
-
-        if (req.body.status === withdrawRecordStatus.rejected) {
-            await req.context.mongo.addCash(record.userId, record.amount)
-            await addPaymentRecordWithdrawUnfreeze(req.context, record.userId, record.amount)
+    router.put("/withdraw/records", async (req, res, next) => {
+        for (const recordId of req.body.ids) {
+            await auditWithdrawal(req, recordId, req.body.status, req.body.remark)
         }
 
         res.tkResponse(TKResponse.Success())
