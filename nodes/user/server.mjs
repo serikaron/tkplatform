@@ -31,6 +31,7 @@ import {routeGetIdentification} from "./handlers/getIdentification.mjs";
 import {routeBackendPutReport} from "./handlers/backendPutReport.mjs";
 import {routeAddUserMember} from "./handlers/addUserMember.mjs";
 import {routeGetUserProfile} from "./handlers/getUserProfile.mjs";
+import {routeAlipayAccount} from "./handlers/alipayAccount.mjs";
 
 export function setup(app, {
     setup, teardown
@@ -63,6 +64,7 @@ export function setup(app, {
     routeGetIdentification(router)
     routeAddUserMember(router)
     routeGetUserProfile(router)
+    routeAlipayAccount(router)
 
     routeBackendLogin(router)
     routeBackendRegister(router)

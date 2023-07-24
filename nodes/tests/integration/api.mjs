@@ -28,7 +28,7 @@ function headers({url, body, authentication}) {
     const timestamp = Math.floor(Date.now() / 1000)
     const s = sign(url, body, timestamp, process.env.SECRET_KEY)
     // console.log(url)
-    console.log(JSON.stringify(s))
+    // console.log(JSON.stringify(s))
     return {
         timestamp,
         signature: s.signature,
@@ -110,7 +110,7 @@ export async function call2({path, query, body, authentication, method}) {
     }
     const r = await call({path, query, body, authentication, method})
     if (r.isError()) {
-        console.log(r.toString())
+        console.log(`call ERROR!!! ${r.status} - ${r.toString()}`)
         throw new ApiError(r)
     }
     return r.data

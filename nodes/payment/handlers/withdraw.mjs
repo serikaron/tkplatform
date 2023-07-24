@@ -1,7 +1,6 @@
 'use strict'
 
 import {InternalError} from "../../common/errors/00000-basic.mjs";
-import {HaveNotIdentified} from "../../common/errors/10000-user.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {NotEnoughCash} from "../../common/errors/40000-payment.mjs";
 import {now} from "../../common/utils.mjs";
@@ -41,6 +40,7 @@ const addRecordV1 = async (req, user, fee, amount) => {
         status: false,
         createdAt: now()
     }
+    await req.context.mongo.addWalletRecord(record)
 }
 
 const addRecordV2 = async (req, user, fee) => {
@@ -51,7 +51,7 @@ const addRecordV2 = async (req, user, fee) => {
         type: "帐户余额",
         method: "支付宝",
         name: user.identification.name,
-        alipayAccount: req.body.alipayAccount,
+        alipayAccount: user.alipayAccount,
         amount: req.body.amount,
         fee: fee,
         createdAt: now()
@@ -91,6 +91,11 @@ export const routeWithdraw = (router) => {
                 msg: "还未实名认证",
                 data: {}
             })
+            next()
+            return
+        }
+        if (!user.hasOwnProperty("alipayAccount") || user.alipayAccount === "") {
+            res.response({status: 200, code: -10011, msg: "未设置支付宝帐号", data: {}})
             next()
             return
         }

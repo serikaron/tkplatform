@@ -80,10 +80,10 @@ export const getMemberRecord = async ({phone, offset, limit}) => {
     })
 }
 
-export const withdraw = async (alipayAccount, amount) => {
+export const withdraw = async (amount) => {
     return await call2({
         method: "POST",
         path: '/v2/withdraw',
-        body: {alipayAccount, amount}
+        body: {amount}
     })
 }

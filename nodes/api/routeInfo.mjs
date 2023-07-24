@@ -27,6 +27,8 @@ const routeInfo = [
     {url: '/v1/user/message/:messageId', method: 'DELETE', needAuth: true, service: {baseURL: 'http://user:8080'}},
     {url: '/v1/user/identification', method: 'POST', needAuth: true, service: {baseURL: 'http://user:8080'}},
     {url: '/v1/user/identification', method: 'GET', needAuth: true, service: {baseURL: 'http://user:8080'}},
+    {url: '/v2/alipayAccount', method: 'PUT', needAuth: true, service: {baseURL: 'http://user:8080', url: '/v1/alipayAccount'}},
+    {url: '/v2/alipayAccount', method: 'GET', needAuth: true, service: {baseURL: 'http://user:8080', url: '/v1/alipayAccount'}},
     // ----- use end ----
 
     // site

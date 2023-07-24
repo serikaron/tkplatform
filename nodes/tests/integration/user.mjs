@@ -86,3 +86,18 @@ export const setIdentification = async (idNo, name) => {
         }
     })
 }
+
+export const setAlipayAccount = async (alipayAccount) => {
+    return await call2({
+        method: "PUT",
+        path: "/v2/alipayAccount",
+        body: {alipayAccount}
+    })
+}
+
+export const getAlipayAccount = async () => {
+    return await call2({
+        method: "GET",
+        path: "/v2/alipayAccount",
+    })
+}

@@ -112,6 +112,13 @@ export async function setupMongo(req) {
             await collection.users
                 .updateOne({_id}, {$set: {phone}})
         },
+        updateAlipayAccount: async (id, alipayAccount) => {
+            await collection.users
+                .updateOne(
+                    {_id: new ObjectId(id)},
+                    {$set: {alipayAccount}}
+                )
+        },
         getOverview: async (userId) => {
             return await collection.users
                 .findOne({
