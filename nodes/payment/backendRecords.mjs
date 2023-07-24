@@ -113,7 +113,8 @@ export const addPaymentRecordRice = async (context, userId, amount) => {
 
 const addPaymentRecordWithdraw = async (context, userId, fn) => {
     const wallet = await context.mongo.getWallet(userId)
-    const balance = wallet !== null && wallet.hasOwnProperty("cash") ? wallet.cash : 0
+    const balance = isNaN(Number(wallet.cash)) ? 0 : Number(wallet.cash)
+    // console.log(`wallet: ${JSON.stringify(wallet)}, balance: ${balance}`)
     await addPaymentRecord(context, userId, (record) => {
         return Object.assign(fn(record), {balance})
     })

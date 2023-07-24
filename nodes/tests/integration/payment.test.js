@@ -493,7 +493,7 @@ describe("提现测试", () => {
                 algorithm: "HS256"
             })
             await addCash(payload.id, 10000)
-            await withdraw("fakeAlipayAccount", 5000)
+            await withdraw(5000)
             const r = await getWithdrawRecord({
                 phone: payload.phone, offset: 0, limit: 1
             })
@@ -534,7 +534,7 @@ describe("提现测试", () => {
                         type: "帐户余额",
                         method: "支付宝",
                         name: userCentre.identification.name,
-                        alipayAccount: "fakeAlipayAccount",
+                        alipayAccount: "fake alipay account",
                         amount: "50.00",
                         fee: formatMoney(await getFee(5000)),
                         netAmount: formatMoney(5000 - await getFee(5000)),
@@ -601,7 +601,7 @@ describe("提现测试", () => {
                         type: "帐户余额",
                         method: "支付宝",
                         name: userCentre.identification.name,
-                        alipayAccount: "fakeAlipayAccount",
+                        alipayAccount: "fake alipay account",
                         amount: "50.00",
                         fee: formatMoney(await getFee(5000)),
                         netAmount: formatMoney(5000 - await getFee(5000)),
