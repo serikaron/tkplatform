@@ -34,7 +34,7 @@ function setupDoc(app) {
             {name: "user(用户相关)"},
             {name: "captcha(图形码)"},
         ],
-        apis: ['./api/doc/*.mjs']
+        apis: ['./nodes/api/doc/*.mjs']
     }
 
     const swaggerSpec = swaggerJsdoc(jsdocOpt)

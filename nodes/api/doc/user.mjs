@@ -902,3 +902,39 @@
  *                     qq:
  *                      type: string
  */
+
+/**
+ * @swagger
+ * /v2/alipayAccount(查询支付宝帐号):
+ *   get:
+ *     tags: ["user(用户相关)","个人中心", 'v2']
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 alipayAccount:
+ *                   type: string
+ *                   example: 没有该字段为未绑定
+ *                 name:
+ *                   type: string
+ *                   example: 没有该字段为未实名认证
+ *
+ */
+
+/**
+ * @swagger
+ * /v2/alipayAccount(设置支付宝帐号):
+ *   put:
+ *     tags: ["user(用户相关)","个人中心", "v2"]
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               alipayAccount:
+ *                 type: string
+ */

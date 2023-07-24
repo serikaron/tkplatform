@@ -318,9 +318,6 @@
  *               amount:
  *                 type: number
  *                 example: 单位分
- *               alipayAccount:
- *                 type: string
- *                 example: 支付宝帐号
  */
 
 /**
