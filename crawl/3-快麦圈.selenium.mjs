@@ -44,6 +44,7 @@ const login = async (token) => {
 }
 
 const token = await getTokenForLogin()
+console.log(`token: ${token}`)
 // await login(await getTokenForLogin())
 
 await driver.quit()
