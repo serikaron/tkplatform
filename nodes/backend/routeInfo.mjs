@@ -102,6 +102,12 @@ const routeInfo = [
             }
         }
     },
+    {
+        url: '/backend/v2/site/templates',
+        method: "GET",
+        needAuth: true,
+        service: {baseURL: "http://site:8080", url: '/v2/site/templates'}
+    },
     // ----- site end -----
 
     {

@@ -20,6 +20,7 @@ export async function setupMongo(req) {
         siteLogs: site.db.collection('siteLogs'),
         reports: site.db.collection('reports'),
         missingSites: site.db.collection("missingSites"),
+        siteTemplates: site.db.collection("siteTemplates"),
     }
     req.context.mongo = {
         client: site.client, db: site.db, collection,
@@ -264,7 +265,12 @@ export async function setupMongo(req) {
                     {_id: new ObjectId(siteId)},
                     {$set: update}
                 )
-        }
+        },
+        getSiteTemplates: async () => {
+            return await collection.siteTemplates
+                .find()
+                .toArray()
+        },
     }
 }
 

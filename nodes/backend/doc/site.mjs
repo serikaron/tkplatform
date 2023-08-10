@@ -254,3 +254,28 @@
  *               comment:
  *                 type: string
  */
+
+/**
+ * @swagger
+ * /backend/v2/site/templates(站点模板):
+ *   get:
+ *     tags: ["site(站点)", "v2"]
+ *     responses:
+ *       200:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 items:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       desc:
+ *                         type: string
+ */

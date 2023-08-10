@@ -78,6 +78,13 @@ export const updateSite = async (siteId, site) => {
     })
 }
 
+export const getSiteTemplates = async () => {
+    return await backendCall({
+        method: "GET",
+        path: "/backend/v2/site/templates",
+    })
+}
+
 // ------------  payment  ----------------
 
 export const addCash = async (userId, cash) => {

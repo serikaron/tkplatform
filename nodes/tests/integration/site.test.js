@@ -2,7 +2,7 @@
 
 // import client from "./client.json" assert {type: "json"}
 // import {runTest} from "./api.mjs";
-import {addSite, getSites} from "./backend.mjs";
+import {addSite, getSites, getSiteTemplates, updateSite} from "./backend.mjs";
 import {addUserSite, getUserSite, getUserSites} from "./site.mjs";
 
 // no concurrent
@@ -82,11 +82,12 @@ describe("添加站点", () => {
 })
 
 test.each([
-    { id: "6437d4c3b0d3db516ad9fd0d", name: "嗨推"},
-    { id: "6437d4dab0d3db516ad9fd0e", name: "新世界"},
-    { id: "643ca67884bb2a4465f4f047", name: "新日日升"},
-    { id: "643ca69884bb2a4465f4f048", name: "乐多多"},
-    { id: "643ca6b184bb2a4465f4f049", name: "快麦圈"},
+    {id: "6437d4c3b0d3db516ad9fd0d", name: "嗨推"},
+    {id: "6437d4dab0d3db516ad9fd0e", name: "新世界"},
+    {id: "643ca67884bb2a4465f4f047", name: "新日日升"},
+    {id: "643ca69884bb2a4465f4f048", name: "乐多多"},
+    {id: "643ca6b184bb2a4465f4f049", name: "快麦圈"},
+    {id: "649cf8bf7b28731043e11ddd", name: "小吉他"},
 ])("($#) 固定站点id测试", async ({id, name}) => {
     const site = JSON.parse(JSON.stringify(defaultSite))
     site.name = name
@@ -107,9 +108,53 @@ test.each([
     expect(getUserSiteRsp.site.type).toBe(id)
 
     const getUserSitesRsp = await getUserSites()
-    const userSite = getUserSitesRsp.filter(x => { return x.id === userSiteId })[0]
+    const userSite = getUserSitesRsp.filter(x => {
+        return x.id === userSiteId
+    })[0]
     expect(userSite.site.type).toBe(id)
 
     // await updateSite(siteId, {disabled: true})
     // await delUserSite(userSiteId)
+})
+
+describe("站点模板", () => {
+    const box = {}
+
+    describe("arrange", () => {
+        it("添加用户站点", async () => {
+            const site = JSON.parse(JSON.stringify(defaultSite))
+            site.name = "测试"
+            const addSiteRsp = await addSite(site)
+            const siteId = addSiteRsp.id
+            box.siteId = siteId
+            const addUserSiteRsp = await addUserSite(siteId)
+            box.userSiteId = addUserSiteRsp.id
+        })
+
+        it("准备模板", async () => {
+            const templates = await getSiteTemplates()
+            expect(templates.items.length).toBeGreaterThan(0)
+            box.siteTemplate = templates.items[0]
+        })
+    })
+
+    describe("action", () => {
+        it("修改模板", async () => {
+            await updateSite(box.siteId, {
+                template: {
+                    msg: "fake site template"
+                }
+            })
+        })
+    })
+
+    describe("assert", () => {
+        it("userSite 和 site 会相应修改", async () => {
+            const siteRsp = await getSites({offset: 0, limit: 1})
+            expect(siteRsp.items[0].template).toStrictEqual({msg: "fake site template"})
+
+            const userSiteRsp = await getUserSite(box.userSiteId)
+            expect(userSiteRsp.site.template).toStrictEqual({msg: "fake site template"})
+        })
+    })
 })
