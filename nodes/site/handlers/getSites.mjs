@@ -1,7 +1,6 @@
 'use strict'
 
 import {getValueNumber, getValueString, replaceId} from "../../common/utils.mjs";
-import {fixSiteTemplate} from "../helper.mjs";
 
 const fixRates = (site) => {
     const fix = (input) => {
@@ -22,7 +21,7 @@ const fixRates = (site) => {
 const fixSite = (site) => {
     replaceId(site)
     fixRates(site)
-    fixSiteTemplate(site)
+    // fixSiteTemplate(site)
     return site
 }
 
