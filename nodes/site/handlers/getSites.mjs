@@ -23,7 +23,6 @@ const fixSite = (site) => {
     replaceId(site)
     fixRates(site)
     fixSiteTemplate(site)
-    fixSiteTemplate(site)
     return site
 }
 
