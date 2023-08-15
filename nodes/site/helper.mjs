@@ -24,6 +24,10 @@ const fixSiteTemplate = (site) => {
         && typeof site.template === "string") {
         site.template = JSON.parse(site.template)
     }
+    if (site.hasOwnProperty("template")
+        && typeof site.template === "string") {
+        site.template = JSON.parse(site.template)
+    }
 }
 
 export const makeUserSite = async (req, userSite) => {
