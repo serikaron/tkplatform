@@ -19,7 +19,7 @@ export const addTypeToSite = (site) => {
     }
 }
 
-const fixSiteTemplate = (site) => {
+export const fixSiteTemplate = (site) => {
     if (site.hasOwnProperty("template")
         && typeof site.template === "string") {
         site.template = JSON.parse(site.template)
