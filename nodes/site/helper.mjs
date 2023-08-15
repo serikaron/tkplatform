@@ -10,11 +10,19 @@ export const addTypeToSite = (site) => {
         {id: "643ca69884bb2a4465f4f048", name: "乐多多"},
         {id: "643ca6b184bb2a4465f4f049", name: "快麦圈"},
         {id: "649cf8bf7b28731043e11ddd", name: "小吉他"},
+        // {id: "64d9f25a922c9ae01177b51e", name: "抖佣"},
     ]
 
     const l = preset.filter(x => x.name === site.name)
     if (l.length > 0) {
         site.type = l[0].id
+    }
+}
+
+const fixSiteTemplate = (site) => {
+    if (site.hasOwnProperty("template")
+        && typeof site.template === "string") {
+        site.template = JSON.parse(site.template)
     }
 }
 
@@ -32,6 +40,7 @@ export const makeUserSite = async (req, userSite) => {
         site.id = site._id
         delete site._id
         addTypeToSite(site)
+        fixSiteTemplate(site)
         Object.assign(userSite.site, site)
         // userSite.site = site
         console.log(`updated site: ${JSON.stringify(site)}`)
