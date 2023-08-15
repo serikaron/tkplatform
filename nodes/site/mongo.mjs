@@ -4,7 +4,6 @@ import * as dotenv from 'dotenv'
 import {connectSite} from "../common/mongo.mjs";
 import {ObjectId} from "mongodb";
 import {now} from "../common/utils.mjs";
-import {fixSiteTemplate} from "./helper.mjs";
 
 dotenv.config()
 
@@ -31,18 +30,14 @@ export async function setupMongo(req) {
                 const regex = `.*${keyword}.*`
                 filter.name = {$regex: regex}
             }
-            const r = await collection.sites.find(filter)
+            return await collection.sites.find(filter)
                 .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
-            r.forEach(x => fixSiteTemplate(x))
-            return r
         },
         getSite: async objectId => {
-            const r = await collection.sites.findOne({_id: objectId})
-            fixSiteTemplate(r)
-            return r
+            return await collection.sites.findOne({_id: objectId})
         },
         searchSite: async (keyword, offset, limit) => {
             const regex = `.*${keyword}.*`
@@ -56,17 +51,14 @@ export async function setupMongo(req) {
                 .skip(offset)
                 .limit(limit)
                 .toArray()
-            l.forEach(x => fixSiteTemplate(x))
             return {total: c, list: l}
         },
         getSitesForBackend: async (offset, limit) => {
-            const r = await collection.sites.find()
+            return await collection.sites.find()
                 .sort({_id: -1})
                 .skip(offset)
                 .limit(limit)
                 .toArray()
-            r.forEach(x => fixSiteTemplate(x))
-            return r
         },
         countSitesForBackend: async () => {
             return await collection.sites
