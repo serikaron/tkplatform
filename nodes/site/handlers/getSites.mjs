@@ -22,7 +22,7 @@ const fixRates = (site) => {
 const fixSite = (site) => {
     replaceId(site)
     fixRates(site)
-    // fixSiteTemplate(site)
+    fixSiteTemplate(site)
     return site
 }
 
@@ -33,10 +33,7 @@ const getUserSites = router => {
         const keyword = getValueString(req.query, "keyword", null)
         const sites = await req.context.mongo.getSites(offset, limit, keyword)
         res.response({
-            data: sites.map(fixSite).map(x => {
-                fixSiteTemplate(x)
-                return x
-            })
+            data: sites.map(fixSite)
         })
         next()
     })
