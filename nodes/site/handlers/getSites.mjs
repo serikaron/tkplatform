@@ -74,6 +74,4 @@ const getBackendSites = router => {
 export function routeGetSite(router) {
     getUserSites(router)
     getBackendSites(router)
-    // route(router, '/sites', {usingDisable: 1})
-    // route(router, '/backend/sites', {})
 }
