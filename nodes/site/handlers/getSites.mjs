@@ -1,6 +1,7 @@
 'use strict'
 
 import {getValueNumber, getValueString, replaceId} from "../../common/utils.mjs";
+import {fixSiteTemplate} from "../helper.mjs";
 
 const fixRates = (site) => {
     const fix = (input) => {
@@ -32,7 +33,10 @@ const getUserSites = router => {
         const keyword = getValueString(req.query, "keyword", null)
         const sites = await req.context.mongo.getSites(offset, limit, keyword)
         res.response({
-            data: sites.map(fixSite)
+            data: sites.map(fixSite).map(x => {
+                fixSiteTemplate(x)
+                return x
+            })
         })
         next()
     })
