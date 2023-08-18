@@ -22,7 +22,7 @@ const fixRates = (site) => {
 const fixSite = (site) => {
     replaceId(site)
     fixRates(site)
-    fixSiteTemplate(site)
+    // fixSiteTemplate(site)
     return site
 }
 
@@ -33,7 +33,10 @@ const getUserSites = router => {
         const keyword = getValueString(req.query, "keyword", null)
         const sites = await req.context.mongo.getSites(offset, limit, keyword)
         res.response({
-            data: sites.map(fixSite)
+            data: sites.map(fixSite).map(x => {
+                fixSiteTemplate(x)
+                return x
+            })
         })
         next()
     })
@@ -54,6 +57,13 @@ const getBackendSites = router => {
                     total: count,
                     offset, limit,
                     items: sites.map(fixSite)
+                        .map(site => {
+                            if (site.hasOwnProperty("template")
+                                && typeof site.template === "string") {
+                                site.template = JSON.parse(site.template)
+                            }
+                            return site
+                        })
                 }
             })
         } else {
@@ -64,6 +74,13 @@ const getBackendSites = router => {
                     total: r.total,
                     offset, limit,
                     items: r.list.map(fixSite)
+                        .map(site => {
+                            if (site.hasOwnProperty("template")
+                                && typeof site.template === "string") {
+                                site.template = JSON.parse(site.template)
+                            }
+                            return site
+                        })
                 }
             })
         }
