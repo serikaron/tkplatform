@@ -11,6 +11,7 @@ export const addTypeToSite = (site) => {
         {id: "643ca6b184bb2a4465f4f049", name: "快麦圈"},
         {id: "649cf8bf7b28731043e11ddd", name: "小吉他"},
         // {id: "64d9f25a922c9ae01177b51e", name: "抖佣"},
+        // {id: "64e0633c56306b5d4f84927c", name: "云单仓"},
     ]
 
     const l = preset.filter(x => x.name === site.name)
