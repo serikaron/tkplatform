@@ -6,9 +6,8 @@ import {
     addPaymentRecordWithdrawUnfreeze,
     withdrawRecordStatus
 } from "../backendRecords.mjs";
-import {addCash} from "../../tests/integration/backend.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {now} from "../../common/utils.mjs";
+import {now, parseMoney} from "../../common/utils.mjs";
 
 
 const checkStatus = (inputStatus, recordStatus) => {
@@ -52,7 +51,7 @@ const auditWithdrawal = async (req, recordId, status, remark) => {
     }
 
     if (req.body.status === withdrawRecordStatus.rejected) {
-        await req.context.mongo.addCash(record.userId, record.amount)
+        await req.context.mongo.addCash(record.userId, parseMoney(record.amount))
         await addPaymentRecordWithdrawUnfreeze(req.context, record.userId, record.amount)
     }
 }
