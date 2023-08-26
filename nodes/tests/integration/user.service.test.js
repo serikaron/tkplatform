@@ -443,7 +443,7 @@ describe("test user service", () => {
                             identified: false,
                             notice: [],
                             wallet: {
-                                cash: 0,
+                                cash: "0.00",
                                 rice: 0,
                                 invitePoint: 0
                             }

@@ -1,6 +1,7 @@
 'use strict'
 import {InternalError} from "../common/errors/00000-basic.mjs";
 import {recordTypeMember, recordTypeRice} from "./itemType.mjs";
+import {now} from "../common/utils.mjs";
 
 const buildWalletRecord = async (req, log, recordSubItemBuilder) => {
     const userRsp = await req.context.stubs.user.getUser(log.userId)
@@ -26,7 +27,8 @@ export const memberRecordBuilder = async (record, req, log) => {
     record.member = {
         title: log.item.title,
         price: priceNum,
-        remainDays: log.days,
+        remainDays: log.item.days,
+        createdAt: now(),
     }
 }
 export const riceRecordBuilder = async (record, req, log) => {
@@ -35,7 +37,8 @@ export const riceRecordBuilder = async (record, req, log) => {
     record.rice = {
         title: log.item.title,
         price: priceNum,
-        remainDays: log.days,
+        remainDays: log.item.days,
+        createdAt: now(),
     }
 }
 export const addWalletRecord = async (req, log, builder) => {
