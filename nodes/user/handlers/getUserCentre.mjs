@@ -1,6 +1,7 @@
 'use strict'
 
 import {TKResponse} from "../../common/TKResponse.mjs";
+import {formatMoney} from "../../common/utils.mjs";
 
 export const routeGetUserCentre = router => {
     router.get('/user/centre', async (req, res, next) => {
@@ -19,6 +20,8 @@ export const routeGetUserCentre = router => {
         } else {
             centre.wallet = walletRsp.data
         }
+
+        centre.wallet.cash = formatMoney(centre.wallet.cash)
 
         res.tkResponse(TKResponse.Success({data: centre}))
 

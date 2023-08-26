@@ -3,7 +3,7 @@
 import JSSoup from "jssoup"
 import FormData from "form-data";
 import chrome from 'selenium-webdriver/chrome.js'
-import { Builder, By, Key, until } from 'selenium-webdriver';
+import {Builder, By, Key, until} from 'selenium-webdriver';
 
 
 const Soup = JSSoup.default
@@ -22,8 +22,8 @@ const driver = new Builder()
     .setChromeOptions(options)
     .build();
 
-const getTokenForLogin = async () => {
-    await driver.get("http://m.kmq999.com/login")
+const getTokenForLogin = async (host) => {
+    await driver.get(`${host}/login`)
     const page = await driver.getPageSource()
     const soup = new Soup(page)
     return soup.find("head")
@@ -43,8 +43,63 @@ const login = async (token) => {
     // console.log(r.data)
 }
 
-const token = await getTokenForLogin()
-console.log(`token: ${token}`)
-// await login(await getTokenForLogin())
+const hostList = [
+    "http://m.dzg003.com",
+    "http://m.jst001.com",
+    "http://m.mdd161.com",
+    "http://m.xty001.com",
+    "http://m.xlw8888.com",
+    "http://m2.tzg8888.com",
+]
+
+for (const host of hostList) {
+    try {
+        const token = await getTokenForLogin(host)
+        console.log(`host: ${host}, token: ${token}`)
+        // await login(await getTokenForLogin())
+    } catch {
+        console.log(`FAILED!!! host: ${host}`)
+    }
+}
 
 await driver.quit()
+
+const j1 = {
+    "loginPageURL": "http://m.kmq999.com/login",
+    "loginURL": "http://m.kmq999.com/login",
+    "loginParams": [
+        "_token",
+        "phone",
+        "password",
+        "captcha"
+    ],
+    "getAccountPageURL": "http://m.kmq999.com/app/buyer/index",
+    "getAccountURL": "http://m.kmq999.com/app/buyer/tasks/step1",
+    "getTaskURL": "http://m.kmq999.com/app/buyer/tasks/has_order",
+    "balanceURL": "http://m.kmq999.com/app/center/cash",
+    "withdrawURL": "http://m.kmq999.com/app/center/cash",
+    "withdrawParams": [
+        "coin",
+        "sum"
+    ]
+}
+
+const j2 = {
+    "loginPageURL": "http://m.xyw009.com/login",
+    "loginURL": "http://m.xyw009.com/login",
+    "loginParams": [
+        "_token",
+        "phone",
+        "password",
+        "captcha"
+    ],
+    "getAccountPageURL": "http://m.xyw009.com/app/buyer/index",
+    "getAccountURL": "http://m.xyw009.com/app/buyer/tasks/step1",
+    "getTaskURL": "http://m.xyw009.com/app/buyer/tasks/has_order",
+    "balanceURL": "http://m.xyw009.com/app/center/cash",
+    "withdrawURL": "http://m.xyw009.com/app/center/cash",
+    "withdrawParams": [
+        "coin",
+        "sum"
+    ]
+}
