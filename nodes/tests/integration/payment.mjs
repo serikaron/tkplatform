@@ -41,10 +41,11 @@ export const getRiceItems = async () => {
     })
 }
 
-export const getWalletOverview = async () => {
+export const getWalletOverview = async (authentication) => {
     return await call2({
         method: "GET",
-        path: "/v1/wallet/overview"
+        path: "/v1/wallet/overview",
+        authentication
     })
 }
 

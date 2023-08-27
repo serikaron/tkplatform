@@ -7,7 +7,7 @@ import {
     withdrawRecordStatus
 } from "../backendRecords.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
-import {now, parseMoney} from "../../common/utils.mjs";
+import {now} from "../../common/utils.mjs";
 
 
 const checkStatus = (inputStatus, recordStatus) => {
@@ -46,12 +46,15 @@ const auditWithdrawal = async (req, recordId, status, remark) => {
 
     await req.context.mongo.updateWithdrawRecord(recordId, status, remark, auditedAt(status))
 
+    // console.log(`audit record: ${JSON.stringify(record)}`)
+
     if (req.body.status === withdrawRecordStatus.approved) {
+        await req.context.mongo.incWithdraw(record.userId, record.amount)
         await addPaymentRecordWithdrawDone(req.context, record.userId, record.amount)
     }
 
     if (req.body.status === withdrawRecordStatus.rejected) {
-        await req.context.mongo.addCash(record.userId, parseMoney(record.amount))
+        await req.context.mongo.addCash(record.userId, record.amount)
         await addPaymentRecordWithdrawUnfreeze(req.context, record.userId, record.amount)
     }
 }

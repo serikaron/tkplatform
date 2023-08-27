@@ -2,13 +2,16 @@
 
 import {token} from "./token.mjs";
 import {
-    getMemberItems, getMemberRecord,
+    getMemberItems,
+    getMemberRecord,
     getPaymentRecord,
     getRiceItems,
     getRiceRecord,
     getWallet,
     getWalletOverview,
-    payMember, payRice, withdraw
+    payMember,
+    payRice,
+    withdraw
 } from "./payment.mjs";
 import {
     getAlipayAccount,
@@ -18,13 +21,7 @@ import {
     setAlipayAccount,
     setIdentification
 } from "./user.mjs";
-import {
-    addCash,
-    auditWithdrawals,
-    getCommissionConfig,
-    getWithdrawFee,
-    getWithdrawRecord
-} from "./backend.mjs";
+import {addCash, auditWithdrawals, getCommissionConfig, getWithdrawFee, getWithdrawRecord} from "./backend.mjs";
 import {formatMoney, now, parseMoney} from "../../common/utils.mjs";
 import jwt from "jsonwebtoken";
 
@@ -45,16 +42,18 @@ describe("购买会员", () => {
         test("查询钱包总览", async () => {
             const r = await getWalletOverview()
             box.walletOverview = {
-                recharge: r.recharge,
+                recharge: parseMoney(r.recharge),
                 rechargeCount: r.rechargeCount
             }
         })
 
         test("查询上线", async () => {
             box.cash = []
+            box.income = []
             for (const i in token.upLines) {
-                const r = await getWallet(token.upLines[i])
-                box.cash.push(r.hasOwnProperty("cash") ? r.cash : 0)
+                const r = await getWalletOverview(token.upLines[i])
+                box.cash.push(r.hasOwnProperty("cash") ? parseMoney(r.cash) : 0)
+                box.income.push(r.hasOwnProperty("income") ? parseMoney(r.income) : 0)
             }
         })
 
@@ -112,7 +111,7 @@ describe("购买会员", () => {
 
         test("检查钱包总览", async () => {
             const r = await getWalletOverview()
-            expect(r.recharge).toBe(box.walletOverview.recharge + Number(box.item.price) * 100)
+            expect(r.recharge).toBe(formatMoney(box.walletOverview.recharge + Number(box.item.price) * 100))
             expect(r.rechargeCount).toBe(box.walletOverview.rechargeCount + 1)
         })
 
@@ -123,8 +122,9 @@ describe("购买会员", () => {
         test("检查上线分成", async () => {
             // 只检查三级分成，按人数的加成没检查
             for (const i in token.upLines) {
-                const r = await getWallet(token.upLines[i])
-                expect(r.cash).toBe(box.cash[i] + parseMoney(commissionOfLevel(i)))
+                const r = await getWalletOverview(token.upLines[i])
+                expect(r.cash).toBe(formatMoney(box.cash[i] + parseMoney(commissionOfLevel(i))))
+                expect(r.income).toBe(formatMoney(box.income[i] + parseMoney(commissionOfLevel([i]))))
             }
         })
 
@@ -225,7 +225,7 @@ describe("购买米粒", () => {
         test("查询用户钱包", async () => {
             const r = await getWalletOverview()
             box.walletOverview = {
-                recharge: r.recharge,
+                recharge: parseMoney(r.recharge),
                 rechargeCount: r.rechargeCount
             }
             const r1 = await getWallet()
@@ -234,9 +234,11 @@ describe("购买米粒", () => {
 
         test("查询上线", async () => {
             box.cash = []
+            box.income = []
             for (const i in token.upLines) {
-                const r = await getWallet(token.upLines[i])
-                box.cash.push(r.hasOwnProperty("cash") ? r.cash : 0)
+                const r = await getWalletOverview(token.upLines[i])
+                box.cash.push(r.hasOwnProperty("cash") ? parseMoney(r.cash) : 0)
+                box.income.push(r.hasOwnProperty("income") ? parseMoney(r.income) : 0)
             }
         })
 
@@ -293,7 +295,7 @@ describe("购买米粒", () => {
 
         test("检查用户钱包", async () => {
             const r = await getWalletOverview()
-            expect(r.recharge).toBe(box.walletOverview.recharge + Number(box.item.price) * 100)
+            expect(r.recharge).toBe(formatMoney(box.walletOverview.recharge + Number(box.item.price) * 100))
             expect(r.rechargeCount).toBe(box.walletOverview.rechargeCount + 1)
             const r1 = await getWallet()
             expect(r1.rice).toBe(box.rice + box.item.rice)
@@ -306,8 +308,9 @@ describe("购买米粒", () => {
         test("检查上线分成", async () => {
             // 只检查三级分成，按人数的加成没检查
             for (const i in token.upLines) {
-                const r = await getWallet(token.upLines[i])
-                expect(r.cash).toBe(box.cash[i] + parseMoney(commissionOfLevel(i)))
+                const r = await getWalletOverview(token.upLines[i])
+                expect(r.cash).toBe(formatMoney(box.cash[i] + parseMoney(commissionOfLevel(i))))
+                expect(r.income).toBe(formatMoney(box.income[i] + parseMoney(commissionOfLevel([i]))))
             }
         })
 
@@ -411,8 +414,7 @@ describe("提现测试", () => {
                     algorithm: "HS256"
                 })
                 await addCash(payload.id, 10000)
-                const wallet = await getWallet()
-                box.cash = wallet.cash
+                box.wallet = await getWalletOverview()
             })
 
             it("实名认证", async () => {
@@ -474,7 +476,7 @@ describe("提现测试", () => {
                     type: 2,
                     category: "提现冻结",
                     outcome: "50.00",
-                    balance: formatMoney(box.cash - 5000),
+                    balance: formatMoney(parseMoney(box.wallet.cash) - 5000),
                     remark: "申请提现，冻结金额"
                 })
             })
@@ -482,6 +484,13 @@ describe("提现测试", () => {
             it("检查支付宝帐号", async () => {
                 const r = await getAlipayAccount()
                 expect(r.alipayAccount).toBe("fake alipay account")
+            })
+
+            it("检查钱包", async () => {
+                const wallet = await getWalletOverview()
+                expect(wallet.cash).toBe(formatMoney(parseMoney(box.wallet.cash) - 5000))
+                expect(wallet.income).toBe(box.wallet.income)
+                expect(wallet.withdraw).toBe(box.wallet.withdraw)
             })
         })
     })
@@ -505,7 +514,7 @@ describe("提现测试", () => {
             it("arrange", async () => {
                 box.recordId = await prepare()
                 box.auditedAt = now()
-                box.cash = (await getWallet()).cash
+                box.wallet = await getWalletOverview()
             })
 
             it("act", async () => {
@@ -561,9 +570,16 @@ describe("提现测试", () => {
                         type: 2,
                         category: "提现成功扣除",
                         outcome: "50.00",
-                        balance: formatMoney(box.cash),
+                        balance: box.wallet.cash,
                         remark: "提现成功，扣款金额"
                     })
+                })
+
+                it("检查钱包", async () => {
+                    const wallet = await getWalletOverview()
+                    expect(wallet.cash).toBe(box.wallet.cash)
+                    expect(wallet.income).toBe(box.wallet.income)
+                    expect(wallet.withdraw).toBe(formatMoney(parseMoney(box.wallet.withdraw) + 5000))
                 })
             })
         })
@@ -572,7 +588,7 @@ describe("提现测试", () => {
             it("arrange", async () => {
                 box.recordId = await prepare()
                 box.auditedAt = now()
-                box.cash = (await getWallet()).cash
+                box.wallet = await getWalletOverview()
             })
 
             it("act", async () => {
@@ -628,9 +644,16 @@ describe("提现测试", () => {
                         type: 1,
                         category: "提现解冻",
                         income: "50.00",
-                        balance: formatMoney(box.cash + 5000),
+                        balance: formatMoney(parseMoney(box.wallet.cash) + 5000),
                         remark: "提现失败，解冻金额"
                     })
+                })
+
+                it("检查钱包", async () => {
+                    const wallet = await getWalletOverview()
+                    expect(wallet.cash).toBe(formatMoney(parseMoney(box.wallet.cash) + 5000))
+                    expect(wallet.income).toBe(box.wallet.income)
+                    expect(wallet.withdraw).toBe(box.wallet.withdraw)
                 })
             })
         })

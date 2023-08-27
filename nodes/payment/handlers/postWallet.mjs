@@ -20,6 +20,7 @@ export const routePostWallet = router => {
         }
 
         await req.context.mongo.addCash(req.body.userId, cash)
+        await req.context.mongo.incIncome(req.body.userId, cash)
         await addPaymentRecordAdmin(req.context, req.body.userId, cash)
 
         res.tkResponse(TKResponse.Success())

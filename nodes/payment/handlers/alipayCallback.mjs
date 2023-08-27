@@ -125,6 +125,7 @@ const buildCommissionInfo = async (req, userId, price, settings) => {
 const addCommissionCash = async (req, info) => {
     for (const x of info.upLines) {
         await req.context.mongo.addCash(x.upLine.id, x.commission)
+        await req.context.mongo.incIncome(x.upLine.id, x.commission)
     }
 }
 

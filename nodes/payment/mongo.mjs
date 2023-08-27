@@ -52,11 +52,17 @@ export async function setupMongo(req) {
         addCash: async (userId, cash) => {
             await updateWallet(collection.wallets, userId, {cash})
         },
+        incIncome: async (userId, income) => {
+            await updateWallet(collection.wallets, userId, {"accumulated.income": income})
+        },
         incRecharge: async (userId, amount) => {
             await updateWallet(collection.wallets, userId, {
                 "accumulated.rechargeCount": 1,
                 "accumulated.recharge": amount
             })
+        },
+        incWithdraw: async (userId, amount) => {
+            await updateWallet(collection.wallets, userId, {"accumulated.withdraw": amount})
         },
         addPayLog: async (userId, amount, itemType, item) => {
             const r = await collection.payLogs
