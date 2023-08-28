@@ -49,7 +49,7 @@ export const routeGetWalletOverview = router => {
             rechargeCount: 0,
         }
         Object.assign(data, wallet === null ? {} : wallet.accumulated)
-        data.cash = formatMoney(data.cash)
+        // data.cash = formatMoney(data.cash)
         data.income = formatMoney(data.income)
         data.recharge = formatMoney(data.recharge)
         data.withdraw = formatMoney(data.withdraw)

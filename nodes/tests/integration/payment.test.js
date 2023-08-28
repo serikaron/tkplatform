@@ -52,7 +52,7 @@ describe("购买会员", () => {
             box.income = []
             for (const i in token.upLines) {
                 const r = await getWalletOverview(token.upLines[i])
-                box.cash.push(r.hasOwnProperty("cash") ? parseMoney(r.cash) : 0)
+                box.cash.push(r.hasOwnProperty("cash") ? r.cash : 0)
                 box.income.push(r.hasOwnProperty("income") ? parseMoney(r.income) : 0)
             }
         })
@@ -123,7 +123,7 @@ describe("购买会员", () => {
             // 只检查三级分成，按人数的加成没检查
             for (const i in token.upLines) {
                 const r = await getWalletOverview(token.upLines[i])
-                expect(r.cash).toBe(formatMoney(box.cash[i] + parseMoney(commissionOfLevel(i))))
+                expect(r.cash).toBe(box.cash[i] + parseMoney(commissionOfLevel(i)))
                 expect(r.income).toBe(formatMoney(box.income[i] + parseMoney(commissionOfLevel([i]))))
             }
         })
@@ -237,7 +237,7 @@ describe("购买米粒", () => {
             box.income = []
             for (const i in token.upLines) {
                 const r = await getWalletOverview(token.upLines[i])
-                box.cash.push(r.hasOwnProperty("cash") ? parseMoney(r.cash) : 0)
+                box.cash.push(r.hasOwnProperty("cash") ? r.cash : 0)
                 box.income.push(r.hasOwnProperty("income") ? parseMoney(r.income) : 0)
             }
         })
@@ -309,7 +309,7 @@ describe("购买米粒", () => {
             // 只检查三级分成，按人数的加成没检查
             for (const i in token.upLines) {
                 const r = await getWalletOverview(token.upLines[i])
-                expect(r.cash).toBe(formatMoney(box.cash[i] + parseMoney(commissionOfLevel(i))))
+                expect(r.cash).toBe(box.cash[i] + parseMoney(commissionOfLevel(i)))
                 expect(r.income).toBe(formatMoney(box.income[i] + parseMoney(commissionOfLevel([i]))))
             }
         })
@@ -476,7 +476,7 @@ describe("提现测试", () => {
                     type: 2,
                     category: "提现冻结",
                     outcome: "50.00",
-                    balance: formatMoney(parseMoney(box.wallet.cash) - 5000),
+                    balance: formatMoney(box.wallet.cash - 5000),
                     remark: "申请提现，冻结金额"
                 })
             })
@@ -488,7 +488,7 @@ describe("提现测试", () => {
 
             it("检查钱包", async () => {
                 const wallet = await getWalletOverview()
-                expect(wallet.cash).toBe(formatMoney(parseMoney(box.wallet.cash) - 5000))
+                expect(wallet.cash).toBe(box.wallet.cash - 5000)
                 expect(wallet.income).toBe(box.wallet.income)
                 expect(wallet.withdraw).toBe(box.wallet.withdraw)
             })
@@ -570,7 +570,7 @@ describe("提现测试", () => {
                         type: 2,
                         category: "提现成功扣除",
                         outcome: "50.00",
-                        balance: box.wallet.cash,
+                        balance: formatMoney(box.wallet.cash),
                         remark: "提现成功，扣款金额"
                     })
                 })
@@ -644,14 +644,14 @@ describe("提现测试", () => {
                         type: 1,
                         category: "提现解冻",
                         income: "50.00",
-                        balance: formatMoney(parseMoney(box.wallet.cash) + 5000),
+                        balance: formatMoney(box.wallet.cash + 5000),
                         remark: "提现失败，解冻金额"
                     })
                 })
 
                 it("检查钱包", async () => {
                     const wallet = await getWalletOverview()
-                    expect(wallet.cash).toBe(formatMoney(parseMoney(box.wallet.cash) + 5000))
+                    expect(wallet.cash).toBe(box.wallet.cash + 5000)
                     expect(wallet.income).toBe(box.wallet.income)
                     expect(wallet.withdraw).toBe(box.wallet.withdraw)
                 })
