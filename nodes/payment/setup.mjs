@@ -13,6 +13,7 @@ import {routeGetRecords} from "./handlers/getRecords.mjs";
 import {routeWithdraw} from "./handlers/withdraw.mjs";
 import {routeAuditWithdrawal} from "./handlers/auditWithdrawal.mjs";
 import {routeAddBackendRecord} from "./handlers/addBackendRecord.mjs";
+import {routeGetWithdrawRecords} from "./handlers/getWithdrawRecords.mjs";
 
 export function setup(app, {setup, teardown}) {
     const router = express.Router()
@@ -38,5 +39,6 @@ export function setup(app, {setup, teardown}) {
     routeWithdraw(routerV2)
     routeAuditWithdrawal(routerV2)
     routeAddBackendRecord(routerV2)
+    routeGetWithdrawRecords(routerV2)
     teardown(routerV2)
 }

@@ -91,9 +91,10 @@ const makeHandler = (collectionName, mapFn) => {
         }
         makeFilter()
 
-        console.log(`filter: ${JSON.stringify(filter)}`)
+        // console.log(`filter: ${JSON.stringify(filter)}`)
 
         const r = await req.context.mongo.getRecords(collectionName, offset, limit, filter)
+        // console.log(`get records: ${JSON.stringify(r)}`)
 
         res.tkResponse(TKResponse.Success({
             data: {

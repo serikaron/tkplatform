@@ -81,6 +81,15 @@ export const getMemberRecord = async ({phone, offset, limit}) => {
     })
 }
 
+export const getWithdrawRecordsApp = async ({offset, limit, authentication}) => {
+    return await call2({
+        method: "GET",
+        path: '/v1/wallet/withdraw/records',
+        query: {offset, limit},
+        authentication
+    })
+}
+
 export const withdraw = async (amount) => {
     return await call2({
         method: "POST",

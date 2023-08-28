@@ -223,7 +223,8 @@ const routeInfo = [
         url: "/v1/wallet/withdraw/records",
         method: "GET",
         needAuth: true,
-        service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/withdraw/records"}
+        // service: {baseURL: "http://apid:9010", url: "/v1/api/user/wallet/withdraw/records"}
+        service: {baseURL: "http://payment:8080", url: "/v2/wallet/withdraw/records"}
     },
     {
         url: '/v1/wallet/recharge',

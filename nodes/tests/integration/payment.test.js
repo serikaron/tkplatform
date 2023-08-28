@@ -8,7 +8,7 @@ import {
     getRiceItems,
     getRiceRecord,
     getWallet,
-    getWalletOverview,
+    getWalletOverview, getWithdrawRecordsApp,
     payMember,
     payRice,
     withdraw
@@ -510,7 +510,10 @@ describe("提现测试", () => {
         }
 
         describe("通过", () => {
-            const box = {}
+            const box = {
+                startTime: now()
+            }
+
             it("arrange", async () => {
                 box.recordId = await prepare()
                 box.auditedAt = now()
@@ -552,6 +555,21 @@ describe("提现测试", () => {
                     })
                 })
 
+                it("检查提现记录（客户端）", async () => {
+                    const r = await getWithdrawRecordsApp({offset: 0, limit: 1})
+
+                    const record = r.items[0]
+                    expect(record.createdAt).toBeGreaterThanOrEqual(box.startTime)
+                    expect(record.createdAt).toBeLessThanOrEqual(now())
+                    delete record.createdAt
+                    expect(record).toStrictEqual({
+                        amount: 5000,
+                        fee: await getFee(5000),
+                        comment: "同意",
+                        status: true
+                    })
+                })
+
                 it("检查资金明细", async () => {
                     const overview = await getOverview()
                     const r = await getPaymentRecord({
@@ -584,7 +602,9 @@ describe("提现测试", () => {
             })
         })
         describe("驳回", () => {
-            const box = {}
+            const box = {
+                startTime: now()
+            }
             it("arrange", async () => {
                 box.recordId = await prepare()
                 box.auditedAt = now()
@@ -623,6 +643,21 @@ describe("提现测试", () => {
                         netAmount: formatMoney(5000 - await getFee(5000)),
                         status: 3,
                         remark: "驳回"
+                    })
+                })
+
+                it("检查提现记录（客户端）", async () => {
+                    const r = await getWithdrawRecordsApp({offset: 0, limit: 1})
+
+                    const record = r.items[0]
+                    expect(record.createdAt).toBeGreaterThanOrEqual(box.startTime)
+                    expect(record.createdAt).toBeLessThanOrEqual(now())
+                    delete record.createdAt
+                    expect(record).toStrictEqual({
+                        amount: 5000,
+                        fee: await getFee(5000),
+                        comment: "驳回",
+                        status: false
                     })
                 })
 
