@@ -1,6 +1,6 @@
 'use strict'
 
-import {InternalError} from "../../common/errors/00000-basic.mjs";
+import {InternalError, InvalidArgument} from "../../common/errors/00000-basic.mjs";
 import {TKResponse} from "../../common/TKResponse.mjs";
 import {NotEnoughCash} from "../../common/errors/40000-payment.mjs";
 import {now} from "../../common/utils.mjs";
@@ -69,6 +69,12 @@ export const routeWithdraw = (router) => {
         // if (r.isError()) {
         //     throw new InternalError()
         // }
+
+        const amount = Number(req.body.amount)
+        if (isNaN(amount)) {
+            throw new InvalidArgument()
+        }
+        req.body.amount = amount
 
         await freeze(req)
 

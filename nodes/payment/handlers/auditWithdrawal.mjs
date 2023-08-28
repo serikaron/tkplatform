@@ -46,7 +46,7 @@ const auditWithdrawal = async (req, recordId, status, remark) => {
 
     await req.context.mongo.updateWithdrawRecord(recordId, status, remark, auditedAt(status))
 
-    // console.log(`audit record: ${JSON.stringify(record)}`)
+    console.log(`audit record: ${JSON.stringify(record)}`)
 
     if (req.body.status === withdrawRecordStatus.approved) {
         await req.context.mongo.incWithdraw(record.userId, record.amount)

@@ -431,7 +431,7 @@ describe("提现测试", () => {
 
         describe("act", () => {
             it("提现申请", async () => {
-                await withdraw(5000)
+                await withdraw("5000")
             })
         })
 
@@ -502,7 +502,7 @@ describe("提现测试", () => {
                 algorithm: "HS256"
             })
             await addCash(payload.id, 10000)
-            await withdraw(5000)
+            await withdraw("5000")
             const r = await getWithdrawRecord({
                 phone: payload.phone, offset: 0, limit: 1
             })
